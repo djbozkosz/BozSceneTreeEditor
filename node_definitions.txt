@@ -1,0 +1,7 @@
+0x4c53 SceneRoot has_childs []
+0x0001 FileInfo [Hex32 : Version, String : Description, Hex8 : Unknown]
+0xafff FileParams1 [Hex16 : Unknown, Hex16 : Unknown, Hex32 : Unknown]
+0x3200 FileParams2 [Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown]
+0x3010 CameraFov [Float : CameraFov]
+0x3011 DrawDistance [Float : DrawDistance]
+0x3211 ClippingRange [Float : Near, Float : Far]
