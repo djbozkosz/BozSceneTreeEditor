@@ -10,19 +10,28 @@ namespace Djbozkosz {
 namespace Application {
 namespace Scene
 {
+	class SceneNodeDefinitions;
+	class SceneNode;
+
+
 	sealed class SceneTree
 	{
 		private: // members
 
+		SceneNodeDefinitions* m_NodeDefinitions;
+		SceneNode*            m_Root;
+
 		public: // methods
 
-		SceneTree(const QString& file = QString());
+		SceneTree(SceneNodeDefinitions* nodeDefinitions, const QString& file = QString());
 		virtual ~SceneTree();
 
 		private: // methods
 
+		void DeleteTree();
+
 		bool Load(const QString& file);
-		bool Save(const QString& file);
+		bool Save(const QString& file) const;
 	};
 }}}
 

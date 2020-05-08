@@ -11,6 +11,7 @@ namespace Application {
 namespace Scene
 {
 	class SceneTree;
+	class SceneNodeDefinitions;
 }
 
 
@@ -22,7 +23,7 @@ namespace Scene
 
 		public: // methods
 
-		Document(const QString& file = QString());
+		Document(Scene::SceneNodeDefinitions* nodeDefinitions, const QString& file = QString());
 		virtual ~Document();
 	};
 }}

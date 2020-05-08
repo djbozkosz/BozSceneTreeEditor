@@ -5,9 +5,9 @@
 using namespace Djbozkosz::Application;
 
 
-Document::Document(const QString& file)
+Document::Document(Scene::SceneNodeDefinitions* nodeDefinitions, const QString& file)
 {
-	m_Tree = new Scene::SceneTree(file);
+	m_Tree = new Scene::SceneTree(nodeDefinitions, file);
 }
 
 Document::~Document()

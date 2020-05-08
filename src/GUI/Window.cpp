@@ -29,11 +29,13 @@ Window::~Window()
 
 void Window::OpenFile()
 {
-	auto file = QFileDialog::getOpenFileName(this, "Open file", "C:\\Hry\\Mafia\\missions", "scene2.bin");
+	/*auto file = QFileDialog::getOpenFileName(this, "Open file", "C:\\Hry\\Mafia\\missions", "scene2.bin");
 	if (file.isEmpty() == true)
 		return;
 
-	emit FileOpened(file);
+	emit FileOpened(file);*/
+
+	emit FileOpened("C:\\Hry\\Mafia\\missions\\00menu\\scene2.bin");
 }
 
 void Window::ExitApp()
