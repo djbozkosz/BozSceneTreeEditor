@@ -57,18 +57,14 @@ void SceneNodeDefinitions::Load(const QString &file)
 {
 	QFile reader(file);
 	auto result = reader.open(QIODevice::ReadOnly);
-	if (result == false)
-		return; // assert
+	Debug::Assert(result == true) << "Cannot open definition file" << file;
 
 	auto lines = QString::fromLatin1(reader.readAll()).split("\r\n", QString::SkipEmptyParts);
 	foreach (line, lines)
 	{
-		auto matched = m_RegExtSplitLine.exactMatch(*line);
-		if (matched == false)
-			continue; // assert
-
-		if (m_RegExtSplitLine.captureCount() < 4)
-			continue; // assert
+		auto match = m_RegExtSplitLine.exactMatch(*line);
+		Debug::Assert(match == true) << "Invalid definition:" << *line;
+		Debug::Assert(m_RegExtSplitLine.captureCount() == 4) << "Invalid parameters count for definition:" << *line;
 
 		auto captures = m_RegExtSplitLine.capturedTexts();
 
@@ -83,12 +79,10 @@ void SceneNodeDefinitions::Load(const QString &file)
 		foreach (field, fieldList)
 		{
 			auto values = field->split(m_RegExtSplitField, QString::SkipEmptyParts);
-			if (values.size() < 2)
-				continue; // assert
+			Debug::Assert(values.size() == 2) << "Invalid field definition:" << *field;
 
 			auto fieldType = m_StringToField.find(values[0]);
-			if (fieldType == m_StringToField.end())
-				continue; // assert
+			Debug::Assert(fieldType != m_StringToField.end()) << "Invalid field type:" << values[0];
 
 			NodeFieldInfo fieldInfo;
 			fieldInfo.FieldType = fieldType.value();

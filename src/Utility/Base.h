@@ -25,7 +25,7 @@
 #define register_qt_type(...)                                       qRegisterMetaType<__VA_ARGS__>(#__VA_ARGS__)
 #define register_qml_type(package, versionMajor, versionMinor, ...) qmlRegisterType<__VA_ARGS__>(package, versionMajor, versionMinor, #__VA_ARGS__)
 
-#if defined(USE_CORE_LOGGING) && !defined(CORE_LOGGING_LOG_H)
-#include "Logging/Log.h"
-using namespace Djbozkosz::Core::Logging;
+#if !defined(APPLICATION_UTILITY_LOG_H)
+#include "Utility/Log.h"
+using namespace Djbozkosz::Application::Utility;
 #endif

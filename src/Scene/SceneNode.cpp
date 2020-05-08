@@ -43,8 +43,7 @@ bool SceneNode::Load(QFile& reader)
 		auto data = new uchar[size];
 
 		auto result = LoadData(reader, data, size);
-		if (result == false)
-			return false; // assert
+		Debug::Assert(result == true) << "Cannot load raw data for node" << Type;
 
 		Fields.push_back(data);
 
@@ -99,7 +98,7 @@ bool SceneNode::Load(QFile& reader)
 		Childs.push_back(child);
 	}
 
-	// assert (reader.pos() == endPos)
+	Debug::Assert(reader.pos() == endPos) << "Data mismatch while load child nodes for node" << Type;
 
 	return true;
 }
