@@ -7,9 +7,9 @@
 using namespace Djbozkosz::Application::Scene;
 
 
-SceneTree::SceneTree(SceneNodeDefinitions* nodeDefinitions) :
+SceneTree::SceneTree(Definitions* definitions) :
 	Root(null),
-	m_NodeDefinitions(nodeDefinitions)
+	m_Definitions(definitions)
 {
 }
 
@@ -35,7 +35,7 @@ bool SceneTree::Load(const QString& file)
 	if (result == false)
 		return false;
 
-	Root = new SceneNode(m_NodeDefinitions);
+	Root = new SceneNode(m_Definitions);
 
 	result = Root->Load(reader);
 	if (result == false)

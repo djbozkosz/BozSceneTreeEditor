@@ -4,11 +4,11 @@
 using namespace Djbozkosz::Application::Scene;
 
 
-SceneNode::SceneNode(SceneNodeDefinitions* nodeDefinitions) :
+SceneNode::SceneNode(Definitions* definitions) :
 	Type(0),
 	Size(0),
 	Definition(null),
-	m_NodeDefinitions(nodeDefinitions)
+	m_Definitions(definitions)
 {
 }
 
@@ -35,9 +35,9 @@ bool SceneNode::Load(QFile& reader)
 	LoadData(reader, Size);
 
 	auto endPos = startPos + Size;
-	Definition  = m_NodeDefinitions->GetDefinition(Type);
+	Definition  = m_Definitions->GetDefinition(Type);
 
-	if (Definition == null || (Definition->Fields.isEmpty() == false && Definition->Fields[0].FieldType->Type == SceneNodeDefinitions::ENodeFieldType::Unknown))
+	if (Definition == null || (Definition->Fields.isEmpty() == false && Definition->Fields[0].FieldType->Type == Definitions::ENodeFieldType::Unknown))
 	{
 		auto size = Size - sizeof(Type) - sizeof(Size);
 		auto data = new uchar[size];
@@ -56,7 +56,7 @@ bool SceneNode::Load(QFile& reader)
 		auto type = field->FieldType->Type;
 		auto data = default_(uchar*);
 
-		if (type == SceneNodeDefinitions::ENodeFieldType::String)
+		if (type == Definitions::ENodeFieldType::String)
 		{
 			QVector<uchar> str;
 			uchar          c;
@@ -87,7 +87,7 @@ bool SceneNode::Load(QFile& reader)
 
 	while (reader.pos() < endPos)
 	{
-		auto child  = new SceneNode(m_NodeDefinitions);
+		auto child  = new SceneNode(m_Definitions);
 		auto result = child->Load(reader);
 		if (result == false)
 		{

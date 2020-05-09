@@ -1,7 +1,7 @@
 #include "Application/Application.h"
 #include "Application/Document.h"
 #include "GUI/Window.h"
-#include "Scene/SceneNodeDefinitions.h"
+#include "Scene/Definitions.h"
 
 
 using namespace Djbozkosz::Application;
@@ -21,7 +21,7 @@ Application::Application(int argc, char* argv[]) : QApplication(argc, argv)
 
 	connect(m_Window, SIGNAL(FileOpened(QString)), this, SLOT(LoadDocument(QString)));
 
-	m_NodeDefinitions = new Scene::SceneNodeDefinitions();
+	m_Definitions = new Scene::Definitions();
 }
 
 Application::~Application()
@@ -29,12 +29,12 @@ Application::~Application()
 	disconnect(m_Window, SIGNAL(FileOpened(QString)), this, SLOT(LoadDocument(QString)));
 
 	delete m_Window;
-	delete m_NodeDefinitions;
+	delete m_Definitions;
 }
 
 void Application::LoadDocument(const QString& file)
 {
-	auto document     = new Document(m_NodeDefinitions);
+	auto document     = new Document(m_Definitions);
 	document->Load(file);
 
 	m_Documents[file] = document;

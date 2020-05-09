@@ -95,7 +95,7 @@ void DocumentWindow::SetupTable(SceneNode* node)
 		return;
 	}
 
-	if (node->Definition == null || node->Definition->Fields[0].FieldType->Type == SceneNodeDefinitions::ENodeFieldType::Unknown)
+	if (node->Definition == null || node->Definition->Fields[0].FieldType->Type == Definitions::ENodeFieldType::Unknown)
 	{
 		table->setRowCount(1);
 		table->setItem(0, 0, new QTableWidgetItem("Unknown data"));
@@ -114,26 +114,26 @@ void DocumentWindow::SetupTable(SceneNode* node)
 	}
 }
 
-void DocumentWindow::SetupTableField(int idx, const void* field, SceneNodeDefinitions::ENodeFieldType fieldType)
+void DocumentWindow::SetupTableField(int idx, const void* field, Definitions::ENodeFieldType fieldType)
 {
 	switch (fieldType)
 	{
-		case SceneNodeDefinitions::ENodeFieldType::Uint8:  SetTableFieldInt<uchar >(idx, field    ); return;
-		case SceneNodeDefinitions::ENodeFieldType::Uint16: SetTableFieldInt<ushort>(idx, field    ); return;
-		case SceneNodeDefinitions::ENodeFieldType::Uint32: SetTableFieldInt<uint  >(idx, field    ); return;
-		case SceneNodeDefinitions::ENodeFieldType::Int8:   SetTableFieldInt<char  >(idx, field    ); return;
-		case SceneNodeDefinitions::ENodeFieldType::Int16:  SetTableFieldInt<short >(idx, field    ); return;
-		case SceneNodeDefinitions::ENodeFieldType::Int32:  SetTableFieldInt<int   >(idx, field    ); return;
-		case SceneNodeDefinitions::ENodeFieldType::Hex8:   SetTableFieldInt<uchar >(idx, field, 16); return;
-		case SceneNodeDefinitions::ENodeFieldType::Hex16:  SetTableFieldInt<ushort>(idx, field, 16); return;
-		case SceneNodeDefinitions::ENodeFieldType::Hex32:  SetTableFieldInt<uint  >(idx, field, 16); return;
-		case SceneNodeDefinitions::ENodeFieldType::Float:  SetTableFieldFloat      (idx, field, 1 ); return;
-		case SceneNodeDefinitions::ENodeFieldType::Float2: SetTableFieldFloat      (idx, field, 2 ); return;
-		case SceneNodeDefinitions::ENodeFieldType::Float3: SetTableFieldFloat      (idx, field, 3 ); return;
-		case SceneNodeDefinitions::ENodeFieldType::Float4: SetTableFieldFloat      (idx, field, 4 ); return;
-		case SceneNodeDefinitions::ENodeFieldType::Color:  SetTableFieldFloat      (idx, field, 3 ); return;
+		case Definitions::ENodeFieldType::Uint8:  SetTableFieldInt<uchar >(idx, field    ); return;
+		case Definitions::ENodeFieldType::Uint16: SetTableFieldInt<ushort>(idx, field    ); return;
+		case Definitions::ENodeFieldType::Uint32: SetTableFieldInt<uint  >(idx, field    ); return;
+		case Definitions::ENodeFieldType::Int8:   SetTableFieldInt<char  >(idx, field    ); return;
+		case Definitions::ENodeFieldType::Int16:  SetTableFieldInt<short >(idx, field    ); return;
+		case Definitions::ENodeFieldType::Int32:  SetTableFieldInt<int   >(idx, field    ); return;
+		case Definitions::ENodeFieldType::Hex8:   SetTableFieldInt<uchar >(idx, field, 16); return;
+		case Definitions::ENodeFieldType::Hex16:  SetTableFieldInt<ushort>(idx, field, 16); return;
+		case Definitions::ENodeFieldType::Hex32:  SetTableFieldInt<uint  >(idx, field, 16); return;
+		case Definitions::ENodeFieldType::Float:  SetTableFieldFloat      (idx, field, 1 ); return;
+		case Definitions::ENodeFieldType::Float2: SetTableFieldFloat      (idx, field, 2 ); return;
+		case Definitions::ENodeFieldType::Float3: SetTableFieldFloat      (idx, field, 3 ); return;
+		case Definitions::ENodeFieldType::Float4: SetTableFieldFloat      (idx, field, 4 ); return;
+		case Definitions::ENodeFieldType::Color:  SetTableFieldFloat      (idx, field, 3 ); return;
 
-		case SceneNodeDefinitions::ENodeFieldType::String:
+		case Definitions::ENodeFieldType::String:
 			m_Ui->Table->setItem(idx, 2, new QTableWidgetItem(QString::fromLatin1(reinterpret_cast<const char*>(field))));
 			return;
 

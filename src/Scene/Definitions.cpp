@@ -1,35 +1,35 @@
 #include <QFile>
 #include <QStringList>
 
-#include "Scene/SceneNodeDefinitions.h"
+#include "Scene/Definitions.h"
 
 
 using namespace Djbozkosz::Application::Scene;
 
 
-const QVector<SceneNodeDefinitions::NodeFieldType> SceneNodeDefinitions::FIELD_TYPES =
+const QVector<Definitions::NodeFieldType> Definitions::FIELD_TYPES =
 {
-	{ "Unknown", SceneNodeDefinitions::ENodeFieldType::Unknown, 0                 },
-	{ "Uint8",   SceneNodeDefinitions::ENodeFieldType::Uint8,   sizeof(uchar)     },
-	{ "Uint16",  SceneNodeDefinitions::ENodeFieldType::Uint16,  sizeof(ushort)    },
-	{ "Uint32",  SceneNodeDefinitions::ENodeFieldType::Uint32,  sizeof(uint)      },
-	{ "Int8",    SceneNodeDefinitions::ENodeFieldType::Int8,    sizeof(char)      },
-	{ "Int16",   SceneNodeDefinitions::ENodeFieldType::Int16,   sizeof(short)     },
-	{ "Int32",   SceneNodeDefinitions::ENodeFieldType::Int32,   sizeof(int)       },
-	{ "Hex8",    SceneNodeDefinitions::ENodeFieldType::Hex8,    sizeof(uchar)     },
-	{ "Hex16",   SceneNodeDefinitions::ENodeFieldType::Hex16,   sizeof(ushort)    },
-	{ "Hex32",   SceneNodeDefinitions::ENodeFieldType::Hex32,   sizeof(uint)      },
-	{ "Float",   SceneNodeDefinitions::ENodeFieldType::Float,   sizeof(float)     },
-	{ "Float2",  SceneNodeDefinitions::ENodeFieldType::Float2,  sizeof(float) * 2 },
-	{ "Float3",  SceneNodeDefinitions::ENodeFieldType::Float3,  sizeof(float) * 3 },
-	{ "Float4",  SceneNodeDefinitions::ENodeFieldType::Float4,  sizeof(float) * 4 },
-	{ "Color",   SceneNodeDefinitions::ENodeFieldType::Color,   sizeof(float) * 3 },
-	{ "String",  SceneNodeDefinitions::ENodeFieldType::String,  0                 }
+	{ "Unknown", Definitions::ENodeFieldType::Unknown, 0                 },
+	{ "Uint8",   Definitions::ENodeFieldType::Uint8,   sizeof(uchar)     },
+	{ "Uint16",  Definitions::ENodeFieldType::Uint16,  sizeof(ushort)    },
+	{ "Uint32",  Definitions::ENodeFieldType::Uint32,  sizeof(uint)      },
+	{ "Int8",    Definitions::ENodeFieldType::Int8,    sizeof(char)      },
+	{ "Int16",   Definitions::ENodeFieldType::Int16,   sizeof(short)     },
+	{ "Int32",   Definitions::ENodeFieldType::Int32,   sizeof(int)       },
+	{ "Hex8",    Definitions::ENodeFieldType::Hex8,    sizeof(uchar)     },
+	{ "Hex16",   Definitions::ENodeFieldType::Hex16,   sizeof(ushort)    },
+	{ "Hex32",   Definitions::ENodeFieldType::Hex32,   sizeof(uint)      },
+	{ "Float",   Definitions::ENodeFieldType::Float,   sizeof(float)     },
+	{ "Float2",  Definitions::ENodeFieldType::Float2,  sizeof(float) * 2 },
+	{ "Float3",  Definitions::ENodeFieldType::Float3,  sizeof(float) * 3 },
+	{ "Float4",  Definitions::ENodeFieldType::Float4,  sizeof(float) * 4 },
+	{ "Color",   Definitions::ENodeFieldType::Color,   sizeof(float) * 3 },
+	{ "String",  Definitions::ENodeFieldType::String,  0                 }
 };
 
 
-SceneNodeDefinitions::SceneNodeDefinitions() :
-	m_RegExtSplitLine("^([a-fx0-9]+) +([a-zA-Z0-9_]+) +([a-zA-Z0-9_]+)? *\\[(.*)\\]$"),
+Definitions::Definitions() :
+	m_RegExtSplitLine("^Node ([a-fx0-9]+) +([a-zA-Z0-9_]+) +([a-zA-Z0-9_]+)? *\\[(.*)\\]$"),
 	m_RegExtSplitFieldList(", *"),
 	m_RegExtSplitField(" *\\: *")
 {
@@ -38,14 +38,14 @@ SceneNodeDefinitions::SceneNodeDefinitions() :
 		m_StringToField[field->Name] = &(*field);
 	}
 
-	Load("node_definitions.txt");
+	Load("definitions.txt");
 }
 
-SceneNodeDefinitions::~SceneNodeDefinitions()
+Definitions::~Definitions()
 {
 }
 
-const SceneNodeDefinitions::NodeDefinition* SceneNodeDefinitions::GetDefinition(ushort type) const
+const Definitions::NodeDefinition* Definitions::GetDefinition(ushort type) const
 {
 	auto definition = m_NodeTypeToDefinition.find(type);
 	if (definition == m_NodeTypeToDefinition.end())
@@ -54,7 +54,7 @@ const SceneNodeDefinitions::NodeDefinition* SceneNodeDefinitions::GetDefinition(
 	return &definition.value();
 }
 
-void SceneNodeDefinitions::Load(const QString &file)
+void Definitions::Load(const QString &file)
 {
 	QFile reader(file);
 	auto result = reader.open(QIODevice::ReadOnly);

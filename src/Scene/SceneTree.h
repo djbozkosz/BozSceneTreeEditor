@@ -10,7 +10,7 @@ namespace Djbozkosz {
 namespace Application {
 namespace Scene
 {
-	class SceneNodeDefinitions;
+	class Definitions;
 	class SceneNode;
 
 
@@ -22,11 +22,11 @@ namespace Scene
 
 		private: // members
 
-		SceneNodeDefinitions* m_NodeDefinitions;
+		Definitions* m_Definitions;
 
 		public: // methods
 
-		explicit SceneTree(SceneNodeDefinitions* nodeDefinitions);
+		explicit SceneTree(Definitions* definitions);
 		virtual ~SceneTree();
 
 		bool Load(const QString& file);

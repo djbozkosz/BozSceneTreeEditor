@@ -17,7 +17,7 @@ namespace GUI
 
 namespace Scene
 {
-	class SceneNodeDefinitions;
+	class Definitions;
 }
 
 
@@ -32,10 +32,10 @@ namespace Scene
 
 		private: // members
 
-		GUI::Window*                 m_Window;
-		QMap<QString, Document*>     m_Documents;
+		GUI::Window*             m_Window;
+		QMap<QString, Document*> m_Documents;
 
-		Scene::SceneNodeDefinitions* m_NodeDefinitions;
+		Scene::Definitions*      m_Definitions;
 
 		public: // methods
 

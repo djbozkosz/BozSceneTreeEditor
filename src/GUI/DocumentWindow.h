@@ -6,7 +6,7 @@
 
 #include "ui_DocumentWindow.h"
 
-#include "Scene/SceneNodeDefinitions.h"
+#include "Scene/Definitions.h"
 
 
 class QTreeWidget;
@@ -76,7 +76,7 @@ namespace GUI
 		static void CreateTree(NodeItem *item, Scene::SceneNode* node);
 
 		void SetupTable(Scene::SceneNode* node);
-		void SetupTableField(int idx, const void* field, Scene::SceneNodeDefinitions::ENodeFieldType fieldType);
+		void SetupTableField(int idx, const void* field, Scene::Definitions::ENodeFieldType fieldType);
 
 		template <typename T> inline void SetTableFieldInt(int idx, const void* field, int base = 10)
 		{

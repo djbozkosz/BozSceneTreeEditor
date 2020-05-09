@@ -1,5 +1,5 @@
-#ifndef APPLICATION_SCENE_SceneNodeDefinitions_H
-#define APPLICATION_SCENE_SceneNodeDefinitions_H
+#ifndef APPLICATION_SCENE_DEFINITIONS_H
+#define APPLICATION_SCENE_DEFINITIONS_H
 
 #include <QString>
 #include <QRegExp>
@@ -13,7 +13,7 @@ namespace Djbozkosz {
 namespace Application {
 namespace Scene
 {
-	sealed class SceneNodeDefinitions
+	sealed class Definitions
 	{
 		public: // types
 
@@ -82,8 +82,8 @@ namespace Scene
 
 		public: // methods
 
-		explicit SceneNodeDefinitions();
-		virtual ~SceneNodeDefinitions();
+		explicit Definitions();
+		virtual ~Definitions();
 
 		const NodeDefinition* GetDefinition(ushort type) const;
 
@@ -93,4 +93,4 @@ namespace Scene
 	};
 }}}
 
-#endif // APPLICATION_SCENE_SceneNodeDefinitions_H
+#endif // APPLICATION_SCENE_DEFINITIONS_H

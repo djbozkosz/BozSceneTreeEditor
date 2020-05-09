@@ -6,7 +6,7 @@
 #include <QVariant>
 #include <QVariantList>
 
-#include "Scene/SceneNodeDefinitions.h"
+#include "Scene/Definitions.h"
 
 
 class QFile;
@@ -25,15 +25,15 @@ namespace Scene
 		QVector<void*>      Fields;
 		QVector<SceneNode*> Childs;
 
-		const SceneNodeDefinitions::NodeDefinition* Definition;
+		const Definitions::NodeDefinition* Definition;
 
 		private: // members
 
-		SceneNodeDefinitions* m_NodeDefinitions;
+		Definitions* m_Definitions;
 
 		public: // methods
 
-		explicit SceneNode(SceneNodeDefinitions* nodeDefinitions);
+		explicit SceneNode(Definitions* definitions);
 		virtual ~SceneNode();
 
 		bool Load(QFile& reader);

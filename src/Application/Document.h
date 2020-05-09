@@ -11,7 +11,7 @@ namespace Application {
 namespace Scene
 {
 	class SceneTree;
-	class SceneNodeDefinitions;
+	class Definitions;
 }
 
 
@@ -25,7 +25,7 @@ namespace Scene
 
 		public: // methods
 
-		explicit Document(Scene::SceneNodeDefinitions* nodeDefinitions);
+		explicit Document(Scene::Definitions* definitions);
 		virtual ~Document();
 
 		void Load(const QString& file);

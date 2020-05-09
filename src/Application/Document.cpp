@@ -5,8 +5,8 @@
 using namespace Djbozkosz::Application;
 
 
-Document::Document(Scene::SceneNodeDefinitions* nodeDefinitions) :
-	m_Tree(new Scene::SceneTree(nodeDefinitions))
+Document::Document(Scene::Definitions* definitions) :
+	m_Tree(new Scene::SceneTree(definitions))
 {
 }
 

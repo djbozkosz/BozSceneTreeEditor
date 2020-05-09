@@ -1,9 +1,12 @@
 SOURCES += \
 	src/Scene/SceneNode.cpp \
-	src/Scene/SceneNodeDefinitions.cpp \
+	src/Scene/Definitions.cpp \
 	src/Scene/SceneTree.cpp
 
 HEADERS += \
 	src/Scene/SceneNode.h \
-	src/Scene/SceneNodeDefinitions.h \
+	src/Scene/Definitions.h \
 	src/Scene/SceneTree.h
+
+OTHER_FILES += \
+	definitions.txt
