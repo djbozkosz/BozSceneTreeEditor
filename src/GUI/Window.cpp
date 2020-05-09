@@ -37,13 +37,15 @@ void Window::AddDocument(Document* document)
 
 void Window::OpenFile()
 {
-	/*auto file = QFileDialog::getOpenFileName(this, "Open file", "C:\\Hry\\Mafia\\missions", "scene2.bin");
+#if 1
+	auto file = QFileDialog::getOpenFileName(this, "Open file", "C:\\Hry\\Mafia\\missions", "scene2.bin");
 	if (file.isEmpty() == true)
 		return;
 
-	emit FileOpened(file);*/
-
+	emit FileOpened(file);
+#else
 	emit FileOpened("C:\\Hry\\Mafia\\missions\\00menu\\scene2.bin");
+#endif
 }
 
 void Window::ExitApp()

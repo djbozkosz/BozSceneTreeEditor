@@ -9,21 +9,22 @@ using namespace Djbozkosz::Application::Scene;
 
 const QVector<SceneNodeDefinitions::NodeFieldType> SceneNodeDefinitions::FIELD_TYPES =
 {
-	{ "Uint8",  SceneNodeDefinitions::ENodeFieldType::Uint8,  sizeof(uchar)     },
-	{ "Uint16", SceneNodeDefinitions::ENodeFieldType::Uint16, sizeof(ushort)    },
-	{ "Uint32", SceneNodeDefinitions::ENodeFieldType::Uint32, sizeof(uint)      },
-	{ "Int8",   SceneNodeDefinitions::ENodeFieldType::Int8,   sizeof(char)      },
-	{ "Int16",  SceneNodeDefinitions::ENodeFieldType::Int16,  sizeof(short)     },
-	{ "Int32",  SceneNodeDefinitions::ENodeFieldType::Int32,  sizeof(int)       },
-	{ "Hex8",   SceneNodeDefinitions::ENodeFieldType::Hex8,   sizeof(uchar)     },
-	{ "Hex16",  SceneNodeDefinitions::ENodeFieldType::Hex16,  sizeof(ushort)    },
-	{ "Hex32",  SceneNodeDefinitions::ENodeFieldType::Hex32,  sizeof(uint)      },
-	{ "Float",  SceneNodeDefinitions::ENodeFieldType::Float,  sizeof(float)     },
-	{ "Float2", SceneNodeDefinitions::ENodeFieldType::Float2, sizeof(float) * 2 },
-	{ "Float3", SceneNodeDefinitions::ENodeFieldType::Float3, sizeof(float) * 3 },
-	{ "Float4", SceneNodeDefinitions::ENodeFieldType::Float4, sizeof(float) * 4 },
-	{ "Color",  SceneNodeDefinitions::ENodeFieldType::Color,  sizeof(float) * 3 },
-	{ "String", SceneNodeDefinitions::ENodeFieldType::String, 0                 }
+	{ "Unknown", SceneNodeDefinitions::ENodeFieldType::Unknown, 0                 },
+	{ "Uint8",   SceneNodeDefinitions::ENodeFieldType::Uint8,   sizeof(uchar)     },
+	{ "Uint16",  SceneNodeDefinitions::ENodeFieldType::Uint16,  sizeof(ushort)    },
+	{ "Uint32",  SceneNodeDefinitions::ENodeFieldType::Uint32,  sizeof(uint)      },
+	{ "Int8",    SceneNodeDefinitions::ENodeFieldType::Int8,    sizeof(char)      },
+	{ "Int16",   SceneNodeDefinitions::ENodeFieldType::Int16,   sizeof(short)     },
+	{ "Int32",   SceneNodeDefinitions::ENodeFieldType::Int32,   sizeof(int)       },
+	{ "Hex8",    SceneNodeDefinitions::ENodeFieldType::Hex8,    sizeof(uchar)     },
+	{ "Hex16",   SceneNodeDefinitions::ENodeFieldType::Hex16,   sizeof(ushort)    },
+	{ "Hex32",   SceneNodeDefinitions::ENodeFieldType::Hex32,   sizeof(uint)      },
+	{ "Float",   SceneNodeDefinitions::ENodeFieldType::Float,   sizeof(float)     },
+	{ "Float2",  SceneNodeDefinitions::ENodeFieldType::Float2,  sizeof(float) * 2 },
+	{ "Float3",  SceneNodeDefinitions::ENodeFieldType::Float3,  sizeof(float) * 3 },
+	{ "Float4",  SceneNodeDefinitions::ENodeFieldType::Float4,  sizeof(float) * 4 },
+	{ "Color",   SceneNodeDefinitions::ENodeFieldType::Color,   sizeof(float) * 3 },
+	{ "String",  SceneNodeDefinitions::ENodeFieldType::String,  0                 }
 };
 
 
@@ -72,6 +73,8 @@ void SceneNodeDefinitions::Load(const QString &file)
 		definition.Type      = captures[1].toUShort(null, 0);
 		definition.Name      = captures[2];
 		definition.HasChilds = (captures[3] == "has_childs");
+
+		Debug::Assert(m_NodeTypeToDefinition.contains(definition.Type) == false) << "Node definitions already contain type" << definition.Type;
 
 		auto fieldList = captures[4].split(m_RegExtSplitFieldList, QString::SkipEmptyParts);
 		definition.Fields.reserve(fieldList.size());

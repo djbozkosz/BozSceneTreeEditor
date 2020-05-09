@@ -57,19 +57,6 @@
       <property name="frameShadow">
        <enum>QFrame::Sunken</enum>
       </property>
-      <widget class="QLabel" name="Info">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>46</width>
-         <height>13</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-      </widget>
      </widget>
     </item>
    </layout>

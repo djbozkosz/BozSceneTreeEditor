@@ -19,7 +19,7 @@ namespace Scene
 
 		enum class ENodeFieldType
 		{
-			Undefined = 0,
+			Unknown = 0,
 			Uint8,
 			Uint16,
 			Uint32,

@@ -37,7 +37,7 @@ bool SceneNode::Load(QFile& reader)
 	auto endPos = startPos + Size;
 	Definition  = m_NodeDefinitions->GetDefinition(Type);
 
-	if (Definition == null)
+	if (Definition == null || (Definition->Fields.isEmpty() == false && Definition->Fields[0].FieldType->Type == SceneNodeDefinitions::ENodeFieldType::Unknown))
 	{
 		auto size = Size - sizeof(Type) - sizeof(Size);
 		auto data = new uchar[size];

@@ -4,7 +4,9 @@
 #include <QWidget>
 #include <QTreeWidgetItem>
 
-#include "Utility/Base.h"
+#include "ui_DocumentWindow.h"
+
+#include "Scene/SceneNodeDefinitions.h"
 
 
 class QTreeWidget;
@@ -74,6 +76,29 @@ namespace GUI
 		static void CreateTree(NodeItem *item, Scene::SceneNode* node);
 
 		void SetupTable(Scene::SceneNode* node);
+		void SetupTableField(int idx, const void* field, Scene::SceneNodeDefinitions::ENodeFieldType fieldType);
+
+		template <typename T> inline void SetTableFieldInt(int idx, const void* field, int base = 10)
+		{
+			auto data = reinterpret_cast<const T*>(field);
+
+			auto text = QString::number(*data, base);
+			if (base == 16)
+			{
+				text = QString("0x%1").arg(text);
+			}
+
+			m_Ui->Table->setItem(idx, 2, new QTableWidgetItem(text));
+		}
+
+		inline void SetTableFieldFloat(int idx, const void* field, int count)
+		{
+			auto data = reinterpret_cast<const float*>(field);
+			for (int i = 0; i < count; i++)
+			{
+				m_Ui->Table->setItem(idx, i + 2, new QTableWidgetItem(QString::number(data[i])));
+			}
+		}
 
 		private slots: // handlers
 

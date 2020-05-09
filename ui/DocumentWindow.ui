@@ -70,7 +70,7 @@
        </size>
       </property>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>150</number>
+       <number>120</number>
       </attribute>
       <column>
        <property name="text">
@@ -85,6 +85,21 @@
       <column>
        <property name="text">
         <string>Value</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string> </string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string> </string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string> </string>
        </property>
       </column>
      </widget>
