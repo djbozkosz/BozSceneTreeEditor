@@ -1,7 +1,9 @@
 build/Makefile*
+build/object_script*
 build/*.cpp
 build/*.h
 build/*.o
+build/*/*.exe
 build/*/*.cpp
 build/*/*.h
 build/*/*.o
