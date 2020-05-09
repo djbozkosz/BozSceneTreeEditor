@@ -14,7 +14,11 @@ namespace Ui
 
 
 namespace Djbozkosz {
-namespace Application {
+namespace Application
+{
+class Document;
+
+
 namespace GUI
 {
 	sealed class Window : public QMainWindow
@@ -29,8 +33,10 @@ namespace GUI
 
 		public: // methods
 
-		Window();
+		explicit Window();
 		virtual ~Window();
+
+		void AddDocument(Document* document);
 
 		signals: // public interface
 

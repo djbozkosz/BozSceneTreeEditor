@@ -3,7 +3,9 @@
 
 #include "ui_Window.h"
 
+#include "GUI/DocumentWindow.h"
 #include "GUI/Window.h"
+#include "Application/Document.h"
 
 
 using namespace Djbozkosz::Application::GUI;
@@ -25,6 +27,12 @@ Window::~Window()
 	disconnect(m_Ui->Menu_Exit, SIGNAL(triggered()), this, SLOT(ExitApp()));
 
 	delete m_Ui;
+}
+
+void Window::AddDocument(Document* document)
+{
+	auto tab = new DocumentWindow(document, m_Ui->Tabs);
+	m_Ui->Tabs->addTab(tab, document->GetFile());
 }
 
 void Window::OpenFile()

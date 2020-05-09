@@ -82,7 +82,7 @@ namespace Scene
 
 		public: // methods
 
-		SceneNodeDefinitions();
+		explicit SceneNodeDefinitions();
 		virtual ~SceneNodeDefinitions();
 
 		const NodeDefinition* GetDefinition(ushort type) const;

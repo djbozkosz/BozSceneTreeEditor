@@ -7,14 +7,10 @@
 using namespace Djbozkosz::Application::Scene;
 
 
-SceneTree::SceneTree(SceneNodeDefinitions* nodeDefinitions, const QString& file) :
-	m_NodeDefinitions(nodeDefinitions),
-	m_Root(null)
+SceneTree::SceneTree(SceneNodeDefinitions* nodeDefinitions) :
+	Root(null),
+	m_NodeDefinitions(nodeDefinitions)
 {
-	if (file.isEmpty() == false)
-	{
-		Load(file);
-	}
 }
 
 SceneTree::~SceneTree()
@@ -24,11 +20,11 @@ SceneTree::~SceneTree()
 
 void SceneTree::DeleteTree()
 {
-	if (m_Root == null)
+	if (Root == null)
 		return;
 
-	delete m_Root;
-	m_Root = null;
+	delete Root;
+	Root = null;
 }
 
 bool SceneTree::Load(const QString& file)
@@ -39,9 +35,9 @@ bool SceneTree::Load(const QString& file)
 	if (result == false)
 		return false;
 
-	m_Root = new SceneNode(m_NodeDefinitions);
+	Root = new SceneNode(m_NodeDefinitions);
 
-	result = m_Root->Load(reader);
+	result = Root->Load(reader);
 	if (result == false)
 	{
 		DeleteTree();

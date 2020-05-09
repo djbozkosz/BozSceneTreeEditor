@@ -16,22 +16,25 @@ namespace Scene
 
 	sealed class SceneTree
 	{
+		public: // members
+
+		SceneNode* Root;
+
 		private: // members
 
 		SceneNodeDefinitions* m_NodeDefinitions;
-		SceneNode*            m_Root;
 
 		public: // methods
 
-		SceneTree(SceneNodeDefinitions* nodeDefinitions, const QString& file = QString());
+		explicit SceneTree(SceneNodeDefinitions* nodeDefinitions);
 		virtual ~SceneTree();
+
+		bool Load(const QString& file);
+		bool Save(const QString& file) const;
 
 		private: // methods
 
 		void DeleteTree();
-
-		bool Load(const QString& file);
-		bool Save(const QString& file) const;
 	};
 }}}
 

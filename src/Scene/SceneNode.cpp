@@ -1,5 +1,4 @@
 #include "Scene/SceneNode.h"
-#include "Scene/SceneNodeDefinitions.h"
 
 
 using namespace Djbozkosz::Application::Scene;
@@ -8,6 +7,7 @@ using namespace Djbozkosz::Application::Scene;
 SceneNode::SceneNode(SceneNodeDefinitions* nodeDefinitions) :
 	Type(0),
 	Size(0),
+	Definition(null),
 	m_NodeDefinitions(nodeDefinitions)
 {
 }
@@ -34,10 +34,10 @@ bool SceneNode::Load(QFile& reader)
 	LoadData(reader, Type);
 	LoadData(reader, Size);
 
-	auto endPos     = startPos + Size;
-	auto definition = m_NodeDefinitions->GetDefinition(Type);
+	auto endPos = startPos + Size;
+	Definition  = m_NodeDefinitions->GetDefinition(Type);
 
-	if (definition == null)
+	if (Definition == null)
 	{
 		auto size = Size - sizeof(Type) - sizeof(Size);
 		auto data = new uchar[size];
@@ -50,7 +50,7 @@ bool SceneNode::Load(QFile& reader)
 		return true;
 	}
 
-	auto fields = definition->Fields;
+	auto fields = Definition->Fields;
 	foreach (field, fields)
 	{
 		auto type = field->FieldType->Type;
@@ -82,7 +82,7 @@ bool SceneNode::Load(QFile& reader)
 		Fields.push_back(data);
 	}
 
-	if (definition->HasChilds == false || reader.pos() == endPos)
+	if (Definition->HasChilds == false || reader.pos() == endPos)
 		return true;
 
 	while (reader.pos() < endPos)

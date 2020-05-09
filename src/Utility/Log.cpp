@@ -22,7 +22,7 @@ Debug::Log::~Log()
 		default:               qLogType = QtDebugMsg;    break;
 	}
 
-	if (Type >= EType::Error)
+	if (Type == EType::Error || (Type == EType::Assert && m_Condition == false) || Type == EType::Exception)
 	{
 		QString title;
 

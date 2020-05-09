@@ -5,3 +5,15 @@
 0x3010 CameraFov [Float : CameraFov]
 0x3011 DrawDistance [Float : DrawDistance]
 0x3211 ClippingRange [Float : Near, Float : Far]
+
+0x4000 SceneObjects has_childs []
+0x4010 SceneObject has_childs []
+0x4011 SceneType [Uint32 : Type]
+0x0010 Name [String : Name]
+0x0020 Position [Float3 : Position]
+0x0022 Rotation [Float4 : Rotation]
+0x002d Scale [Float3 : Scale]
+0x002c Position2 [Float3 : Position2]
+0x4020 Parents has_childs []
+
+0x2012 ModelName [String : ModelName]

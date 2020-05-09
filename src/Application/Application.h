@@ -39,12 +39,12 @@ namespace Scene
 
 		public: // methods
 
-		Application(int argc, char* argv[]);
+		explicit Application(int argc, char* argv[]);
 		virtual ~Application();
 
 		private slots: // handlers
 
-		void CreateDocument(const QString& file);
+		void LoadDocument(const QString& file);
 		void CloseDocument(const QString& file);
 	};
 }}

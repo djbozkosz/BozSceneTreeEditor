@@ -19,22 +19,26 @@ Application::Application(int argc, char* argv[]) : QApplication(argc, argv)
 	m_Window = new GUI::Window();
 	m_Window->show();
 
-	connect(m_Window, SIGNAL(FileOpened(QString)), this, SLOT(CreateDocument(QString)));
+	connect(m_Window, SIGNAL(FileOpened(QString)), this, SLOT(LoadDocument(QString)));
 
 	m_NodeDefinitions = new Scene::SceneNodeDefinitions();
 }
 
 Application::~Application()
 {
-	disconnect(m_Window, SIGNAL(FileOpened(QString)), this, SLOT(CreateDocument(QString)));
+	disconnect(m_Window, SIGNAL(FileOpened(QString)), this, SLOT(LoadDocument(QString)));
 
 	delete m_Window;
 	delete m_NodeDefinitions;
 }
 
-void Application::CreateDocument(const QString& file)
+void Application::LoadDocument(const QString& file)
 {
-	m_Documents[file] = new Document(m_NodeDefinitions, file);
+	auto document     = new Document(m_NodeDefinitions);
+	document->Load(file);
+
+	m_Documents[file] = document;
+	m_Window->AddDocument(document);
 }
 
 void Application::CloseDocument(const QString& file)

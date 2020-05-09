@@ -3,8 +3,10 @@
 
 #include <QFile>
 #include <QVector>
+#include <QVariant>
+#include <QVariantList>
 
-#include "Utility/Base.h"
+#include "Scene/SceneNodeDefinitions.h"
 
 
 class QFile;
@@ -14,9 +16,6 @@ namespace Djbozkosz {
 namespace Application {
 namespace Scene
 {
-	class SceneNodeDefinitions;
-
-
 	sealed class SceneNode
 	{
 		public: // members
@@ -26,13 +25,15 @@ namespace Scene
 		QVector<void*>      Fields;
 		QVector<SceneNode*> Childs;
 
+		const SceneNodeDefinitions::NodeDefinition* Definition;
+
 		private: // members
 
 		SceneNodeDefinitions* m_NodeDefinitions;
 
 		public: // methods
 
-		SceneNode(SceneNodeDefinitions* nodeDefinitions);
+		explicit SceneNode(SceneNodeDefinitions* nodeDefinitions);
 		virtual ~SceneNode();
 
 		bool Load(QFile& reader);

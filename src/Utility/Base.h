@@ -1,10 +1,10 @@
 #include "Utility/PreBase.h"
 
 
-#define null NULL
+#define null nullptr
 
 #define unused(...)   (void)(__VA_ARGS__)
-#define default_(...) reinterpret_cast<__VA_ARGS__>(null)
+#define default_(...) reinterpret_cast<__VA_ARGS__>(NULL)
 
 #define as(obj, ...)  dynamic_cast<__VA_ARGS__>(obj)
 #define is(obj, ...)  (as(obj, __VA_ARGS__) != null)

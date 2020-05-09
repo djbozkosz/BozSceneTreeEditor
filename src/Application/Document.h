@@ -19,12 +19,19 @@ namespace Scene
 	{
 		private: // members
 
+		QString           m_File;
+
 		Scene::SceneTree* m_Tree;
 
 		public: // methods
 
-		Document(Scene::SceneNodeDefinitions* nodeDefinitions, const QString& file = QString());
+		explicit Document(Scene::SceneNodeDefinitions* nodeDefinitions);
 		virtual ~Document();
+
+		void Load(const QString& file);
+
+		inline const QString&          GetFile() const { return m_File; }
+		inline       Scene::SceneTree* GetTree() const { return m_Tree; }
 	};
 }}
 
