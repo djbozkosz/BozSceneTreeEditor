@@ -18,7 +18,29 @@ Node 0x4020 Parent has_childs []
 
 Node 0x2012 Model [String : Name]
 
-Node 0xb401 Sector [Unknown : Data]
+Node 0xb401 Sector has_childs []
+Node 0xb401_0x0000 Unknown [Float : Unknown]
+Node 0xb401_0x0001 Unknown [Float : Unknown]
+Node 0xb401_0x0002 Unknown [Uint32 : Unknown]
+Node 0xb401_0x0003 Unknown [Float : Unknown]
+Node 0xb401_0x0004 Unknown [Float : Unknown]
+Node 0xb401_0x0005 Unknown [Uint32 : Unknown]
+Node 0xb401_0x0006 Unknown [Float : Unknown]
+Node 0xb401_0x0007 Unknown [Uint32 : Unknown]
+Node 0xb401_0x0008 Unknown [Float : Unknown]
+Node 0xb401_0x0009 Unknown [Uint32 : Unknown]
+Node 0xb401_0x000a Unknown [Float : Unknown]
+Node 0xb401_0x000b Unknown [Float : Unknown]
+Node 0xb401_0x000c Unknown [Uint32 : Unknown]
+Node 0xb401_0x000d Unknown [Uint32 : Unknown]
+Node 0xb401_0x000e Unknown [Uint32 : Unknown]
+Node 0xb401_0x000f Unknown [Uint32 : Unknown]
+Node 0xb401_0x0010 Unknown [Uint32 : Unknown]
+Node 0xb401_0x0011 Unknown [Float : Unknown]
+Node 0xb401_0x0012 Unknown [Float : Unknown]
+Node 0xb401_0x0013 Unknown [Float : Unknown]
+Node 0xb401_0x0014 Unknown [Float3 : Unknown]
+Node 0xb401_0x0015 Unknown [Float3 : Unknown]
 
 Node 0x4033 Hidden []
 
@@ -43,6 +65,9 @@ Node 0x4066 Empty []
 Node 0x4067 Empty []
 Node 0xb800 Unknown [Float : Unknown]
 Node 0xb200 Sector [String : Name]
+
+Node 0x4083 Occluder [Unknown : Data]
+Node 0xb151 Volume [Unknown : Data]
 
 Node 0x4090 DataSignature [Hex32 : Signature]
 
@@ -75,3 +100,15 @@ Node 0xae51 InitScript [Unknown : Data]
 
 Node 0x01f4 City has_childs [Hex32 : Version]
 Node 0x03e8 Part [Unknown : Data]
+
+
+
+NodeName 0x4010_0x0010 [0]
+NodeName 0xae21_0xae23 [0]
+
+
+
+Enum 0x4011 [0] [2 : Light, 3 : Point, 4 : Sound, 6 : BoundingBox, 9 : Model, 12 : Occluder, 14 : Geometry]
+Enum 0x4041 [0] [1 : Point, 2 : Spot, 3 : Directional, 4 : Ambient, 5 : Fog]
+Enum 0x4061 [0] [1 : Point]
+Enum 0xae22 [0] [1 : Hidden, 2 : Player, 4 : Car, 5 : Script, 6 : Door, 8 : Railway, 9 : VillaObject, 12 : Traffic, 18 : Pedestrians, 20 : Bridge, 21 : Dog, 22 : Airplane, 24 : Turnout, 25 : Pumper, 27 : Human, 28 : RaceCamera, 30 : Wagon, 34 : Clock, 35 : Physical, 36 : Truck]

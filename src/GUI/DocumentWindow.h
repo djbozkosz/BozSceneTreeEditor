@@ -48,13 +48,9 @@ namespace GUI
 
 			Scene::SceneNode* Node;
 
-			explicit NodeItem(QTreeWidget* parent, Scene::SceneNode* node);
-			explicit NodeItem(NodeItem* parent, Scene::SceneNode* node);
+			explicit NodeItem(QTreeWidget* parent, Scene::SceneNode* node, QString& name);
+			explicit NodeItem(NodeItem* parent, Scene::SceneNode* node, QString& name);
 			virtual ~NodeItem();
-
-			private:
-
-			static QString GetName(Scene::SceneNode* node);
 		};
 
 		private: // members
@@ -63,22 +59,23 @@ namespace GUI
 
 		Document*           m_Document;
 		Scene::SceneTree*   m_Tree;
+		Scene::Definitions* m_Definitions;
 
 
 		public: // methods
 
-		explicit DocumentWindow(Document* document, QWidget* parent = null);
+		explicit DocumentWindow(Document* document, Scene::Definitions* definitions, QWidget* parent = null);
 		virtual ~DocumentWindow();
 
 		private: // methods
 
 		void SetupTree();
-		static void CreateTree(NodeItem *item, Scene::SceneNode* node);
+		void CreateTree(NodeItem *item, Scene::SceneNode* node);
 
 		void SetupTable(Scene::SceneNode* node);
-		void SetupTableField(int idx, const void* field, Scene::Definitions::ENodeFieldType fieldType);
+		void SetupTableField(ushort type, int idx, const void* field, Scene::Definitions::ENodeFieldType fieldType);
 
-		template <typename T> inline void SetTableFieldInt(int idx, const void* field, int base = 10)
+		template <typename T> inline int SetTableFieldInt(int idx, const void* field, int base = 10)
 		{
 			auto data = reinterpret_cast<const T*>(field);
 
@@ -89,6 +86,7 @@ namespace GUI
 			}
 
 			m_Ui->Table->setItem(idx, 2, new QTableWidgetItem(text));
+			return *data;
 		}
 
 		inline void SetTableFieldFloat(int idx, const void* field, int count)
@@ -99,6 +97,8 @@ namespace GUI
 				m_Ui->Table->setItem(idx, i + 2, new QTableWidgetItem(QString::number(data[i])));
 			}
 		}
+
+		QString GetNodeName(Scene::SceneNode* node) const;
 
 		private slots: // handlers
 

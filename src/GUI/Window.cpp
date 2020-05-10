@@ -29,9 +29,9 @@ Window::~Window()
 	delete m_Ui;
 }
 
-void Window::AddDocument(Document* document)
+void Window::AddDocument(Document* document, Scene::Definitions* definitions)
 {
-	auto tab = new DocumentWindow(document, m_Ui->Tabs);
+	auto tab = new DocumentWindow(document, definitions, m_Ui->Tabs);
 	m_Ui->Tabs->addTab(tab, document->GetFile());
 }
 

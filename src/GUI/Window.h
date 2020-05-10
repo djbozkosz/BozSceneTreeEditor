@@ -14,8 +14,13 @@ namespace Ui
 
 
 namespace Djbozkosz {
-namespace Application
+namespace Application {
+namespace Scene
 {
+	class Definitions;
+}
+
+
 class Document;
 
 
@@ -36,7 +41,7 @@ namespace GUI
 		explicit Window();
 		virtual ~Window();
 
-		void AddDocument(Document* document);
+		void AddDocument(Document* document, Scene::Definitions* definitions);
 
 		signals: // public interface
 

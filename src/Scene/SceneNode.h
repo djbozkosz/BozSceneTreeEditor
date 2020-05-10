@@ -36,7 +36,9 @@ namespace Scene
 		explicit SceneNode(Definitions* definitions);
 		virtual ~SceneNode();
 
-		bool Load(QFile& reader);
+		SceneNode* GetChild(ushort type) const;
+
+		bool Load(QFile& reader, SceneNode* parent);
 		bool Save(QFile& writer) const;
 
 		private: // methods

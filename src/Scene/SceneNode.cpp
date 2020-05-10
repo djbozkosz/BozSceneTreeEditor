@@ -27,15 +27,32 @@ SceneNode::~SceneNode()
 	Childs.clear();
 }
 
-bool SceneNode::Load(QFile& reader)
+SceneNode* SceneNode::GetChild(ushort type) const
+{
+	foreach (child, Childs)
+	{
+		if ((*child)->Type == type)
+			return *child;
+	}
+
+	return null;
+}
+
+bool SceneNode::Load(QFile& reader, SceneNode* parent)
 {
 	auto startPos = reader.pos();
 
 	LoadData(reader, Type);
 	LoadData(reader, Size);
 
-	auto endPos = startPos + Size;
-	Definition  = m_Definitions->GetDefinition(Type);
+	auto endPos     = startPos + Size;
+	auto parentType = (parent != null) ? parent->Type : 0;
+	Definition      = m_Definitions->GetNodeDefinition(parentType, Type);
+
+	if (Definition == null)
+	{
+		Definition = m_Definitions->GetNodeDefinition(0, Type);
+	}
 
 	if (Definition == null || (Definition->Fields.isEmpty() == false && Definition->Fields[0].FieldType->Type == Definitions::ENodeFieldType::Unknown))
 	{
@@ -88,7 +105,7 @@ bool SceneNode::Load(QFile& reader)
 	while (reader.pos() < endPos)
 	{
 		auto child  = new SceneNode(m_Definitions);
-		auto result = child->Load(reader);
+		auto result = child->Load(reader, this);
 		if (result == false)
 		{
 			delete child;

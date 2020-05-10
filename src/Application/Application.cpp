@@ -38,7 +38,7 @@ void Application::LoadDocument(const QString& file)
 	document->Load(file);
 
 	m_Documents[file] = document;
-	m_Window->AddDocument(document);
+	m_Window->AddDocument(document, m_Definitions);
 }
 
 void Application::CloseDocument(const QString& file)

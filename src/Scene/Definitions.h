@@ -67,29 +67,53 @@ namespace Scene
 			inline NodeDefinition() : Type(0), HasChilds(false) {}
 		};
 
+		sealed struct NodeName
+		{
+			ushort Type;
+			ushort ChildType;
+			uint   FieldIdx;
+
+			inline NodeName() : Type(0), ChildType(0), FieldIdx(0) {}
+		};
+
 		private: // constants
 
 		static const QVector<NodeFieldType> FIELD_TYPES;
 
 		private: // members
 
-		QRegExp                             m_RegExtSplitLine;
-		QRegExp                             m_RegExtSplitFieldList;
-		QRegExp                             m_RegExtSplitField;
+		QRegExp                             m_RNodeLine;
+		QRegExp                             m_RNodeFieldList;
+		QRegExp                             m_RNodeField;
+		QRegExp                             m_RNodeNameLine;
+		QRegExp                             m_RNodeFieldEnum;
 
 		QMap<QString, const NodeFieldType*> m_StringToField;
-		QMap<ushort, NodeDefinition>        m_NodeTypeToDefinition;
+		QMap<uint, NodeDefinition>          m_NodeTypeToDefinition;
+
+		QMap<ushort, NodeName>              m_NodeNames;
+
+		typedef QMap<int, QString>                       NodeFieldEnum;
+		typedef QMap<ushort, QMap<uint, NodeFieldEnum> > NodeFieldEnums;
+		NodeFieldEnums                      m_NodeFieldEnums;
 
 		public: // methods
 
 		explicit Definitions();
 		virtual ~Definitions();
 
-		const NodeDefinition* GetDefinition(ushort type) const;
+		const NodeDefinition* GetNodeDefinition(ushort parentType, ushort type) const;
+		const NodeName*       GetNodeName(ushort type) const;
+		const NodeFieldEnum*  GetNodeFieldEnum(ushort type, uint fieldIdx) const;
 
 		private: // methods
 
 		void Load(const QString& file);
+		void LoadDefinition(const QString& line);
+		void LoadNodeName(const QString& line);
+		void LoadNodeFieldEnum(const QString& line);
+
+		static inline uint GetKey(ushort parentType, ushort type) { return (parentType << 16) | type; }
 	};
 }}}
 

@@ -37,7 +37,7 @@ bool SceneTree::Load(const QString& file)
 
 	Root = new SceneNode(m_Definitions);
 
-	result = Root->Load(reader);
+	result = Root->Load(reader, null);
 	if (result == false)
 	{
 		DeleteTree();
