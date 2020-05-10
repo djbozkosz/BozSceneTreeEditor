@@ -47,7 +47,21 @@ bool SceneNode::Load(QFile& reader, SceneNode* parent)
 
 	auto endPos     = startPos + Size;
 	auto parentType = (parent != null) ? parent->Type : 0;
-	Definition      = m_Definitions->GetNodeDefinition(parentType, Type);
+
+	auto fieldDefinition = m_Definitions->GetNodeFieldDefinition(Type);
+	if (fieldDefinition != null)
+	{
+		auto sibling = parent->GetChild(fieldDefinition->SiblingType);
+		Debug::Assert(sibling != null) << "Sibling" << fieldDefinition->SiblingType << "is not found for node" << Type;
+
+		auto dataType = *reinterpret_cast<const int*>(sibling->Fields[fieldDefinition->SiblingFieldIdx]);
+		Definition    = m_Definitions->GetNodeFieldDefinitionData(Type, dataType);
+	}
+
+	if (Definition == null)
+	{
+		Definition = m_Definitions->GetNodeDefinition(parentType, Type);
+	}
 
 	if (Definition == null)
 	{
@@ -88,6 +102,16 @@ bool SceneNode::Load(QFile& reader, SceneNode* parent)
 			auto size = str.size();
 			data = new uchar[size];
 			memcpy(data, str.data(), size);
+		}
+		else if (type == Definitions::ENodeFieldType::CharArray)
+		{
+			auto lengthSize = field->FieldType->Size;
+			uint arraySize;
+			LoadData(reader, &arraySize, lengthSize);
+
+			data = new uchar[lengthSize + arraySize];
+			memcpy(data, &arraySize, lengthSize);
+			LoadData(reader, &data[lengthSize], arraySize);
 		}
 		else
 		{

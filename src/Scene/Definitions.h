@@ -34,7 +34,8 @@ namespace Scene
 			Float3,
 			Float4,
 			Color,
-			String
+			String,
+			CharArray
 		};
 
 		sealed struct NodeFieldType
@@ -67,6 +68,15 @@ namespace Scene
 			inline NodeDefinition() : Type(0), HasChilds(false) {}
 		};
 
+		sealed struct NodeFieldDefinition
+		{
+			ushort                     SiblingType;
+			uint                       SiblingFieldIdx;
+			QMap<uint, NodeDefinition> Definitions;
+
+			inline NodeFieldDefinition() : SiblingType(0), SiblingFieldIdx(0) {}
+		};
+
 		sealed struct NodeName
 		{
 			ushort Type;
@@ -85,11 +95,14 @@ namespace Scene
 		QRegExp                             m_RNodeLine;
 		QRegExp                             m_RNodeFieldList;
 		QRegExp                             m_RNodeField;
+		QRegExp                             m_RNodeFieldLine;
 		QRegExp                             m_RNodeNameLine;
-		QRegExp                             m_RNodeFieldEnum;
+		QRegExp                             m_RNodeFieldEnumLine;
 
 		QMap<QString, const NodeFieldType*> m_StringToField;
-		QMap<uint, NodeDefinition>          m_NodeTypeToDefinition;
+		QMap<uint, NodeDefinition>          m_NodeDefinitions;
+
+		QMap<ushort, NodeFieldDefinition>   m_NodeFieldDefinitions;
 
 		QMap<ushort, NodeName>              m_NodeNames;
 
@@ -102,14 +115,18 @@ namespace Scene
 		explicit Definitions();
 		virtual ~Definitions();
 
-		const NodeDefinition* GetNodeDefinition(ushort parentType, ushort type) const;
-		const NodeName*       GetNodeName(ushort type) const;
-		const NodeFieldEnum*  GetNodeFieldEnum(ushort type, uint fieldIdx) const;
+		const NodeDefinition*      GetNodeDefinition(ushort parentType, ushort type) const;
+		const NodeFieldDefinition* GetNodeFieldDefinition(ushort type) const;
+		const NodeDefinition*      GetNodeFieldDefinitionData(ushort type, uint dataType) const;
+		const NodeName*            GetNodeName(ushort type) const;
+		const NodeFieldEnum*       GetNodeFieldEnum(ushort type, uint fieldIdx) const;
 
 		private: // methods
 
 		void Load(const QString& file);
 		void LoadDefinition(const QString& line);
+		void LoadNodeFields(const QString& line);
+		void LoadFields(NodeDefinition& definition, const QString& fields);
 		void LoadNodeName(const QString& line);
 		void LoadNodeFieldEnum(const QString& line);
 
