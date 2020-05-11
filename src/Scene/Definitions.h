@@ -35,7 +35,7 @@ namespace Scene
 			Float4,
 			Color,
 			String,
-			CharArray
+			StringArray
 		};
 
 		sealed struct NodeFieldType

@@ -88,27 +88,27 @@ Node 0xae22 Type [Uint32 : Type]
 Node 0xae24 Data [Unknown : Data]
 NodeFields 0xae24 0xae22 [0] 1 []
 NodeFields 0xae24 0xae22 [0] 2 [Hex8 : Unknown, Hex32 : CharacterType1, Hex32 : CharacterType2, Float : Strength, Float : Energy, Float : LeftHandEnergy, Float : RightHandEnergy, Float : LeftLegEnergy, Float : RightLegEnergy, Float : Reactions, Float : Speed, Float : Aggresivity, Float : Intelligence, Float : Shooting, Float : Sight, Float : Hearing, Float : Driving, Float : Mass, Float : Morale]
-NodeFields 0xae24 0xae22 [0] 5 [Hex8 : Unknown, Hex32 : Unknown, Hex8 : Unknown, Hex32 : Unknown, CharArray : Script]
+NodeFields 0xae24 0xae22 [0] 5 [Hex8 : Unknown, Hex32 : Unknown, Hex8 : Unknown, Hex32 : Unknown, StringArray : Script]
 NodeFields 0xae24 0xae22 [0] 8 [Hex8 : Unknown, Hex32 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown]
 NodeFields 0xae24 0xae22 [0] 9 [Hex32 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown]
 NodeFields 0xae24 0xae22 [0] 20 []
 NodeFields 0xae24 0xae22 [0] 21 [Hex8 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Float : Unknown, Hex8 : Unknown]
 NodeFields 0xae24 0xae22 [0] 22 [Hex8 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Float : Unknown]
 NodeFields 0xae24 0xae22 [0] 25 [Hex8 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown]
-NodeFields 0xae24 0xae22 [0] 27 [Hex8 : Unknown, Hex32 : CharacterType1, Hex32 : CharacterType2, Float : Strength, Float : Energy, Float : LeftHandEnergy, Float : RightHandEnergy, Float : LeftLegEnergy, Float : RightLegEnergy, Float : Reactions, Float : Speed, Float : Aggresivity, Float : Intelligence, Float : Shooting, Float : Sight, Float : Hearing, Float : Driving, Float : Mass, Float : Morale, Hex8 : Unknown, Hex8 : Unknown, Hex32 : Unknown, CharArray : Script]
+NodeFields 0xae24 0xae22 [0] 27 [Hex8 : Unknown, Hex32 : CharacterType1, Hex32 : CharacterType2, Float : Strength, Float : Energy, Float : LeftHandEnergy, Float : RightHandEnergy, Float : LeftLegEnergy, Float : RightLegEnergy, Float : Reactions, Float : Speed, Float : Aggresivity, Float : Intelligence, Float : Shooting, Float : Sight, Float : Hearing, Float : Driving, Float : Mass, Float : Morale, Hex8 : Unknown, Hex8 : Unknown, Hex32 : Unknown, StringArray : Script]
 NodeFields 0xae24 0xae22 [0] 28 [Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown]
 NodeFields 0xae24 0xae22 [0] 30 []
 NodeFields 0xae24 0xae22 [0] 34 []
 NodeFields 0xae24 0xae22 [0] 35 [Hex8 : Unknown, Hex8 : Unknown, Float : Unknown, Float : Unknown, Float : Mass, Float : Friction, Float : Unknown, Uint32 : Sound, Hex8 : Unknown, Hex32 : Unknown]
 
 Node 0xae02 FrameAnimations has_childs []
-Node 0xae03 FrameAnimation [Hex16 : Unknown, Float : Unknown, Float : Unknown, CharArray : Frame]
+Node 0xae03 FrameAnimation [Hex16 : Unknown, Float : Unknown, Float : Unknown, StringArray : Frame]
 
 Node 0xaef0 RainSetup [Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex32 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown]
 Node 0xaef1 NonRainFrame [Unknown : Data]
 
 Node 0xae50 InitScripts has_childs []
-Node 0xae51 InitScript [Hex8 : Unknown, CharArray : Name, CharArray : Script]
+Node 0xae51 InitScript [Hex8 : Unknown, StringArray : Name, StringArray : Script]
 
 
 

@@ -9,23 +9,23 @@ using namespace Djbozkosz::Application::Scene;
 
 const QVector<Definitions::NodeFieldType> Definitions::FIELD_TYPES =
 {
-	{ "Unknown",   Definitions::ENodeFieldType::Unknown,   0                 },
-	{ "Uint8",     Definitions::ENodeFieldType::Uint8,     sizeof(uchar)     },
-	{ "Uint16",    Definitions::ENodeFieldType::Uint16,    sizeof(ushort)    },
-	{ "Uint32",    Definitions::ENodeFieldType::Uint32,    sizeof(uint)      },
-	{ "Int8",      Definitions::ENodeFieldType::Int8,      sizeof(char)      },
-	{ "Int16",     Definitions::ENodeFieldType::Int16,     sizeof(short)     },
-	{ "Int32",     Definitions::ENodeFieldType::Int32,     sizeof(int)       },
-	{ "Hex8",      Definitions::ENodeFieldType::Hex8,      sizeof(uchar)     },
-	{ "Hex16",     Definitions::ENodeFieldType::Hex16,     sizeof(ushort)    },
-	{ "Hex32",     Definitions::ENodeFieldType::Hex32,     sizeof(uint)      },
-	{ "Float",     Definitions::ENodeFieldType::Float,     sizeof(float)     },
-	{ "Float2",    Definitions::ENodeFieldType::Float2,    sizeof(float) * 2 },
-	{ "Float3",    Definitions::ENodeFieldType::Float3,    sizeof(float) * 3 },
-	{ "Float4",    Definitions::ENodeFieldType::Float4,    sizeof(float) * 4 },
-	{ "Color",     Definitions::ENodeFieldType::Color,     sizeof(float) * 3 },
-	{ "String",    Definitions::ENodeFieldType::String,    1                 },
-	{ "CharArray", Definitions::ENodeFieldType::CharArray, sizeof(uint)      }
+	{ "Unknown",     Definitions::ENodeFieldType::Unknown,     0                 },
+	{ "Uint8",       Definitions::ENodeFieldType::Uint8,       sizeof(uchar)     },
+	{ "Uint16",      Definitions::ENodeFieldType::Uint16,      sizeof(ushort)    },
+	{ "Uint32",      Definitions::ENodeFieldType::Uint32,      sizeof(uint)      },
+	{ "Int8",        Definitions::ENodeFieldType::Int8,        sizeof(char)      },
+	{ "Int16",       Definitions::ENodeFieldType::Int16,       sizeof(short)     },
+	{ "Int32",       Definitions::ENodeFieldType::Int32,       sizeof(int)       },
+	{ "Hex8",        Definitions::ENodeFieldType::Hex8,        sizeof(uchar)     },
+	{ "Hex16",       Definitions::ENodeFieldType::Hex16,       sizeof(ushort)    },
+	{ "Hex32",       Definitions::ENodeFieldType::Hex32,       sizeof(uint)      },
+	{ "Float",       Definitions::ENodeFieldType::Float,       sizeof(float)     },
+	{ "Float2",      Definitions::ENodeFieldType::Float2,      sizeof(float) * 2 },
+	{ "Float3",      Definitions::ENodeFieldType::Float3,      sizeof(float) * 3 },
+	{ "Float4",      Definitions::ENodeFieldType::Float4,      sizeof(float) * 4 },
+	{ "Color",       Definitions::ENodeFieldType::Color,       sizeof(float) * 3 },
+	{ "String",      Definitions::ENodeFieldType::String,      1                 },
+	{ "StringArray", Definitions::ENodeFieldType::StringArray, sizeof(uint)      }
 };
 
 

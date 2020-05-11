@@ -103,7 +103,7 @@ bool SceneNode::Load(QFile& reader, SceneNode* parent)
 			data = new uchar[size];
 			memcpy(data, str.data(), size);
 		}
-		else if (type == Definitions::ENodeFieldType::CharArray)
+		else if (type == Definitions::ENodeFieldType::StringArray)
 		{
 			auto lengthSize = field->FieldType->Size;
 			uint arraySize;

@@ -140,7 +140,7 @@ void DocumentWindow::SetupTableField(ushort type, int idx, const void* field, De
 			break;
 		}
 
-		case Definitions::ENodeFieldType::CharArray:
+		case Definitions::ENodeFieldType::StringArray:
 		{
 			auto dataChar = reinterpret_cast<const char*>(field);
 			auto dataUInt = reinterpret_cast<const uint*>(field);
