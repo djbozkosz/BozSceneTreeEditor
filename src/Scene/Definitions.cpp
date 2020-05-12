@@ -25,14 +25,15 @@ const QVector<Definitions::NodeFieldType> Definitions::FIELD_TYPES =
 	{ "Float4",      Definitions::ENodeFieldType::Float4,      sizeof(float) * 4 },
 	{ "Color",       Definitions::ENodeFieldType::Color,       sizeof(float) * 3 },
 	{ "String",      Definitions::ENodeFieldType::String,      1                 },
-	{ "StringArray", Definitions::ENodeFieldType::StringArray, sizeof(uint)      }
+	{ "StringArray", Definitions::ENodeFieldType::StringArray, sizeof(uint)      },
+	{ "StringFixed", Definitions::ENodeFieldType::StringFixed, 0                 }
 };
 
 
 Definitions::Definitions() :
 	m_RNodeLine("^Node\\s+([a-fx0-9]+)_?([a-fx0-9]*)\\s+([a-zA-Z0-9_]+)\\s+([a-zA-Z0-9_]+)?\\s*\\[(.*)\\]$"),
 	m_RNodeFieldList(",\\s*"),
-	m_RNodeField(" *\\:\\s*"),
+	m_RNodeField("^([a-zA-Z0-9_]+)\\s*\\:\\s*([a-zA-Z0-9_]+)$"),
 	m_RNodeFieldLine("^NodeFields\\s+([a-fx0-9]+)\\s+([a-fx0-9]+)\\s+\\[([0-9]+)\\]\\s+([0-9]+)\\s+\\[(.*)\\]$"),
 	m_RNodeNameLine("^NodeName\\s+([a-fx0-9]+)_?([a-fx0-9]*)\\s*\\[([0-9]+)\\]$"),
 	m_RNodeFieldEnumLine("^Enum\\s+([a-fx0-9]+)\\s+\\[([0-9]+)\\]\\s+\\[(.*)\\]$")
@@ -183,18 +184,30 @@ void Definitions::LoadFields(Definitions::NodeDefinition& definition, const QStr
 
 	foreach (field, fieldList)
 	{
-		auto values = field->split(m_RNodeField, QString::SkipEmptyParts);
-		Debug::Assert(values.size() == 2) << "Invalid field definition:" << *field;
+		QString type;
+		QString name;
+		LoadField(*field, type, name);
 
-		auto fieldType = m_StringToField.find(values[0]);
-		Debug::Assert(fieldType != m_StringToField.end()) << "Invalid field type:" << values[0];
+		auto fieldType = m_StringToField.find(type);
+		Debug::Assert(fieldType != m_StringToField.end()) << "Invalid field type:" << type;
 
 		NodeFieldInfo fieldInfo;
 		fieldInfo.FieldType = fieldType.value();
-		fieldInfo.Name      = values[1];
+		fieldInfo.Name      = name;
 
 		definition.Fields.push_back(fieldInfo);
 	}
+}
+
+void Definitions::LoadField(const QString& field, QString& type, QString& name)
+{
+	auto match = m_RNodeField.exactMatch(field);
+	Debug::Assert(match == true) << "Invalid field format:" << field;
+	Debug::Assert(m_RNodeField.captureCount() == 2) << "Invalid parameters count for field:" << field;
+
+	auto captures = m_RNodeField.capturedTexts();
+	type = captures[1];
+	name = captures[2];
 }
 
 void Definitions::LoadNodeName(const QString& line)
@@ -229,11 +242,12 @@ void Definitions::LoadNodeFieldEnum(const QString& line)
 
 	foreach (field, fieldList)
 	{
-		auto values = field->split(m_RNodeField, QString::SkipEmptyParts);
-		Debug::Assert(values.size() == 2) << "Invalid field definition:" << *field;
+		QString idx;
+		QString name;
+		LoadField(*field, idx, name);
 
-		auto key     = values[0].toUShort(null, 0);
-		enumMap[key] = values[1];
+		auto key     = idx.toUShort(null, 0);
+		enumMap[key] = name;
 	}
 
 	auto& enums     = m_NodeFieldEnums[type];

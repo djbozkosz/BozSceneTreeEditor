@@ -35,7 +35,8 @@ namespace Scene
 			Float4,
 			Color,
 			String,
-			StringArray
+			StringArray,
+			StringFixed
 		};
 
 		sealed struct NodeFieldType
@@ -127,6 +128,7 @@ namespace Scene
 		void LoadDefinition(const QString& line);
 		void LoadNodeFields(const QString& line);
 		void LoadFields(NodeDefinition& definition, const QString& fields);
+		void LoadField(const QString& field, QString& type, QString& name);
 		void LoadNodeName(const QString& line);
 		void LoadNodeFieldEnum(const QString& line);
 
