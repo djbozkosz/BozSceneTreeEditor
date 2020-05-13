@@ -148,6 +148,13 @@ void DocumentWindow::SetupTableField(ushort type, int idx, const void* field, De
 			break;
 		}
 
+		case Definitions::ENodeFieldType::StringFixed:
+		{
+			auto dataChar = reinterpret_cast<const char*>(field);
+			m_Ui->Table->setItem(idx, 2, new QTableWidgetItem(QString::fromLatin1(dataChar)));
+			break;
+		}
+
 		default:
 			break;
 	}

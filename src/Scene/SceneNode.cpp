@@ -113,6 +113,12 @@ bool SceneNode::Load(QFile& reader, SceneNode* parent)
 			memcpy(data, &arraySize, lengthSize);
 			LoadData(reader, &data[lengthSize], arraySize);
 		}
+		else if (type == Definitions::ENodeFieldType::StringFixed)
+		{
+			auto size = field->FixedSize;
+			data = new uchar[size];
+			LoadData(reader, data, size);
+		}
 		else
 		{
 			auto size = field->FieldType->Size;

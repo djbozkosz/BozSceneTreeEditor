@@ -33,7 +33,7 @@ const QVector<Definitions::NodeFieldType> Definitions::FIELD_TYPES =
 Definitions::Definitions() :
 	m_RNodeLine("^Node\\s+([a-fx0-9]+)_?([a-fx0-9]*)\\s+([a-zA-Z0-9_]+)\\s+([a-zA-Z0-9_]+)?\\s*\\[(.*)\\]$"),
 	m_RNodeFieldList(",\\s*"),
-	m_RNodeField("^([a-zA-Z0-9_]+)\\s*\\:\\s*([a-zA-Z0-9_]+)$"),
+	m_RNodeField("^([a-zA-Z0-9_]+)\\'?([0-9]*)\\s*\\:\\s*([a-zA-Z0-9_]+)$"),
 	m_RNodeFieldLine("^NodeFields\\s+([a-fx0-9]+)\\s+([a-fx0-9]+)\\s+\\[([0-9]+)\\]\\s+([0-9]+)\\s+\\[(.*)\\]$"),
 	m_RNodeNameLine("^NodeName\\s+([a-fx0-9]+)_?([a-fx0-9]*)\\s*\\[([0-9]+)\\]$"),
 	m_RNodeFieldEnumLine("^Enum\\s+([a-fx0-9]+)\\s+\\[([0-9]+)\\]\\s+\\[(.*)\\]$")
@@ -186,7 +186,8 @@ void Definitions::LoadFields(Definitions::NodeDefinition& definition, const QStr
 	{
 		QString type;
 		QString name;
-		LoadField(*field, type, name);
+		uint    fixedSize;
+		LoadField(*field, type, name, fixedSize);
 
 		auto fieldType = m_StringToField.find(type);
 		Debug::Assert(fieldType != m_StringToField.end()) << "Invalid field type:" << type;
@@ -194,20 +195,22 @@ void Definitions::LoadFields(Definitions::NodeDefinition& definition, const QStr
 		NodeFieldInfo fieldInfo;
 		fieldInfo.FieldType = fieldType.value();
 		fieldInfo.Name      = name;
+		fieldInfo.FixedSize = fixedSize;
 
 		definition.Fields.push_back(fieldInfo);
 	}
 }
 
-void Definitions::LoadField(const QString& field, QString& type, QString& name)
+void Definitions::LoadField(const QString& field, QString& type, QString& name, uint& fixedSize)
 {
 	auto match = m_RNodeField.exactMatch(field);
 	Debug::Assert(match == true) << "Invalid field format:" << field;
-	Debug::Assert(m_RNodeField.captureCount() == 2) << "Invalid parameters count for field:" << field;
+	Debug::Assert(m_RNodeField.captureCount() == 3) << "Invalid parameters count for field:" << field;
 
 	auto captures = m_RNodeField.capturedTexts();
-	type = captures[1];
-	name = captures[2];
+	type          = captures[1];
+	name          = captures[3];
+	fixedSize     = captures[2].toUInt();
 }
 
 void Definitions::LoadNodeName(const QString& line)
@@ -244,7 +247,8 @@ void Definitions::LoadNodeFieldEnum(const QString& line)
 	{
 		QString idx;
 		QString name;
-		LoadField(*field, idx, name);
+		uint    fixedSize;
+		LoadField(*field, idx, name, fixedSize);
 
 		auto key     = idx.toUShort(null, 0);
 		enumMap[key] = name;

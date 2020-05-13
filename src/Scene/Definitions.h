@@ -55,8 +55,9 @@ namespace Scene
 		{
 			const NodeFieldType* FieldType;
 			QString              Name;
+			uint                 FixedSize;
 
-			inline NodeFieldInfo() : FieldType(0) {}
+			inline NodeFieldInfo() : FieldType(0), FixedSize(0) {}
 		};
 
 		sealed struct NodeDefinition
@@ -128,7 +129,7 @@ namespace Scene
 		void LoadDefinition(const QString& line);
 		void LoadNodeFields(const QString& line);
 		void LoadFields(NodeDefinition& definition, const QString& fields);
-		void LoadField(const QString& field, QString& type, QString& name);
+		void LoadField(const QString& field, QString& type, QString& name, uint& fixedSize);
 		void LoadNodeName(const QString& line);
 		void LoadNodeFieldEnum(const QString& line);
 
