@@ -134,6 +134,7 @@ void DocumentWindow::SetupTableField(ushort type, int idx, const void* field, De
 		case Definitions::ENodeFieldType::Color:             SetTableFieldFloat      (idx, field, 3 ); break;
 
 		case Definitions::ENodeFieldType::String:
+		case Definitions::ENodeFieldType::StringFixed:
 		{
 			auto dataChar = reinterpret_cast<const char*>(field);
 			m_Ui->Table->setItem(idx, 2, new QTableWidgetItem(QString::fromLatin1(dataChar)));
@@ -145,13 +146,6 @@ void DocumentWindow::SetupTableField(ushort type, int idx, const void* field, De
 			auto dataChar = reinterpret_cast<const char*>(field);
 			auto dataUInt = reinterpret_cast<const uint*>(field);
 			m_Ui->Table->setItem(idx, 2, new QTableWidgetItem(QString::fromLatin1(&dataChar[4], dataUInt[0])));
-			break;
-		}
-
-		case Definitions::ENodeFieldType::StringFixed:
-		{
-			auto dataChar = reinterpret_cast<const char*>(field);
-			m_Ui->Table->setItem(idx, 2, new QTableWidgetItem(QString::fromLatin1(dataChar)));
 			break;
 		}
 
