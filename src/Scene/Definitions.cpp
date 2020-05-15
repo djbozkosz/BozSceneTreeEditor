@@ -26,12 +26,14 @@ const QVector<Definitions::NodeFieldType> Definitions::FIELD_TYPES =
 	{ "Color",       Definitions::ENodeFieldType::Color,       sizeof(float) * 3 },
 	{ "String",      Definitions::ENodeFieldType::String,      1                 },
 	{ "StringArray", Definitions::ENodeFieldType::StringArray, sizeof(uint)      },
-	{ "StringFixed", Definitions::ENodeFieldType::StringFixed, 0                 }
+	{ "StringFixed", Definitions::ENodeFieldType::StringFixed, 0                 },
+	{ "Structure",   Definitions::ENodeFieldType::Structure,   0                 }
 };
 
 
 Definitions::Definitions() :
 	m_RNodeLine("^Node\\s+([a-fx0-9]+)_?([a-fx0-9]*)\\s+([a-zA-Z0-9_]+)\\s+([a-zA-Z0-9_]+)?\\s*\\[(.*)\\]$"),
+	m_RStructLine("^Struct\\s+([a-fx0-9]+)\\s+\\[(.*)\\]$"),
 	m_RNodeFieldList(",\\s*"),
 	m_RNodeField("^([a-zA-Z0-9_]+)\\'?([0-9]*)\\s*\\:\\s*([a-zA-Z0-9_]+)$"),
 	m_RNodeFieldLine("^NodeFields\\s+([a-fx0-9]+)\\s+([a-fx0-9]+)\\s+\\[([0-9]+)\\]\\s+([0-9]+)\\s+\\[(.*)\\]$"),
@@ -50,29 +52,29 @@ Definitions::~Definitions()
 {
 }
 
-const Definitions::NodeDefinition* Definitions::GetNodeDefinition(ushort parentType, ushort type) const
+const Definitions::NodeDefinition* Definitions::GetNode(ushort parentType, ushort type) const
 {
 	auto key        = GetKey(parentType, type);
-	auto definition = m_NodeDefinitions.find(key);
+	auto definition = m_Nodes.find(key);
 
-	if (definition == m_NodeDefinitions.end())
+	if (definition == m_Nodes.end())
 		return null;
 
 	return &definition.value();
 }
 
-const Definitions::NodeFieldDefinition* Definitions::GetNodeFieldDefinition(ushort type) const
+const Definitions::NodeFieldDefinition* Definitions::GetNodeField(ushort type) const
 {
-	auto fieldDefinitions = m_NodeFieldDefinitions.find(type);
-	if (fieldDefinitions == m_NodeFieldDefinitions.end())
+	auto fieldDefinitions = m_NodeFields.find(type);
+	if (fieldDefinitions == m_NodeFields.end())
 		return null;
 
 	return &fieldDefinitions.value();
 }
 
-const Definitions::NodeDefinition* Definitions::GetNodeFieldDefinitionData(ushort type, uint dataType) const
+const Definitions::NodeDefinition* Definitions::GetNodeFieldData(ushort type, uint dataType) const
 {
-	auto fieldDefinitions = GetNodeFieldDefinition(type);
+	auto fieldDefinitions = GetNodeField(type);
 	if (fieldDefinitions == null)
 		return null;
 
@@ -117,7 +119,11 @@ void Definitions::Load(const QString &file)
 	{
 		if (line->startsWith("Node ") == true)
 		{
-			LoadDefinition(*line);
+			LoadNode(*line);
+		}
+		else if (line->startsWith("Struct ") == true)
+		{
+			LoadStruct(*line);
 		}
 		else if (line->startsWith("NodeFields ") == true)
 		{
@@ -134,27 +140,45 @@ void Definitions::Load(const QString &file)
 	}
 }
 
-void Definitions::LoadDefinition(const QString& line)
+void Definitions::LoadNode(const QString& line)
 {
 	auto match = m_RNodeLine.exactMatch(line);
-	Debug::Assert(match == true) << "Invalid definition:" << line;
-	Debug::Assert(m_RNodeLine.captureCount() == 5) << "Invalid parameters count for definition:" << line;
+	Debug::Assert(match == true) << "Invalid node:" << line;
+	Debug::Assert(m_RNodeLine.captureCount() == 5) << "Invalid parameters count for node:" << line;
 
 	auto captures = m_RNodeLine.capturedTexts();
 
-	NodeDefinition definition;
+	NodeDefinition node;
 	auto parentType = captures[2].isEmpty() ? (short)0                      : captures[1].toUShort(null, 0);
 	auto type       = captures[2].isEmpty() ? captures[1].toUShort(null, 0) : captures[2].toUShort(null, 0);
 	auto key        = GetKey(parentType, type);
 
-	definition.Type      = type;
-	definition.Name      = captures[3];
-	definition.HasChilds = (captures[4] == "has_childs");
+	node.Type       = type;
+	node.Name       = captures[3];
+	node.HasChilds  = (captures[4] == "has_childs");
 
-	Debug::Assert(m_NodeDefinitions.contains(key) == false) << "Node definitions already contain type" << type;
+	Debug::Assert(m_Nodes.contains(key) == false) << "Node already contain type" << type;
 
-	LoadFields(definition, captures[5]);
-	m_NodeDefinitions[key] = definition;
+	LoadFields(node.Fields, captures[5]);
+	m_Nodes[key] = node;
+}
+
+void Definitions::LoadStruct(const QString& line)
+{
+	auto match = m_RStructLine.exactMatch(line);
+	Debug::Assert(match == true) << "Invalid struct:" << line;
+	Debug::Assert(m_RStructLine.captureCount() == 2) << "Invalid parameters count for struct:" << line;
+
+	auto captures = m_RStructLine.capturedTexts();
+
+	auto name = captures[1];
+	Debug::Assert(m_Structs.contains(name) == false) << "Structs already contain type" << name;
+
+	StructDefinition strukt;
+	strukt.Name = name;
+
+	LoadFields(strukt.Fields, captures[2]);
+	m_Structs[name] = strukt;
 }
 
 void Definitions::LoadNodeFields(const QString& line)
@@ -163,24 +187,24 @@ void Definitions::LoadNodeFields(const QString& line)
 	Debug::Assert(match == true) << "Invalid node field definition:" << line;
 	Debug::Assert(m_RNodeFieldLine.captureCount() == 5) << "Invalid parameters count for node field definition:" << line;
 
-	auto captures                   = m_RNodeFieldLine.capturedTexts();
+	auto captures         = m_RNodeFieldLine.capturedTexts();
 
-	auto  type                      = captures[1].toUShort(null, 0);
-	auto& fieldDefinition           = m_NodeFieldDefinitions[type];
-	auto  dataType                  = captures[4].toUInt(null, 0);
-	fieldDefinition.SiblingType     = captures[2].toUShort(null, 0);
-	fieldDefinition.SiblingFieldIdx = captures[3].toUInt(null, 0);
+	auto  type            = captures[1].toUShort(null, 0);
+	auto& field           = m_NodeFields[type];
+	auto  dataType        = captures[4].toUInt(null, 0);
+	field.SiblingType     = captures[2].toUShort(null, 0);
+	field.SiblingFieldIdx = captures[3].toUInt(null, 0);
 
-	auto definition                 = *GetNodeDefinition(0, type);
-	definition.Fields.clear();
-	LoadFields(definition, captures[5]);
-	fieldDefinition.Definitions[dataType] = definition;
+	auto node             = *GetNode(0, type);
+	node.Fields.clear();
+	LoadFields(node.Fields, captures[5]);
+	field.Definitions[dataType] = node;
 }
 
-void Definitions::LoadFields(Definitions::NodeDefinition& definition, const QString& fields)
+void Definitions::LoadFields(QVector<NodeFieldInfo>& fieldInfos, const QString& fields)
 {
 	auto fieldList = fields.split(m_RNodeFieldList, QString::SkipEmptyParts);
-	definition.Fields.reserve(fieldList.size());
+	fieldInfos.reserve(fieldList.size());
 
 	foreach (field, fieldList)
 	{
@@ -197,7 +221,7 @@ void Definitions::LoadFields(Definitions::NodeDefinition& definition, const QStr
 		fieldInfo.Name      = name;
 		fieldInfo.FixedSize = fixedSize;
 
-		definition.Fields.push_back(fieldInfo);
+		fieldInfos.push_back(fieldInfo);
 	}
 }
 

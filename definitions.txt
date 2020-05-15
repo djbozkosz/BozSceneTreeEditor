@@ -81,6 +81,8 @@ Node 0xb115 IncreaseStep [Float : IncreaseStep]
 Node 0xb116 DecreaseStep [Float : DecreaseStep]
 Node 0xb117 ShowUpdateTimeMs [Float : ShowUpdateTimeMs]
 
+Struct Traffic [StringFixed'20 : Vehicle, Float : DensityRatio, Hex8 : Color, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Police, Hex8 : Gangster0, Hex8 : Gangster1]
+
 Node 0xae20 Actors has_childs []
 Node 0xae21 Actor has_childs []
 Node 0xae23 Name [String : Name]
@@ -122,10 +124,6 @@ Node 0x03e8 Part [Unknown : Data]
 
 NodeName 0x4010_0x0010 [0]
 NodeName 0xae21_0xae23 [0]
-
-
-
-Struct Traffic [StringFixed'20 : Vehicle, Float : DensityRatio, Hex8 : Color, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Police, Hex8 : Gangster0, Hex8 : Gangster1]
 
 
 

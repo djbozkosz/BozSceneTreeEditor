@@ -36,7 +36,8 @@ namespace Scene
 			Color,
 			String,
 			StringArray,
-			StringFixed
+			StringFixed,
+			Structure
 		};
 
 		sealed struct NodeFieldType
@@ -51,13 +52,16 @@ namespace Scene
 			}
 		};
 
+		struct StructDefinition;
+
 		sealed struct NodeFieldInfo
 		{
 			const NodeFieldType* FieldType;
+			StructDefinition*    NestedField;
 			QString              Name;
 			uint                 FixedSize;
 
-			inline NodeFieldInfo() : FieldType(0), FixedSize(0) {}
+			inline NodeFieldInfo() : FieldType(0), NestedField(null), FixedSize(0) {}
 		};
 
 		sealed struct NodeDefinition
@@ -88,6 +92,12 @@ namespace Scene
 			inline NodeName() : Type(0), ChildType(0), FieldIdx(0) {}
 		};
 
+		sealed struct StructDefinition
+		{
+			QString                Name;
+			QVector<NodeFieldInfo> Fields;
+		};
+
 		private: // constants
 
 		static const QVector<NodeFieldType> FIELD_TYPES;
@@ -95,6 +105,7 @@ namespace Scene
 		private: // members
 
 		QRegExp                             m_RNodeLine;
+		QRegExp                             m_RStructLine;
 		QRegExp                             m_RNodeFieldList;
 		QRegExp                             m_RNodeField;
 		QRegExp                             m_RNodeFieldLine;
@@ -102,9 +113,10 @@ namespace Scene
 		QRegExp                             m_RNodeFieldEnumLine;
 
 		QMap<QString, const NodeFieldType*> m_StringToField;
-		QMap<uint, NodeDefinition>          m_NodeDefinitions;
+		QMap<uint, NodeDefinition>          m_Nodes;
+		QMap<QString, StructDefinition>     m_Structs;
 
-		QMap<ushort, NodeFieldDefinition>   m_NodeFieldDefinitions;
+		QMap<ushort, NodeFieldDefinition>   m_NodeFields;
 
 		QMap<ushort, NodeName>              m_NodeNames;
 
@@ -117,18 +129,19 @@ namespace Scene
 		explicit Definitions();
 		virtual ~Definitions();
 
-		const NodeDefinition*      GetNodeDefinition(ushort parentType, ushort type) const;
-		const NodeFieldDefinition* GetNodeFieldDefinition(ushort type) const;
-		const NodeDefinition*      GetNodeFieldDefinitionData(ushort type, uint dataType) const;
+		const NodeDefinition*      GetNode(ushort parentType, ushort type) const;
+		const NodeFieldDefinition* GetNodeField(ushort type) const;
+		const NodeDefinition*      GetNodeFieldData(ushort type, uint dataType) const;
 		const NodeName*            GetNodeName(ushort type) const;
 		const NodeFieldEnum*       GetNodeFieldEnum(ushort type, uint fieldIdx) const;
 
 		private: // methods
 
 		void Load(const QString& file);
-		void LoadDefinition(const QString& line);
+		void LoadNode(const QString& line);
+		void LoadStruct(const QString& line);
 		void LoadNodeFields(const QString& line);
-		void LoadFields(NodeDefinition& definition, const QString& fields);
+		void LoadFields(QVector<NodeFieldInfo>& fieldInfos, const QString& fields);
 		void LoadField(const QString& field, QString& type, QString& name, uint& fixedSize);
 		void LoadNodeName(const QString& line);
 		void LoadNodeFieldEnum(const QString& line);
