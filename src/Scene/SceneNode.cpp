@@ -14,6 +14,8 @@ SceneNode::SceneNode(Definitions* definitions) :
 
 SceneNode::~SceneNode()
 {
+	Debug::Assert(false) << "Proper struct cleanup";
+
 	foreach (field, Fields)
 	{
 		delete[] reinterpret_cast<uchar*>(*field);
@@ -48,13 +50,13 @@ bool SceneNode::Load(QFile& reader, SceneNode* parent)
 	auto endPos     = startPos + Size;
 	auto parentType = (parent != null) ? parent->Type : 0;
 
-	auto fieldDefinition = m_Definitions->GetNodeField(Type);
-	if (fieldDefinition != null)
+	auto field = m_Definitions->GetNodeField(Type);
+	if (field != null)
 	{
-		auto sibling = parent->GetChild(fieldDefinition->SiblingType);
-		Debug::Assert(sibling != null) << "Sibling" << fieldDefinition->SiblingType << "is not found for node" << Type;
+		auto sibling = parent->GetChild(field->SiblingType);
+		Debug::Assert(sibling != null) << "Sibling" << field->SiblingType << "is not found for node" << Type;
 
-		auto dataType = *reinterpret_cast<const int*>(sibling->Fields[fieldDefinition->SiblingFieldIdx]);
+		auto dataType = *reinterpret_cast<const int*>(sibling->Fields[field->SiblingFieldIdx]);
 		Definition    = m_Definitions->GetNodeFieldData(Type, dataType);
 	}
 
@@ -81,8 +83,39 @@ bool SceneNode::Load(QFile& reader, SceneNode* parent)
 		return true;
 	}
 
-	auto fields = Definition->Fields;
-	foreach (field, fields)
+	LoadFields(reader, Fields, Definition->Fields);
+
+	if (Definition->HasChilds == false || reader.pos() == endPos)
+		return true;
+
+	while (reader.pos() < endPos)
+	{
+		auto child  = new SceneNode(m_Definitions);
+		auto result = child->Load(reader, this);
+		if (result == false)
+		{
+			delete child;
+			return false;
+		}
+
+		Childs.push_back(child);
+	}
+
+	Debug::Assert(reader.pos() == endPos) << "Data mismatch while load child nodes for node" << Type;
+
+	return true;
+}
+
+bool SceneNode::Save(QFile& writer) const
+{
+	unused(writer);
+
+	return false;
+}
+
+void SceneNode::LoadFields(QFile& reader, QVector<void*>& fields, const QVector<Definitions::NodeFieldInfo>& fieldInfos)
+{
+	foreach (field, fieldInfos)
 	{
 		auto type = field->FieldType->Type;
 		auto data = default_(uchar*);
@@ -119,6 +152,15 @@ bool SceneNode::Load(QFile& reader, SceneNode* parent)
 			data = new uchar[size];
 			LoadData(reader, data, size);
 		}
+		else if (type == Definitions::ENodeFieldType::Struct)
+		{
+			auto structFields = new QVector<void*>();
+
+			// foreach as array by referenced size
+			//LoadFields(reader, );
+
+			data = reinterpret_cast<uchar*>(structFields);
+		}
 		else
 		{
 			auto size = field->FieldType->Size;
@@ -126,33 +168,6 @@ bool SceneNode::Load(QFile& reader, SceneNode* parent)
 			LoadData(reader, data, size);
 		}
 
-		Fields.push_back(data);
+		fields.push_back(data);
 	}
-
-	if (Definition->HasChilds == false || reader.pos() == endPos)
-		return true;
-
-	while (reader.pos() < endPos)
-	{
-		auto child  = new SceneNode(m_Definitions);
-		auto result = child->Load(reader, this);
-		if (result == false)
-		{
-			delete child;
-			return false;
-		}
-
-		Childs.push_back(child);
-	}
-
-	Debug::Assert(reader.pos() == endPos) << "Data mismatch while load child nodes for node" << Type;
-
-	return true;
-}
-
-bool SceneNode::Save(QFile& writer) const
-{
-	unused(writer);
-
-	return false;
 }

@@ -43,14 +43,16 @@ namespace Scene
 
 		private: // methods
 
-		template <typename T> inline bool LoadData(QFile& reader, T& dest)
+		static void LoadFields(QFile& reader, QVector<void *>& fields, const QVector<Definitions::NodeFieldInfo>& fieldInfos);
+
+		template <typename T> static inline bool LoadData(QFile& reader, T& dest)
 		{
 			auto   sizeToRead = sizeof(T);
 			auto   readSize   = reader.read(reinterpret_cast<char*>(&dest), sizeToRead);
 			return readSize == sizeToRead;
 		}
 
-		inline bool LoadData(QFile& reader, void* dest, uint sizeToRead)
+		static inline bool LoadData(QFile& reader, void* dest, uint sizeToRead)
 		{
 			auto   readSize = reader.read(reinterpret_cast<char*>(dest), sizeToRead);
 			return readSize == sizeToRead;

@@ -37,7 +37,7 @@ namespace Scene
 			String,
 			StringArray,
 			StringFixed,
-			Structure
+			Struct
 		};
 
 		sealed struct NodeFieldType
@@ -142,7 +142,7 @@ namespace Scene
 		void LoadStruct(const QString& line);
 		void LoadNodeFields(const QString& line);
 		void LoadFields(QVector<NodeFieldInfo>& fieldInfos, const QString& fields);
-		void LoadField(const QString& field, QString& type, QString& name, uint& fixedSize);
+		void LoadField(const QString& field, QString& type, QString& name, uint& size);
 		void LoadNodeName(const QString& line);
 		void LoadNodeFieldEnum(const QString& line);
 

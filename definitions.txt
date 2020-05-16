@@ -94,7 +94,7 @@ NodeFields 0xae24 0xae22 [0] 5 [Hex8 : Unknown, Hex32 : Unknown, Hex8 : Unknown,
 NodeFields 0xae24 0xae22 [0] 6 [Hex32 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Float : Unknown, Hex8 : Unknown, Hex8 : Unknown, Float : Unknown, Float : Unknown, StringFixed'16 : OpenSound, StringFixed'16 : CloseSound, StringFixed'16 : LockedSound, Hex8 : Unknown]
 NodeFields 0xae24 0xae22 [0] 8 [Hex8 : Unknown, Hex32 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown]
 NodeFields 0xae24 0xae22 [0] 9 [Hex32 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown]
-NodeFields 0xae24 0xae22 [0] 12 [Hex32 : Unknown, Float : DespawnRadius, Float : InnerSpawnRadius, Float : OuterSpawnRadius, Uint32 : MaxCarsCount, Uint32 : ListSize, Traffic_5 : Cars]
+NodeFields 0xae24 0xae22 [0] 12 [Hex32 : Unknown, Float : DespawnRadius, Float : InnerSpawnRadius, Float : OuterSpawnRadius, Uint32 : MaxCarsCount, Uint32 : ListSize, Traffic'5 : Cars]
 NodeFields 0xae24 0xae22 [0] 20 []
 NodeFields 0xae24 0xae22 [0] 21 [Hex8 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Float : Unknown, Hex8 : Unknown]
 NodeFields 0xae24 0xae22 [0] 22 [Hex8 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Float : Unknown]
