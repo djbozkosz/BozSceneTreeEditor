@@ -100,19 +100,21 @@ void DocumentWindow::SetupTable(SceneNode* node)
 		return;
 	}
 
-	for (int idx = 0; idx < count; idx++)
+	auto idx = 0;
+
+	for (int fieldIdx = 0; fieldIdx < count; fieldIdx++, idx++)
 	{
-		const auto& field     = node->Fields[idx];
-		const auto& fieldInfo = node->Definition->Fields[idx];
+		const auto& field     = node->Fields[fieldIdx];
+		const auto& fieldInfo = node->Definition->Fields[fieldIdx];
 
 		table->setRowCount(table->rowCount() + 1);
 		table->setItem(idx, 0, new QTableWidgetItem(fieldInfo.Name));
 		table->setItem(idx, 1, new QTableWidgetItem(fieldInfo.FieldType->Name));
-		SetupTableField(node->Type, idx, count, field, fieldInfo);
+		SetupTableField(node->Type, idx, field, fieldInfo);
 	}
 }
 
-void DocumentWindow::SetupTableField(ushort type, int& idx, int& count, const void* field, const Definitions::NodeFieldInfo& fieldInfo)
+void DocumentWindow::SetupTableField(ushort type, int& idx, const void* field, const Definitions::NodeFieldInfo& fieldInfo)
 {
 	auto intValue  = -1;
 	auto fieldType = fieldInfo.FieldType->Type;
@@ -156,13 +158,13 @@ void DocumentWindow::SetupTableField(ushort type, int& idx, int& count, const vo
 			auto        structArrayCount = structArray.size();
 
 			auto*       table            = m_Ui->Table;
-			table->setRowCount(table->rowCount() + fieldInfo.NestedField->Fields.size() * structArrayCount);
+			table->setRowCount(table->rowCount() + fieldInfo.NestedField->Fields.size() * structArrayCount - 1);
 
 			for (int structIdx = 0; structIdx < structArrayCount; structIdx++)
 			{
 				const auto& strukt = structArray[structIdx];
 
-				for (int fieldIdx = 0, cnt = strukt.size(); fieldIdx < cnt; fieldIdx++)
+				for (int fieldIdx = 0, count = strukt.size(); fieldIdx < count; fieldIdx++)
 				{
 					const auto* field    = strukt[fieldIdx];
 					const auto& fieldInf = fieldInfo.NestedField->Fields[fieldIdx];
@@ -170,12 +172,12 @@ void DocumentWindow::SetupTableField(ushort type, int& idx, int& count, const vo
 					table->setItem(idx, 0, new QTableWidgetItem(QString("%1: %2").arg(structIdx).arg(fieldInf.Name)));
 					table->setItem(idx, 1, new QTableWidgetItem(fieldInf.FieldType->Name));
 
-					SetupTableField(type, idx, count, field, fieldInf);
+					SetupTableField(type, idx, field, fieldInf);
 					idx++;
-					count++;
 				}
 			}
 
+			idx--;
 			break;
 		}
 
