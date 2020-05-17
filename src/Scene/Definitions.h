@@ -22,6 +22,7 @@ namespace Scene
 			Unknown = 0,
 			Uint8,
 			Uint16,
+			Uint16_3,
 			Uint32,
 			Int8,
 			Int16,

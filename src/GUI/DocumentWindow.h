@@ -75,18 +75,21 @@ namespace GUI
 		void SetupTable(Scene::SceneNode* node);
 		void SetupTableField(ushort type, int& idx, const void* field, const Scene::Definitions::NodeFieldInfo& fieldInfo);
 
-		template <typename T> inline int SetTableFieldInt(int idx, const void* field, int base = 10)
+		template <typename T> inline int SetTableFieldInt(int idx, const void* field, int count, int base = 10)
 		{
 			auto data = reinterpret_cast<const T*>(field);
-
-			auto text = QString::number(*data, base);
-			if (base == 16)
+			for (int i = 0; i < count; i++)
 			{
-				text = QString("0x%1").arg(text);
+				auto text = QString::number(data[i], base);
+				if (base == 16)
+				{
+					text = QString("0x%1").arg(text);
+				}
+
+				m_Ui->Table->setItem(idx, i + 2, new QTableWidgetItem(text));
 			}
 
-			m_Ui->Table->setItem(idx, 2, new QTableWidgetItem(text));
-			return *data;
+			return data[0];
 		}
 
 		inline void SetTableFieldFloat(int idx, const void* field, int count)

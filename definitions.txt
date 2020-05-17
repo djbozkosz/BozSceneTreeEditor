@@ -66,8 +66,11 @@ Node 0x4067 Empty []
 Node 0xb800 Unknown [Float : Unknown]
 Node 0xb200 Sector [String : Name]
 
-Node 0x4083 Occluder [Unknown : Data]
-Node 0xb151 Volume [Unknown : Data]
+Struct MeshVertex [Float3 : Vertex]
+Struct MeshTriangleIndices [Uint16_3 : Indices]
+
+Node 0x4083 Occluder [Uint32 : VerticesCount, MeshVertex'0 : Vertices, Uint32 : TrianglesCount, MeshTriangleIndices'2 : TriangleIndices]
+Node 0xb151 Volume [Uint32 : VerticesCount, MeshVertex'0 : Vertices, Uint32 : TrianglesCount, MeshTriangleIndices'2 : TriangleIndices]
 
 Node 0x4090 DataSignature [Hex32 : Signature]
 
@@ -82,7 +85,7 @@ Node 0xb116 DecreaseStep [Float : DecreaseStep]
 Node 0xb117 ShowUpdateTimeMs [Float : ShowUpdateTimeMs]
 
 Struct Traffic [StringFixed'20 : Vehicle, Float : DensityRatio, Hex8 : Color, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Police, Hex8 : Gangster0, Hex8 : Gangster1, Hex8 : Unknown]
-Struct PedestrianNames [StringFixed'17 : Pedestrian]
+Struct PedestrianName [StringFixed'17 : Pedestrian]
 Struct PedestrianDensity [Uint32 : DensityRatio]
 
 Node 0xae20 Actors has_childs []
@@ -97,7 +100,7 @@ NodeFields 0xae24 0xae22 [0] 6 [Hex32 : Unknown, Hex8 : Unknown, Hex8 : Unknown,
 NodeFields 0xae24 0xae22 [0] 8 [Hex8 : Unknown, Hex32 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown]
 NodeFields 0xae24 0xae22 [0] 9 [Hex32 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown]
 NodeFields 0xae24 0xae22 [0] 12 [Hex32 : Unknown, Float : DespawnRadius, Float : InnerSpawnRadius, Float : OuterSpawnRadius, Uint32 : MaxCarsCount, Uint32 : CarsCount, Traffic'5 : Cars]
-NodeFields 0xae24 0xae22 [0] 18 [Hex32 : Unknown, Hex8 : Unknown, Float : SpawnRadius, Float : DespawnRadius, Float : InnerSpawnRadius, Float : OuterSpawnRadius, Float : InnerSpawnRadius, Uint32 : MaxPedsCount, Uint32 : PedsCount, PedestrianNames'8 : PedestrianNames, PedestrianDensity'8 : PedestrianDensity]
+NodeFields 0xae24 0xae22 [0] 18 [Hex32 : Unknown, Hex8 : Unknown, Float : SpawnRadius, Float : DespawnRadius, Float : InnerSpawnRadius, Float : OuterSpawnRadius, Float : InnerSpawnRadius, Uint32 : MaxPedsCount, Uint32 : PedsCount, PedestrianName'8 : PedestrianNames, PedestrianDensity'8 : PedestrianDensity]
 NodeFields 0xae24 0xae22 [0] 20 []
 NodeFields 0xae24 0xae22 [0] 21 [Hex8 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Float : Unknown, Hex8 : Unknown]
 NodeFields 0xae24 0xae22 [0] 22 [Hex8 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Float : Unknown]

@@ -121,20 +121,21 @@ void DocumentWindow::SetupTableField(ushort type, int& idx, const void* field, c
 
 	switch (fieldType)
 	{
-		case Definitions::ENodeFieldType::Uint8:  intValue = SetTableFieldInt<uchar >(idx, field    ); break;
-		case Definitions::ENodeFieldType::Uint16: intValue = SetTableFieldInt<ushort>(idx, field    ); break;
-		case Definitions::ENodeFieldType::Uint32: intValue = SetTableFieldInt<uint  >(idx, field    ); break;
-		case Definitions::ENodeFieldType::Int8:   intValue = SetTableFieldInt<char  >(idx, field    ); break;
-		case Definitions::ENodeFieldType::Int16:  intValue = SetTableFieldInt<short >(idx, field    ); break;
-		case Definitions::ENodeFieldType::Int32:  intValue = SetTableFieldInt<int   >(idx, field    ); break;
-		case Definitions::ENodeFieldType::Hex8:   intValue = SetTableFieldInt<uchar >(idx, field, 16); break;
-		case Definitions::ENodeFieldType::Hex16:  intValue = SetTableFieldInt<ushort>(idx, field, 16); break;
-		case Definitions::ENodeFieldType::Hex32:  intValue = SetTableFieldInt<uint  >(idx, field, 16); break;
-		case Definitions::ENodeFieldType::Float:             SetTableFieldFloat      (idx, field, 1 ); break;
-		case Definitions::ENodeFieldType::Float2:            SetTableFieldFloat      (idx, field, 2 ); break;
-		case Definitions::ENodeFieldType::Float3:            SetTableFieldFloat      (idx, field, 3 ); break;
-		case Definitions::ENodeFieldType::Float4:            SetTableFieldFloat      (idx, field, 4 ); break;
-		case Definitions::ENodeFieldType::Color:             SetTableFieldFloat      (idx, field, 3 ); break;
+		case Definitions::ENodeFieldType::Uint8:    intValue = SetTableFieldInt<uchar >(idx, field, 1    ); break;
+		case Definitions::ENodeFieldType::Uint16:   intValue = SetTableFieldInt<ushort>(idx, field, 1    ); break;
+		case Definitions::ENodeFieldType::Uint16_3: intValue = SetTableFieldInt<ushort>(idx, field, 3    ); break;
+		case Definitions::ENodeFieldType::Uint32:   intValue = SetTableFieldInt<uint  >(idx, field, 1    ); break;
+		case Definitions::ENodeFieldType::Int8:     intValue = SetTableFieldInt<char  >(idx, field, 1    ); break;
+		case Definitions::ENodeFieldType::Int16:    intValue = SetTableFieldInt<short >(idx, field, 1    ); break;
+		case Definitions::ENodeFieldType::Int32:    intValue = SetTableFieldInt<int   >(idx, field, 1    ); break;
+		case Definitions::ENodeFieldType::Hex8:     intValue = SetTableFieldInt<uchar >(idx, field, 1, 16); break;
+		case Definitions::ENodeFieldType::Hex16:    intValue = SetTableFieldInt<ushort>(idx, field, 1, 16); break;
+		case Definitions::ENodeFieldType::Hex32:    intValue = SetTableFieldInt<uint  >(idx, field, 1, 16); break;
+		case Definitions::ENodeFieldType::Float:               SetTableFieldFloat      (idx, field, 1    ); break;
+		case Definitions::ENodeFieldType::Float2:              SetTableFieldFloat      (idx, field, 2    ); break;
+		case Definitions::ENodeFieldType::Float3:              SetTableFieldFloat      (idx, field, 3    ); break;
+		case Definitions::ENodeFieldType::Float4:              SetTableFieldFloat      (idx, field, 4    ); break;
+		case Definitions::ENodeFieldType::Color:               SetTableFieldFloat      (idx, field, 3    ); break;
 
 		case Definitions::ENodeFieldType::String:
 		case Definitions::ENodeFieldType::StringFixed:
