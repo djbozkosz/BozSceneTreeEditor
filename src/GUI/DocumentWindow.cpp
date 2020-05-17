@@ -102,8 +102,8 @@ void DocumentWindow::SetupTable(SceneNode* node)
 
 	for (int idx = 0; idx < count; idx++)
 	{
-		auto const& field     = node->Fields[idx];
-		auto const& fieldInfo = node->Definition->Fields[idx];
+		const auto& field     = node->Fields[idx];
+		const auto& fieldInfo = node->Definition->Fields[idx];
 
 		table->setRowCount(table->rowCount() + 1);
 		table->setItem(idx, 0, new QTableWidgetItem(fieldInfo.Name));
@@ -152,15 +152,23 @@ void DocumentWindow::SetupTableField(ushort type, int& idx, int& count, const vo
 
 		case Definitions::ENodeFieldType::Struct:
 		{
-			auto structArray = *reinterpret_cast<const QVector<QVector<const void*> >*>(field);
-			m_Ui->Table->setRowCount(m_Ui->Table->rowCount() + fieldInfo.NestedField->Fields.size() * fieldInfo.Number);
+			const auto& structArray      = *reinterpret_cast<const QVector<QVector<const void*> >*>(field);
+			auto        structArrayCount = structArray.size();
 
-			foreach (strukt, structArray)
+			auto*       table            = m_Ui->Table;
+			table->setRowCount(table->rowCount() + fieldInfo.NestedField->Fields.size() * structArrayCount);
+
+			for (int structIdx = 0; structIdx < structArrayCount; structIdx++)
 			{
-				for (int idx = 0, cnt = strukt->size(); idx < cnt; idx++)
+				const auto& strukt = structArray[structIdx];
+
+				for (int fieldIdx = 0, cnt = strukt.size(); fieldIdx < cnt; fieldIdx++)
 				{
-					auto field    = (*strukt)[idx];
-					auto fieldInf = fieldInfo.NestedField->Fields[idx];
+					const auto* field    = strukt[fieldIdx];
+					const auto& fieldInf = fieldInfo.NestedField->Fields[fieldIdx];
+
+					table->setItem(idx, 0, new QTableWidgetItem(QString("%1: %2").arg(structIdx).arg(fieldInf.Name)));
+					table->setItem(idx, 1, new QTableWidgetItem(fieldInf.FieldType->Name));
 
 					SetupTableField(type, idx, count, field, fieldInf);
 					idx++;
@@ -181,7 +189,7 @@ void DocumentWindow::SetupTableField(ushort type, int& idx, int& count, const vo
 		auto enumMap = m_Definitions->GetNodeFieldEnum(type, idx);
 		if (enumMap != null)
 		{
-			auto const& enumValue = enumMap->find(intValue);
+			const auto& enumValue = enumMap->find(intValue);
 			if (enumValue != enumMap->end())
 			{
 				auto item = m_Ui->Table->item(idx, 2);
