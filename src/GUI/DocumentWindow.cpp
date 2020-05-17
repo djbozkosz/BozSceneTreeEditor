@@ -108,13 +108,14 @@ void DocumentWindow::SetupTable(SceneNode* node)
 		table->setRowCount(table->rowCount() + 1);
 		table->setItem(idx, 0, new QTableWidgetItem(fieldInfo.Name));
 		table->setItem(idx, 1, new QTableWidgetItem(fieldInfo.FieldType->Name));
-		SetupTableField(node->Type, idx, field, fieldInfo.FieldType->Type);
+		SetupTableField(node->Type, idx, count, field, fieldInfo);
 	}
 }
 
-void DocumentWindow::SetupTableField(ushort type, int idx, const void* field, Definitions::ENodeFieldType fieldType)
+void DocumentWindow::SetupTableField(ushort type, int& idx, int& count, const void* field, const Definitions::NodeFieldInfo& fieldInfo)
 {
-	int intValue = -1;
+	auto intValue  = -1;
+	auto fieldType = fieldInfo.FieldType->Type;
 
 	switch (fieldType)
 	{
@@ -146,6 +147,27 @@ void DocumentWindow::SetupTableField(ushort type, int idx, const void* field, De
 			auto dataChar = reinterpret_cast<const char*>(field);
 			auto dataUInt = reinterpret_cast<const uint*>(field);
 			m_Ui->Table->setItem(idx, 2, new QTableWidgetItem(QString::fromLatin1(&dataChar[4], dataUInt[0])));
+			break;
+		}
+
+		case Definitions::ENodeFieldType::Struct:
+		{
+			auto structArray = *reinterpret_cast<const QVector<QVector<const void*> >*>(field);
+			m_Ui->Table->setRowCount(m_Ui->Table->rowCount() + fieldInfo.NestedField->Fields.size() * fieldInfo.Number);
+
+			foreach (strukt, structArray)
+			{
+				for (int idx = 0, cnt = strukt->size(); idx < cnt; idx++)
+				{
+					auto field    = (*strukt)[idx];
+					auto fieldInf = fieldInfo.NestedField->Fields[idx];
+
+					SetupTableField(type, idx, count, field, fieldInf);
+					idx++;
+					count++;
+				}
+			}
+
 			break;
 		}
 

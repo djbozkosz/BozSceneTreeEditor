@@ -73,7 +73,7 @@ namespace GUI
 		void CreateTree(NodeItem *item, Scene::SceneNode* node);
 
 		void SetupTable(Scene::SceneNode* node);
-		void SetupTableField(ushort type, int idx, const void* field, Scene::Definitions::ENodeFieldType fieldType);
+		void SetupTableField(ushort type, int& idx, int& count, const void* field, const Scene::Definitions::NodeFieldInfo& fieldInfo);
 
 		template <typename T> inline int SetTableFieldInt(int idx, const void* field, int base = 10)
 		{
