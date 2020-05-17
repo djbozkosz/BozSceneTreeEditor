@@ -29,6 +29,7 @@ namespace Scene
 		virtual ~Document();
 
 		void Load(const QString& file);
+		void Save(const QString& file);
 
 		inline const QString&          GetFile() const { return m_File; }
 		inline       Scene::SceneTree* GetTree() const { return m_Tree; }

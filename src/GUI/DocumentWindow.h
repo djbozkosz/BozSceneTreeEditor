@@ -67,6 +67,8 @@ namespace GUI
 		explicit DocumentWindow(Document* document, Scene::Definitions* definitions, QWidget* parent = null);
 		virtual ~DocumentWindow();
 
+		inline Document* GetDocument() const { return m_Document; }
+
 		private: // methods
 
 		void SetupTree();

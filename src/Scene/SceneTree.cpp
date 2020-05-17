@@ -27,17 +27,11 @@ void SceneTree::DeleteTree()
 	Root = null;
 }
 
-bool SceneTree::Load(const QString& file)
+bool SceneTree::Load(QFile& reader)
 {
-	QFile reader(file);
-
-	auto result = reader.open(QIODevice::ReadOnly);
-	if (result == false)
-		return false;
-
 	Root = new SceneNode(m_Definitions);
 
-	result = Root->Load(reader, null);
+	auto result = Root->Load(reader, null);
 	if (result == false)
 	{
 		DeleteTree();
@@ -47,13 +41,7 @@ bool SceneTree::Load(const QString& file)
 	return true;
 }
 
-bool SceneTree::Save(const QString& file) const
+bool SceneTree::Save(QFile& writer) const
 {
-	QFile writer(file);
-
-	auto result = writer.open(QIODevice::WriteOnly);
-	if (result == false)
-		return false;
-
-	return true;
+	return Root->Save(writer);
 }

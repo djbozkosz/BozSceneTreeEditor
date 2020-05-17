@@ -46,10 +46,12 @@ namespace GUI
 		signals: // public interface
 
 		void FileOpened(const QString& file);
+		void FileSaved(Document* document, const QString& file);
 
 		private slots: // handlers
 
 		void OpenFile();
+		void SaveFile();
 		void ExitApp();
 	};
 }}}

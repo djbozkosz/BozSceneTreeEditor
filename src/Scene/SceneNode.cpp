@@ -129,7 +129,26 @@ bool SceneNode::Save(QFile& writer) const
 {
 	unused(writer);
 
-	return false;
+	SaveData(writer, Type);
+	SaveData(writer, Size);
+
+	if (Definition == null || (Definition->Fields.isEmpty() == false && Definition->Fields[0].FieldType->Type == Definitions::ENodeFieldType::Unknown))
+	{
+		auto size = Size - sizeof(Type) - sizeof(Size);
+		SaveData(writer, Fields[0], size);
+		return true;
+	}
+
+	SaveFields(writer, Fields, Definition->Fields);
+
+	foreach (child, Childs)
+	{
+		auto result = (*child)->Save(writer);
+		if (result == false)
+			return false;
+	}
+
+	return true;
 }
 
 void SceneNode::LoadFields(QFile& reader, QVector<void*>& fields, const QVector<Definitions::NodeFieldInfo>& fieldInfos)
@@ -207,5 +226,55 @@ void SceneNode::LoadFields(QFile& reader, QVector<void*>& fields, const QVector<
 		}
 
 		fields.push_back(data);
+	}
+}
+
+void SceneNode::SaveFields(QFile& writer, const QVector<void*>& fields, const QVector<Definitions::NodeFieldInfo>& fieldInfos)
+{
+	for (int idx = 0, count = fields.size(); idx < count; idx++)
+	{
+		const auto* field     = fields[idx];
+		const auto& fieldInfo = fieldInfos[idx];
+		const auto  type      = fieldInfo.FieldType->Type;
+
+		switch (type)
+		{
+			case Definitions::ENodeFieldType::String:
+			{
+				auto size = strlen(reinterpret_cast<const char*>(field));
+				SaveData(writer, field, size + 1);
+				break;
+			}
+
+			case Definitions::ENodeFieldType::StringArray:
+			{
+				auto data = *reinterpret_cast<const uint*>(field);
+				SaveData(writer, field, data + sizeof(uint));
+				break;
+			}
+
+			case Definitions::ENodeFieldType::StringFixed:
+			{
+				SaveData(writer, field, fieldInfo.Number);
+				break;
+			}
+
+			case Definitions::ENodeFieldType::Struct:
+			{
+				const auto& structArray = *reinterpret_cast<const QVector<QVector<void*> >*>(field);
+				for (int idx = 0, count = structArray.size(); idx < count; idx++)
+				{
+					SaveFields(writer, structArray[idx], fieldInfo.NestedField->Fields);
+				}
+				break;
+			}
+
+			default:
+			{
+				auto size = fieldInfo.FieldType->Size;
+				SaveData(writer, field, size);
+				break;
+			}
+		}
 	}
 }

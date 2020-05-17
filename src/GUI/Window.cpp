@@ -18,12 +18,14 @@ Window::Window() :
 	m_Ui->setupUi(this);
 
 	connect(m_Ui->Menu_Open, SIGNAL(triggered()), this, SLOT(OpenFile()));
+	connect(m_Ui->Menu_Save, SIGNAL(triggered()), this, SLOT(SaveFile()));
 	connect(m_Ui->Menu_Exit, SIGNAL(triggered()), this, SLOT(ExitApp()));
 }
 
 Window::~Window()
 {
 	disconnect(m_Ui->Menu_Open, SIGNAL(triggered()), this, SLOT(OpenFile()));
+	disconnect(m_Ui->Menu_Save, SIGNAL(triggered()), this, SLOT(SaveFile()));
 	disconnect(m_Ui->Menu_Exit, SIGNAL(triggered()), this, SLOT(ExitApp()));
 
 	delete m_Ui;
@@ -46,6 +48,23 @@ void Window::OpenFile()
 #else
 	emit FileOpened("C:\\Hry\\Mafia\\missions\\00menu\\scene2.bin");
 #endif
+}
+
+void Window::SaveFile()
+{
+	auto tab      = as(m_Ui->Tabs->currentWidget(), DocumentWindow*);
+	auto document = tab->GetDocument();
+	auto file     = document->GetFile();
+
+	if (file.isEmpty() == true)
+	{
+		file = QFileDialog::getSaveFileName(this, "Save file", "C:\\Hry\\Mafia\\missions", "scene2.bin");
+	}
+
+	if (file.isEmpty() == true)
+		return;
+
+	emit FileSaved(document, file);
 }
 
 void Window::ExitApp()

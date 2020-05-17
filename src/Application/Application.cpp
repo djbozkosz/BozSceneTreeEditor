@@ -19,14 +19,16 @@ Application::Application(int argc, char* argv[]) : QApplication(argc, argv)
 	m_Window = new GUI::Window();
 	m_Window->show();
 
-	connect(m_Window, SIGNAL(FileOpened(QString)), this, SLOT(LoadDocument(QString)));
+	connect(m_Window, SIGNAL(FileOpened(QString)),           this, SLOT(LoadDocument(QString)));
+	connect(m_Window, SIGNAL(FileSaved(Document*, QString)), this, SLOT(SaveDocument(Document*, QString)));
 
 	m_Definitions = new Scene::Definitions();
 }
 
 Application::~Application()
 {
-	disconnect(m_Window, SIGNAL(FileOpened(QString)), this, SLOT(LoadDocument(QString)));
+	disconnect(m_Window, SIGNAL(FileOpened(QString)),           this, SLOT(LoadDocument(QString)));
+	disconnect(m_Window, SIGNAL(FileSaved(Document*, QString)), this, SLOT(SaveDocument(Document*, QString)));
 
 	delete m_Window;
 	delete m_Definitions;
@@ -34,11 +36,16 @@ Application::~Application()
 
 void Application::LoadDocument(const QString& file)
 {
-	auto document     = new Document(m_Definitions);
+	auto document = new Document(m_Definitions);
 	document->Load(file);
 
 	m_Documents[file] = document;
 	m_Window->AddDocument(document, m_Definitions);
+}
+
+void Application::SaveDocument(Document* document, const QString& file)
+{
+	document->Save(file);
 }
 
 void Application::CloseDocument(const QString& file)

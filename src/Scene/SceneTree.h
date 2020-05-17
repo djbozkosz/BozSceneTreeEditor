@@ -6,6 +6,9 @@
 #include "Utility/Base.h"
 
 
+class QFile;
+
+
 namespace Djbozkosz {
 namespace Application {
 namespace Scene
@@ -29,8 +32,8 @@ namespace Scene
 		explicit SceneTree(Definitions* definitions);
 		virtual ~SceneTree();
 
-		bool Load(const QString& file);
-		bool Save(const QString& file) const;
+		bool Load(QFile& reader);
+		bool Save(QFile& writer) const;
 
 		private: // methods
 

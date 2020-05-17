@@ -45,6 +45,7 @@ namespace Scene
 		private slots: // handlers
 
 		void LoadDocument(const QString& file);
+		void SaveDocument(Document* document, const QString& file);
 		void CloseDocument(const QString& file);
 	};
 }}
