@@ -16,9 +16,28 @@ SceneNode::~SceneNode()
 {
 	Debug::Assert(false) << "Proper struct cleanup";
 
-	foreach (field, Fields)
+	for (int idx = 0, count = Fields.size(); idx < count; idx++)
 	{
-		delete[] reinterpret_cast<uchar*>(*field);
+		auto field        = Fields[idx];
+		auto structFields = (Definition != null) ? Definition->Fields[idx].NestedField : null;
+
+		if (structFields == null)
+		{
+			delete[] reinterpret_cast<uchar*>(field);
+			continue;
+		}
+
+		while (structFields != null)
+		{
+			auto structArray = reinterpret_cast<QVector<QVector<void*> >*>(field);
+			foreach (strukt, *structArray)
+			{
+				foreach (field, *strukt)
+				{
+					delete[] reinterpret_cast<uchar*>(*field);
+				}
+			}
+		}
 	}
 
 	foreach (child, Childs)
@@ -120,52 +139,71 @@ void SceneNode::LoadFields(QFile& reader, QVector<void*>& fields, const QVector<
 		auto type = field->FieldType->Type;
 		auto data = default_(uchar*);
 
-		if (type == Definitions::ENodeFieldType::String)
+		switch (type)
 		{
-			QVector<uchar> str;
-			uchar          c;
-
-			do
+			case Definitions::ENodeFieldType::String:
 			{
-				LoadData(reader, c);
-				str.push_back(c);
+				QVector<uchar> str;
+				uchar          c;
+
+				do
+				{
+					LoadData(reader, c);
+					str.push_back(c);
+				}
+				while (c != 0);
+
+				auto size = str.size();
+				data = new uchar[size];
+				memcpy(data, str.data(), size);
+				break;
 			}
-			while (c != 0);
 
-			auto size = str.size();
-			data = new uchar[size];
-			memcpy(data, str.data(), size);
-		}
-		else if (type == Definitions::ENodeFieldType::StringArray)
-		{
-			auto lengthSize = field->FieldType->Size;
-			uint arraySize;
-			LoadData(reader, &arraySize, lengthSize);
+			case Definitions::ENodeFieldType::StringArray:
+			{
+				auto lengthSize = field->FieldType->Size;
+				uint arraySize;
+				LoadData(reader, &arraySize, lengthSize);
 
-			data = new uchar[lengthSize + arraySize];
-			memcpy(data, &arraySize, lengthSize);
-			LoadData(reader, &data[lengthSize], arraySize);
-		}
-		else if (type == Definitions::ENodeFieldType::StringFixed)
-		{
-			auto size = field->FixedSize;
-			data = new uchar[size];
-			LoadData(reader, data, size);
-		}
-		else if (type == Definitions::ENodeFieldType::Struct)
-		{
-			auto structFields = new QVector<void*>();
+				data = new uchar[lengthSize + arraySize];
+				memcpy(data, &arraySize, lengthSize);
+				LoadData(reader, &data[lengthSize], arraySize);
+				break;
+			}
 
-			// foreach as array by referenced size
-			//LoadFields(reader, );
+			case Definitions::ENodeFieldType::StringFixed:
+			{
+				auto size = field->Number;
+				data = new uchar[size];
+				LoadData(reader, data, size);
+				break;
+			}
 
-			data = reinterpret_cast<uchar*>(structFields);
-		}
-		else
-		{
-			auto size = field->FieldType->Size;
-			data = new uchar[size];
-			LoadData(reader, data, size);
+			case Definitions::ENodeFieldType::Struct:
+			{
+				auto sizeIdx = field->Number;
+				auto size    = *reinterpret_cast<const uint*>(fields[sizeIdx]);
+
+				auto structArray = new QVector<QVector<void*> >();
+				structArray->reserve(size);
+
+				for (uint idx = 0; idx < size; idx++)
+				{
+					structArray->push_back(QVector<void*>());
+					LoadFields(reader, structArray->back(), field->NestedField->Fields);
+				}
+
+				data = reinterpret_cast<uchar*>(structArray);
+				break;
+			}
+
+			default:
+			{
+				auto size = field->FieldType->Size;
+				data = new uchar[size];
+				LoadData(reader, data, size);
+				break;
+			}
 		}
 
 		fields.push_back(data);

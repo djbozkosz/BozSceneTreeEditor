@@ -210,8 +210,8 @@ void Definitions::LoadFields(QVector<NodeFieldInfo>& fieldInfos, const QString& 
 	{
 		QString type;
 		QString name;
-		uint    size;
-		LoadField(*field, type, name, size);
+		uint    number;
+		LoadField(*field, type, name, number);
 
 		NodeFieldInfo fieldInfo;
 
@@ -227,13 +227,13 @@ void Definitions::LoadFields(QVector<NodeFieldInfo>& fieldInfos, const QString& 
 
 		fieldInfo.FieldType = fieldType.value();
 		fieldInfo.Name      = name;
-		fieldInfo.FixedSize = size;
+		fieldInfo.Number    = number;
 
 		fieldInfos.push_back(fieldInfo);
 	}
 }
 
-void Definitions::LoadField(const QString& field, QString& type, QString& name, uint& size)
+void Definitions::LoadField(const QString& field, QString& type, QString& name, uint& number)
 {
 	auto match = m_RNodeField.exactMatch(field);
 	Debug::Assert(match == true) << "Invalid field format:" << field;
@@ -242,7 +242,7 @@ void Definitions::LoadField(const QString& field, QString& type, QString& name, 
 	auto captures = m_RNodeField.capturedTexts();
 	type          = captures[1];
 	name          = captures[3];
-	size          = captures[2].toUInt();
+	number        = captures[2].toUInt();
 }
 
 void Definitions::LoadNodeName(const QString& line)
@@ -279,8 +279,8 @@ void Definitions::LoadNodeFieldEnum(const QString& line)
 	{
 		QString idx;
 		QString name;
-		uint    size;
-		LoadField(*field, idx, name, size);
+		uint    number;
+		LoadField(*field, idx, name, number);
 
 		auto key     = idx.toUShort(null, 0);
 		enumMap[key] = name;

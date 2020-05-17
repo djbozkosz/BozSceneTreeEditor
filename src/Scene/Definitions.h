@@ -59,9 +59,9 @@ namespace Scene
 			const NodeFieldType* FieldType;
 			StructDefinition*    NestedField;
 			QString              Name;
-			uint                 FixedSize;
+			uint                 Number;
 
-			inline NodeFieldInfo() : FieldType(0), NestedField(null), FixedSize(0) {}
+			inline NodeFieldInfo() : FieldType(0), NestedField(null), Number(0) {}
 		};
 
 		sealed struct NodeDefinition
