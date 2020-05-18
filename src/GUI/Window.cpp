@@ -33,8 +33,11 @@ Window::~Window()
 
 void Window::AddDocument(Document* document, Scene::Definitions* definitions)
 {
-	auto tab = new DocumentWindow(document, definitions, m_Ui->Tabs);
-	m_Ui->Tabs->addTab(tab, document->GetFile());
+	auto tab  = new DocumentWindow(document, definitions, m_Ui->Tabs);
+	auto tabs = m_Ui->Tabs;
+
+	tabs->addTab(tab, document->GetFile());
+	tabs->setCurrentIndex(tabs->count() - 1);
 }
 
 void Window::OpenFile()
