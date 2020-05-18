@@ -179,6 +179,7 @@ void SceneNode::LoadFields(QFile& reader, QVector<void*>& fields, const QVector<
 			}
 
 			case Definitions::ENodeFieldType::StringArray:
+			case Definitions::ENodeFieldType::StringArray2:
 			{
 				auto lengthSize = field->FieldType->Size;
 				uint arraySize;

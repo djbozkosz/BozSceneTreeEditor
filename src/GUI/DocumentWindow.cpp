@@ -146,10 +146,12 @@ void DocumentWindow::SetupTableField(ushort type, int& idx, const void* field, c
 		}
 
 		case Definitions::ENodeFieldType::StringArray:
+		case Definitions::ENodeFieldType::StringArray2:
 		{
-			auto dataChar = reinterpret_cast<const char*>(field);
-			auto dataUInt = reinterpret_cast<const uint*>(field);
-			m_Ui->Table->setItem(idx, 2, new QTableWidgetItem(QString::fromLatin1(&dataChar[4], dataUInt[0])));
+			auto dataChar      = reinterpret_cast<const char*>(field);
+			auto dataUInt      = reinterpret_cast<const uint*>(field);
+			auto sizeReduction = (fieldType == Definitions::ENodeFieldType::StringArray2) ? 1 : 0;
+			m_Ui->Table->setItem(idx, 2, new QTableWidgetItem(QString::fromLatin1(&dataChar[4], dataUInt[0] - sizeReduction)));
 			break;
 		}
 

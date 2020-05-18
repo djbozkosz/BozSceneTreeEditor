@@ -115,8 +115,10 @@ NodeFields 0xae24 0xae22 [0] 35 [Hex8 : Unknown, Hex8 : Unknown, Float : Unknown
 Node 0xae02 FrameAnimations has_childs []
 Node 0xae03 FrameAnimation [Hex16 : Unknown, Float : Unknown, Float : Unknown, StringArray : Frame]
 
+Struct NonRainFrame [StringArray2 : Frame]
+
 Node 0xaef0 RainSetup [Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex32 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown]
-Node 0xaef1 NonRainFrame [Unknown : Data]
+Node 0xaef1 NonRainFrames [Uint32 : FrameCount, NonRainFrame'0 : Frames]
 
 Node 0xae50 InitScripts has_childs []
 Node 0xae51 InitScript [Hex8 : Unknown, StringArray : Name, StringArray : Script]

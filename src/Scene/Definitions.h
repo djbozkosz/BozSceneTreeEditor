@@ -37,6 +37,7 @@ namespace Scene
 			Color,
 			String,
 			StringArray,
+			StringArray2,
 			StringFixed,
 			Struct
 		};
