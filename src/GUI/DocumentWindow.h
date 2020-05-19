@@ -65,6 +65,20 @@ namespace GUI
 				QTableWidgetItem(text), FieldIdx(fieldIdx), Fields(fields), FieldInfo(fieldInfo)
 			{
 			}
+
+			virtual inline ~FieldItem() {}
+		};
+
+		sealed class ReadOnlyItem : public QTableWidgetItem
+		{
+			public:
+
+			explicit inline ReadOnlyItem(const QString& text) : QTableWidgetItem(text)
+			{
+				setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+			}
+
+			virtual inline ~ReadOnlyItem() {}
 		};
 
 		private: // members
@@ -91,9 +105,10 @@ namespace GUI
 		void SetupTable(Scene::SceneNode* node);
 		void SetupTableField(ushort type, int& row, uint fieldIdx, QVector<void*>* fields, const Scene::Definitions::NodeFieldInfo* fieldInfo);
 
-		template <typename T> inline int SetTableFieldInt(int idx, const void* field, int count, int base = 10)
+		template <typename T> inline int SetTableFieldInt(int row, uint fieldIdx, QVector<void*>* fields, const Scene::Definitions::NodeFieldInfo* fieldInfo, int count, int base = 10)
 		{
-			auto data = reinterpret_cast<const T*>(field);
+			auto field = (*fields)[fieldIdx];
+			auto data  = reinterpret_cast<const T*>(field);
 			for (int i = 0; i < count; i++)
 			{
 				auto text = QString::number(data[i], base);
@@ -102,19 +117,27 @@ namespace GUI
 					text = QString("0x%1").arg(text);
 				}
 
-				m_Ui->Table->setItem(idx, i + 2, new QTableWidgetItem(text));
+				m_Ui->Table->setItem(row, i + 2, new FieldItem(text, fieldIdx, fields, fieldInfo));
 			}
 
 			return data[0];
 		}
 
-		inline void SetTableFieldFloat(int idx, const void* field, int count)
+		inline void SetTableFieldFloat(int idx, uint fieldIdx, QVector<void*>* fields, const Scene::Definitions::NodeFieldInfo* fieldInfo, int count)
 		{
-			auto data = reinterpret_cast<const float*>(field);
+			auto field = (*fields)[fieldIdx];
+			auto data  = reinterpret_cast<const float*>(field);
 			for (int i = 0; i < count; i++)
 			{
-				m_Ui->Table->setItem(idx, i + 2, new QTableWidgetItem(QString::number(data[i])));
+				auto text = QString::number(data[i]);
+				m_Ui->Table->setItem(idx, i + 2, new FieldItem(text, fieldIdx, fields, fieldInfo));
 			}
+		}
+
+		template <typename T> inline void SetField(const T& value, void* field, uint offset = 0)
+		{
+			auto data = reinterpret_cast<T*>(field);
+			data[offset] = value;
 		}
 
 		QString GetNodeName(Scene::SceneNode* node) const;
@@ -122,6 +145,7 @@ namespace GUI
 		private slots: // handlers
 
 		void UpdateTable(QTreeWidgetItem* current, QTreeWidgetItem* previous);
+		void UpdateField(QTableWidgetItem* item);
 	};
 }}}
 
