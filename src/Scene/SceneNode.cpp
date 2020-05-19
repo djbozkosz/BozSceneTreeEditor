@@ -248,6 +248,7 @@ void SceneNode::SaveFields(QFile& writer, const QVector<void*>& fields, const QV
 			}
 
 			case Definitions::ENodeFieldType::StringArray:
+			case Definitions::ENodeFieldType::StringArray2:
 			{
 				auto data = *reinterpret_cast<const uint*>(field);
 				SaveData(writer, field, data + sizeof(uint));
