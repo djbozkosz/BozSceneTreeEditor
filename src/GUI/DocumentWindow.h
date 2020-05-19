@@ -53,6 +53,20 @@ namespace GUI
 			virtual ~NodeItem();
 		};
 
+		sealed class FieldItem : public QTableWidgetItem
+		{
+			public:
+
+			uint                                     FieldIdx;
+			QVector<void*>*                          Fields;
+			const Scene::Definitions::NodeFieldInfo* FieldInfo;
+
+			explicit inline FieldItem(const QString& text, uint fieldIdx, QVector<void*>* fields, const Scene::Definitions::NodeFieldInfo* fieldInfo) :
+				QTableWidgetItem(text), FieldIdx(fieldIdx), Fields(fields), FieldInfo(fieldInfo)
+			{
+			}
+		};
+
 		private: // members
 
 		Ui::DocumentWindow* m_Ui;
@@ -75,7 +89,7 @@ namespace GUI
 		void CreateTree(NodeItem *item, Scene::SceneNode* node);
 
 		void SetupTable(Scene::SceneNode* node);
-		void SetupTableField(ushort type, int& idx, const void* field, const Scene::Definitions::NodeFieldInfo& fieldInfo);
+		void SetupTableField(ushort type, int& row, uint fieldIdx, QVector<void*>* fields, const Scene::Definitions::NodeFieldInfo* fieldInfo);
 
 		template <typename T> inline int SetTableFieldInt(int idx, const void* field, int count, int base = 10)
 		{

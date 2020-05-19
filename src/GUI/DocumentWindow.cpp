@@ -100,48 +100,48 @@ void DocumentWindow::SetupTable(SceneNode* node)
 		return;
 	}
 
-	auto idx = 0;
+	auto row = 0;
 
-	for (int fieldIdx = 0; fieldIdx < count; fieldIdx++, idx++)
+	for (int fieldIdx = 0; fieldIdx < count; fieldIdx++, row++)
 	{
-		const auto& field     = node->Fields[fieldIdx];
-		const auto& fieldInfo = node->Definition->Fields[fieldIdx];
+		auto fieldInfo = &node->Definition->Fields[fieldIdx];
 
 		table->setRowCount(table->rowCount() + 1);
-		table->setItem(idx, 0, new QTableWidgetItem(fieldInfo.Name));
-		table->setItem(idx, 1, new QTableWidgetItem(fieldInfo.FieldType->Name));
-		SetupTableField(node->Type, idx, field, fieldInfo);
+		table->setItem(row, 0, new QTableWidgetItem(fieldInfo->Name));
+		table->setItem(row, 1, new QTableWidgetItem(fieldInfo->FieldType->Name));
+		SetupTableField(node->Type, row, fieldIdx, &node->Fields, fieldInfo);
 	}
 }
 
-void DocumentWindow::SetupTableField(ushort type, int& idx, const void* field, const Definitions::NodeFieldInfo& fieldInfo)
+void DocumentWindow::SetupTableField(ushort type, int& row, uint fieldIdx, QVector<void*>* fields, const Definitions::NodeFieldInfo* fieldInfo)
 {
+	auto field     = (*fields)[fieldIdx];
 	auto intValue  = -1;
-	auto fieldType = fieldInfo.FieldType->Type;
+	auto fieldType = fieldInfo->FieldType->Type;
 
 	switch (fieldType)
 	{
-		case Definitions::ENodeFieldType::Uint8:    intValue = SetTableFieldInt<uchar >(idx, field, 1    ); break;
-		case Definitions::ENodeFieldType::Uint16:   intValue = SetTableFieldInt<ushort>(idx, field, 1    ); break;
-		case Definitions::ENodeFieldType::Uint16_3: intValue = SetTableFieldInt<ushort>(idx, field, 3    ); break;
-		case Definitions::ENodeFieldType::Uint32:   intValue = SetTableFieldInt<uint  >(idx, field, 1    ); break;
-		case Definitions::ENodeFieldType::Int8:     intValue = SetTableFieldInt<char  >(idx, field, 1    ); break;
-		case Definitions::ENodeFieldType::Int16:    intValue = SetTableFieldInt<short >(idx, field, 1    ); break;
-		case Definitions::ENodeFieldType::Int32:    intValue = SetTableFieldInt<int   >(idx, field, 1    ); break;
-		case Definitions::ENodeFieldType::Hex8:     intValue = SetTableFieldInt<uchar >(idx, field, 1, 16); break;
-		case Definitions::ENodeFieldType::Hex16:    intValue = SetTableFieldInt<ushort>(idx, field, 1, 16); break;
-		case Definitions::ENodeFieldType::Hex32:    intValue = SetTableFieldInt<uint  >(idx, field, 1, 16); break;
-		case Definitions::ENodeFieldType::Float:               SetTableFieldFloat      (idx, field, 1    ); break;
-		case Definitions::ENodeFieldType::Float2:              SetTableFieldFloat      (idx, field, 2    ); break;
-		case Definitions::ENodeFieldType::Float3:              SetTableFieldFloat      (idx, field, 3    ); break;
-		case Definitions::ENodeFieldType::Float4:              SetTableFieldFloat      (idx, field, 4    ); break;
-		case Definitions::ENodeFieldType::Color:               SetTableFieldFloat      (idx, field, 3    ); break;
+		case Definitions::ENodeFieldType::Uint8:    intValue = SetTableFieldInt<uchar >(row, field, 1    ); break;
+		case Definitions::ENodeFieldType::Uint16:   intValue = SetTableFieldInt<ushort>(row, field, 1    ); break;
+		case Definitions::ENodeFieldType::Uint16_3: intValue = SetTableFieldInt<ushort>(row, field, 3    ); break;
+		case Definitions::ENodeFieldType::Uint32:   intValue = SetTableFieldInt<uint  >(row, field, 1    ); break;
+		case Definitions::ENodeFieldType::Int8:     intValue = SetTableFieldInt<char  >(row, field, 1    ); break;
+		case Definitions::ENodeFieldType::Int16:    intValue = SetTableFieldInt<short >(row, field, 1    ); break;
+		case Definitions::ENodeFieldType::Int32:    intValue = SetTableFieldInt<int   >(row, field, 1    ); break;
+		case Definitions::ENodeFieldType::Hex8:     intValue = SetTableFieldInt<uchar >(row, field, 1, 16); break;
+		case Definitions::ENodeFieldType::Hex16:    intValue = SetTableFieldInt<ushort>(row, field, 1, 16); break;
+		case Definitions::ENodeFieldType::Hex32:    intValue = SetTableFieldInt<uint  >(row, field, 1, 16); break;
+		case Definitions::ENodeFieldType::Float:               SetTableFieldFloat      (row, field, 1    ); break;
+		case Definitions::ENodeFieldType::Float2:              SetTableFieldFloat      (row, field, 2    ); break;
+		case Definitions::ENodeFieldType::Float3:              SetTableFieldFloat      (row, field, 3    ); break;
+		case Definitions::ENodeFieldType::Float4:              SetTableFieldFloat      (row, field, 4    ); break;
+		case Definitions::ENodeFieldType::Color:               SetTableFieldFloat      (row, field, 3    ); break;
 
 		case Definitions::ENodeFieldType::String:
 		case Definitions::ENodeFieldType::StringFixed:
 		{
 			auto dataChar = reinterpret_cast<const char*>(field);
-			m_Ui->Table->setItem(idx, 2, new QTableWidgetItem(QString::fromLatin1(dataChar)));
+			m_Ui->Table->setItem(row, 2, new FieldItem(QString::fromLatin1(dataChar), fieldIdx, fields, fieldInfo));
 			break;
 		}
 
@@ -151,36 +151,35 @@ void DocumentWindow::SetupTableField(ushort type, int& idx, const void* field, c
 			auto dataChar      = reinterpret_cast<const char*>(field);
 			auto dataUInt      = reinterpret_cast<const uint*>(field);
 			auto sizeReduction = (fieldType == Definitions::ENodeFieldType::StringArray2) ? 1 : 0;
-			m_Ui->Table->setItem(idx, 2, new QTableWidgetItem(QString::fromLatin1(&dataChar[4], dataUInt[0] - sizeReduction)));
+			m_Ui->Table->setItem(row, 2, new FieldItem(QString::fromLatin1(&dataChar[4], dataUInt[0] - sizeReduction), fieldIdx, fields, fieldInfo));
 			break;
 		}
 
 		case Definitions::ENodeFieldType::Struct:
 		{
-			const auto& structArray      = *reinterpret_cast<const QVector<QVector<const void*> >*>(field);
-			auto        structArrayCount = structArray.size();
+			auto& structArray      = *reinterpret_cast<QVector<QVector<void*> >*>(field);
+			auto  structArrayCount = structArray.size();
 
 			auto*       table            = m_Ui->Table;
-			table->setRowCount(table->rowCount() + fieldInfo.NestedField->Fields.size() * structArrayCount - 1);
+			table->setRowCount(table->rowCount() + fieldInfo->NestedField->Fields.size() * structArrayCount - 1);
 
 			for (int structIdx = 0; structIdx < structArrayCount; structIdx++)
 			{
-				const auto& strukt = structArray[structIdx];
+				auto strukt = &structArray[structIdx];
 
-				for (int fieldIdx = 0, count = strukt.size(); fieldIdx < count; fieldIdx++)
+				for (int fieldIdx = 0, count = strukt->size(); fieldIdx < count; fieldIdx++)
 				{
-					const auto* field    = strukt[fieldIdx];
-					const auto& fieldInf = fieldInfo.NestedField->Fields[fieldIdx];
+					auto fieldInf = &fieldInfo->NestedField->Fields[fieldIdx];
 
-					table->setItem(idx, 0, new QTableWidgetItem(QString("%1: %2").arg(structIdx).arg(fieldInf.Name)));
-					table->setItem(idx, 1, new QTableWidgetItem(fieldInf.FieldType->Name));
+					table->setItem(row, 0, new QTableWidgetItem(QString("%1: %2").arg(structIdx).arg(fieldInf->Name)));
+					table->setItem(row, 1, new QTableWidgetItem(fieldInf->FieldType->Name));
 
-					SetupTableField(type, idx, field, fieldInf);
-					idx++;
+					SetupTableField(type, row, fieldIdx, strukt, fieldInf);
+					row++;
 				}
 			}
 
-			idx--;
+			row--;
 			break;
 		}
 
@@ -191,13 +190,13 @@ void DocumentWindow::SetupTableField(ushort type, int& idx, const void* field, c
 	// hack begin
 	if (fieldType >= Definitions::ENodeFieldType::Uint8 && fieldType <= Definitions::ENodeFieldType::Hex32)
 	{
-		auto enumMap = m_Definitions->GetNodeFieldEnum(type, idx);
+		auto enumMap = m_Definitions->GetNodeFieldEnum(type, row);
 		if (enumMap != null)
 		{
 			const auto& enumValue = enumMap->find(intValue);
 			if (enumValue != enumMap->end())
 			{
-				auto item = m_Ui->Table->item(idx, 2);
+				auto item = m_Ui->Table->item(row, 2);
 				item->setText(QString("%1 [%2]").arg(intValue).arg(enumValue.value()));
 			}
 		}
