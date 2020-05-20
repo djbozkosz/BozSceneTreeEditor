@@ -53,19 +53,30 @@ namespace GUI
 			virtual ~NodeItem();
 		};
 
-		sealed class FieldItem : public QTableWidgetItem
+		sealed class FieldContext
 		{
 			public:
 
+			Scene::SceneNode*                        Node;
 			uint                                     FieldIdx;
 			QVector<void*>*                          Fields;
 			const Scene::Definitions::NodeFieldInfo* FieldInfo;
 
-			explicit inline FieldItem(const QString& text, uint fieldIdx, QVector<void*>* fields, const Scene::Definitions::NodeFieldInfo* fieldInfo) :
-				QTableWidgetItem(text), FieldIdx(fieldIdx), Fields(fields), FieldInfo(fieldInfo)
+			explicit inline FieldContext(Scene::SceneNode* node, uint fieldIdx, QVector<void*>* fields, const Scene::Definitions::NodeFieldInfo* fieldInfo) :
+				Node(node), FieldIdx(fieldIdx), Fields(fields), FieldInfo(fieldInfo)
 			{
 			}
 
+			virtual inline ~FieldContext() {}
+		};
+
+		sealed class FieldItem : public QTableWidgetItem
+		{
+			public:
+
+			FieldContext FieldCtx;
+
+			explicit inline FieldItem(const QString& text, const FieldContext& fieldCtx) : QTableWidgetItem(text), FieldCtx(fieldCtx) {}
 			virtual inline ~FieldItem() {}
 		};
 
@@ -103,11 +114,11 @@ namespace GUI
 		void CreateTree(NodeItem *item, Scene::SceneNode* node);
 
 		void SetupTable(Scene::SceneNode* node);
-		void SetupTableField(ushort type, int& row, uint fieldIdx, QVector<void*>* fields, const Scene::Definitions::NodeFieldInfo* fieldInfo);
+		void SetupTableField(ushort type, int& row, const FieldContext& fieldCtx);
 
-		template <typename T> inline int SetTableFieldInt(int row, uint fieldIdx, QVector<void*>* fields, const Scene::Definitions::NodeFieldInfo* fieldInfo, int count, int base = 10)
+		template <typename T> inline int SetTableFieldInt(int row, const FieldContext& fieldCtx, int count, int base = 10)
 		{
-			auto field = (*fields)[fieldIdx];
+			auto field = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
 			auto data  = reinterpret_cast<const T*>(field);
 			for (int i = 0; i < count; i++)
 			{
@@ -117,20 +128,20 @@ namespace GUI
 					text = QString("0x%1").arg(text);
 				}
 
-				m_Ui->Table->setItem(row, i + 2, new FieldItem(text, fieldIdx, fields, fieldInfo));
+				m_Ui->Table->setItem(row, i + 2, new FieldItem(text, fieldCtx));
 			}
 
 			return data[0];
 		}
 
-		inline void SetTableFieldFloat(int idx, uint fieldIdx, QVector<void*>* fields, const Scene::Definitions::NodeFieldInfo* fieldInfo, int count)
+		inline void SetTableFieldFloat(int idx, const FieldContext& fieldCtx, int count)
 		{
-			auto field = (*fields)[fieldIdx];
+			auto field = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
 			auto data  = reinterpret_cast<const float*>(field);
 			for (int i = 0; i < count; i++)
 			{
 				auto text = QString::number(data[i]);
-				m_Ui->Table->setItem(idx, i + 2, new FieldItem(text, fieldIdx, fields, fieldInfo));
+				m_Ui->Table->setItem(idx, i + 2, new FieldItem(text, fieldCtx));
 			}
 		}
 
