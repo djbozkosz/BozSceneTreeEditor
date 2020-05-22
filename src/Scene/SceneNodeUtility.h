@@ -8,11 +8,45 @@ namespace Djbozkosz {
 namespace Application {
 namespace Scene
 {
+	class SceneNode;
+
+
 	static_ class SceneNodeUtility
 	{
+		public: // types
+
+		sealed class FieldContext
+		{
+			public:
+
+			SceneNode*                        Node;
+			uint                              FieldIdx;
+			QVector<void*>*                   Fields;
+			const Definitions::NodeFieldInfo* FieldInfo;
+
+			explicit inline FieldContext(SceneNode* node, uint fieldIdx, QVector<void*>* fields, const Definitions::NodeFieldInfo* fieldInfo) :
+				Node(node), FieldIdx(fieldIdx), Fields(fields), FieldInfo(fieldInfo)
+			{
+			}
+
+			virtual inline ~FieldContext() {}
+		};
+
 		public: // methods
 
-		// add field context struct
+		template <typename T> static inline const T& GetFieldData(const FieldContext& fieldCtx, uint idx)
+		{
+			auto   field = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
+			auto   data  = reinterpret_cast<const T*>(field);
+			return data[idx];
+		}
+
+		template <typename T> static inline void SetFieldData(const FieldContext& fieldCtx, uint idx, const T& value)
+		{
+			auto field = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
+			auto data  = reinterpret_cast<const T*>(field);
+			data[idx]  = value;
+		}
 
 		// operations:
 		// get field data at index (float3 ...)
