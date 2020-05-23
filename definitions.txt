@@ -132,6 +132,8 @@ Node 0x03e8 Part [Unknown : Data]
 
 NodeName 0x4010_0x0010 [0]
 NodeName 0xae21_0xae23 [0]
+NodeName 0xae03 [3]
+NodeName 0xae51 [1]
 
 
 

@@ -2,6 +2,7 @@
 #define APPLICATION_SCENE_SCENENODEUTILITY_H
 
 #include <QStringList>
+#include <QVector>
 
 #include "Scene/Definitions.h"
 
@@ -34,7 +35,7 @@ namespace Scene
 			virtual inline ~FieldContext() {}
 		};
 
-		public: // methods
+		public: // get field methods
 
 		template <typename T> static inline const T& GetFieldData(const FieldContext& fieldCtx, int idx)
 		{
@@ -70,6 +71,11 @@ namespace Scene
 			}
 		}
 
+		static QStringList GetFieldDataAsString(const FieldContext& fieldCtx);
+		static QString     GetFieldDataEnum(const Definitions* definitions, const FieldContext& fieldCtx, int idx);
+
+		public: // set field methods
+
 		template <typename T> static inline void SetFieldData(const FieldContext& fieldCtx, int idx, const T& value)
 		{
 			auto field = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
@@ -77,9 +83,14 @@ namespace Scene
 			data[idx]  = value;
 		}
 
-		static QStringList GetFieldDataAsString(const FieldContext& fieldCtx);
+		static void SetFieldData(const FieldContext& fieldCtx, const void* data, int dataSize);
 
-		static QString GetFieldDataEnum(const Definitions* definitions, const FieldContext& fieldCtx, int idx);
+		static void SetFieldDataFromString(SceneNode* root, const FieldContext& fieldCtx, const QString& data, int idx);
+
+		public: // tree methods
+
+		static bool GetNodePath(QVector<SceneNode*>& path, SceneNode* parent, const SceneNode* node);
+		static void ApplyNodeSizeOffset(QVector<SceneNode*>& path, int offset);
 
 		// operations:
 		// get field data at index (float3 ...)

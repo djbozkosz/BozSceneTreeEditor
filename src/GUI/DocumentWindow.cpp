@@ -183,13 +183,14 @@ QString DocumentWindow::GetNodeName(SceneNode* node) const
 	if (nameInfo != null)
 	{
 		auto childType = nameInfo->ChildType;
-		auto nodeName  = (childType > 0) ? node->GetChild(childType) : node;
+		auto nodeWithName  = (childType > 0) ? node->GetChild(childType) : node;
 
 		QString name;
 
-		if (nodeName != null)
+		if (nodeWithName != null)
 		{
-			name = QString::fromLatin1(reinterpret_cast<const char*>(nodeName->Fields[nameInfo->FieldIdx]));
+			auto fieldCtx = SceneNodeUtility::FieldContext(nodeWithName, nameInfo->FieldIdx, &nodeWithName->Fields, &nodeWithName->Definition->Fields[nameInfo->FieldIdx]);
+			name = SceneNodeUtility::GetFieldDataAsString(fieldCtx)[0];
 		}
 
 		return QString("%1 [%2]").arg(node->Definition->Name, name);
@@ -213,29 +214,5 @@ void DocumentWindow::UpdateField(QTableWidgetItem* item)
 	if (fieldItem == null)
 		return;
 
-	const auto& fieldCtx  = fieldItem->FieldCtx;
-	auto        fieldType = fieldCtx.FieldInfo->FieldType->Type;
-	auto        offset    = item->column() - 2;
-	const auto& text      = item->text();
-
-	switch (fieldType)
-	{
-		case Definitions::ENodeFieldType::Uint8:    SceneNodeUtility::SetFieldData<uchar >(fieldCtx, offset, text.toUShort()        ); break;
-		case Definitions::ENodeFieldType::Uint16:   SceneNodeUtility::SetFieldData<ushort>(fieldCtx, offset, text.toUShort()        ); break;
-		case Definitions::ENodeFieldType::Uint16_3: SceneNodeUtility::SetFieldData<ushort>(fieldCtx, offset, text.toUShort()        ); break;
-		case Definitions::ENodeFieldType::Uint32:   SceneNodeUtility::SetFieldData<uint  >(fieldCtx, offset, text.toUInt()          ); break;
-		case Definitions::ENodeFieldType::Int8:     SceneNodeUtility::SetFieldData<char  >(fieldCtx, offset, text.toShort()         ); break;
-		case Definitions::ENodeFieldType::Int16:    SceneNodeUtility::SetFieldData<short >(fieldCtx, offset, text.toShort()         ); break;
-		case Definitions::ENodeFieldType::Int32:    SceneNodeUtility::SetFieldData<int   >(fieldCtx, offset, text.toInt()           ); break;
-		case Definitions::ENodeFieldType::Hex8:     SceneNodeUtility::SetFieldData<uchar >(fieldCtx, offset, text.toUShort(null, 16)); break;
-		case Definitions::ENodeFieldType::Hex16:    SceneNodeUtility::SetFieldData<ushort>(fieldCtx, offset, text.toUShort(null, 16)); break;
-		case Definitions::ENodeFieldType::Hex32:    SceneNodeUtility::SetFieldData<uint  >(fieldCtx, offset, text.toUInt  (null, 16)); break;
-		case Definitions::ENodeFieldType::Float:    SceneNodeUtility::SetFieldData<float >(fieldCtx, offset, text.toFloat()         ); break;
-		case Definitions::ENodeFieldType::Float2:   SceneNodeUtility::SetFieldData<float >(fieldCtx, offset, text.toFloat()         ); break;
-		case Definitions::ENodeFieldType::Float3:   SceneNodeUtility::SetFieldData<float >(fieldCtx, offset, text.toFloat()         ); break;
-		case Definitions::ENodeFieldType::Float4:   SceneNodeUtility::SetFieldData<float >(fieldCtx, offset, text.toFloat()         ); break;
-		case Definitions::ENodeFieldType::Color:    SceneNodeUtility::SetFieldData<float >(fieldCtx, offset, text.toFloat()         ); break;
-
-		default: break;
-	}
+	SceneNodeUtility::SetFieldDataFromString(m_Tree->Root, fieldItem->FieldCtx, item->text(), item->column() - 2);
 }
