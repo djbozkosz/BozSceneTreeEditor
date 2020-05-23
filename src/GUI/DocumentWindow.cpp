@@ -111,34 +111,33 @@ void DocumentWindow::SetupTable(SceneNode* node)
 		table->setRowCount(table->rowCount() + 1);
 		table->setItem(row, 0, new ReadOnlyItem(fieldInfo->Name));
 		table->setItem(row, 1, new ReadOnlyItem(fieldInfo->FieldType->Name));
-		SetupTableField(node->Type, row, FieldContext(node, fieldIdx, &node->Fields, fieldInfo));
+		SetupTableField(Scene::SceneNodeUtility::FieldContext(node, fieldIdx, &node->Fields, fieldInfo), row);
 	}
 }
 
-void DocumentWindow::SetupTableField(ushort type, int& row, const FieldContext &fieldCtx)
+void DocumentWindow::SetupTableField(const Scene::SceneNodeUtility::FieldContext &fieldCtx, int& row)
 {
 	auto        field     = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
-	auto        intValue  = -1;
 	const auto& fieldInfo = fieldCtx.FieldInfo;
 	auto        fieldType = fieldInfo->FieldType->Type;
 
 	switch (fieldType)
 	{
-		case Definitions::ENodeFieldType::Uint8:    intValue = SetTableFieldInt<uchar >(row, fieldCtx, 1    ); break;
-		case Definitions::ENodeFieldType::Uint16:   intValue = SetTableFieldInt<ushort>(row, fieldCtx, 1    ); break;
-		case Definitions::ENodeFieldType::Uint16_3: intValue = SetTableFieldInt<ushort>(row, fieldCtx, 3    ); break;
-		case Definitions::ENodeFieldType::Uint32:   intValue = SetTableFieldInt<uint  >(row, fieldCtx, 1    ); break;
-		case Definitions::ENodeFieldType::Int8:     intValue = SetTableFieldInt<char  >(row, fieldCtx, 1    ); break;
-		case Definitions::ENodeFieldType::Int16:    intValue = SetTableFieldInt<short >(row, fieldCtx, 1    ); break;
-		case Definitions::ENodeFieldType::Int32:    intValue = SetTableFieldInt<int   >(row, fieldCtx, 1    ); break;
-		case Definitions::ENodeFieldType::Hex8:     intValue = SetTableFieldInt<uchar >(row, fieldCtx, 1, 16); break;
-		case Definitions::ENodeFieldType::Hex16:    intValue = SetTableFieldInt<ushort>(row, fieldCtx, 1, 16); break;
-		case Definitions::ENodeFieldType::Hex32:    intValue = SetTableFieldInt<uint  >(row, fieldCtx, 1, 16); break;
-		case Definitions::ENodeFieldType::Float:               SetTableFieldFloat      (row, fieldCtx, 1    ); break;
-		case Definitions::ENodeFieldType::Float2:              SetTableFieldFloat      (row, fieldCtx, 2    ); break;
-		case Definitions::ENodeFieldType::Float3:              SetTableFieldFloat      (row, fieldCtx, 3    ); break;
-		case Definitions::ENodeFieldType::Float4:              SetTableFieldFloat      (row, fieldCtx, 4    ); break;
-		case Definitions::ENodeFieldType::Color:               SetTableFieldFloat      (row, fieldCtx, 3    ); break;
+		case Definitions::ENodeFieldType::Uint8:    SetTableFieldInt<uchar >(row, fieldCtx, 1    ); break;
+		case Definitions::ENodeFieldType::Uint16:   SetTableFieldInt<ushort>(row, fieldCtx, 1    ); break;
+		case Definitions::ENodeFieldType::Uint16_3: SetTableFieldInt<ushort>(row, fieldCtx, 3    ); break;
+		case Definitions::ENodeFieldType::Uint32:   SetTableFieldInt<uint  >(row, fieldCtx, 1    ); break;
+		case Definitions::ENodeFieldType::Int8:     SetTableFieldInt<char  >(row, fieldCtx, 1    ); break;
+		case Definitions::ENodeFieldType::Int16:    SetTableFieldInt<short >(row, fieldCtx, 1    ); break;
+		case Definitions::ENodeFieldType::Int32:    SetTableFieldInt<int   >(row, fieldCtx, 1    ); break;
+		case Definitions::ENodeFieldType::Hex8:     SetTableFieldInt<uchar >(row, fieldCtx, 1, 16); break;
+		case Definitions::ENodeFieldType::Hex16:    SetTableFieldInt<ushort>(row, fieldCtx, 1, 16); break;
+		case Definitions::ENodeFieldType::Hex32:    SetTableFieldInt<uint  >(row, fieldCtx, 1, 16); break;
+		case Definitions::ENodeFieldType::Float:    SetTableFieldFloat      (row, fieldCtx, 1    ); break;
+		case Definitions::ENodeFieldType::Float2:   SetTableFieldFloat      (row, fieldCtx, 2    ); break;
+		case Definitions::ENodeFieldType::Float3:   SetTableFieldFloat      (row, fieldCtx, 3    ); break;
+		case Definitions::ENodeFieldType::Float4:   SetTableFieldFloat      (row, fieldCtx, 4    ); break;
+		case Definitions::ENodeFieldType::Color:    SetTableFieldFloat      (row, fieldCtx, 3    ); break;
 
 		case Definitions::ENodeFieldType::String:
 		case Definitions::ENodeFieldType::StringFixed:
@@ -177,7 +176,7 @@ void DocumentWindow::SetupTableField(ushort type, int& row, const FieldContext &
 					table->setItem(row, 0, new ReadOnlyItem(QString("%1: %2").arg(structIdx).arg(fieldInf->Name)));
 					table->setItem(row, 1, new ReadOnlyItem(fieldInf->FieldType->Name));
 
-					SetupTableField(type, row, FieldContext(fieldCtx.Node, fieldIdx, strukt, fieldInf));
+					SetupTableField(SceneNodeUtility::FieldContext(fieldCtx.Node, fieldIdx, strukt, fieldInf), row);
 					row++;
 				}
 			}
@@ -189,22 +188,6 @@ void DocumentWindow::SetupTableField(ushort type, int& row, const FieldContext &
 		default:
 			break;
 	}
-
-	// hack begin
-	if (fieldType >= Definitions::ENodeFieldType::Uint8 && fieldType <= Definitions::ENodeFieldType::Hex32)
-	{
-		auto enumMap = m_Definitions->GetNodeFieldEnum(type, row);
-		if (enumMap != null)
-		{
-			const auto& enumValue = enumMap->find(intValue);
-			if (enumValue != enumMap->end())
-			{
-				auto item = m_Ui->Table->item(row, 2);
-				item->setText(QString("%1 [%2]").arg(intValue).arg(enumValue.value()));
-			}
-		}
-	}
-	// hack end
 }
 
 QString DocumentWindow::GetNodeName(SceneNode* node) const
@@ -247,28 +230,27 @@ void DocumentWindow::UpdateField(QTableWidgetItem* item)
 		return;
 
 	const auto& fieldCtx  = fieldItem->FieldCtx;
-	auto        field     = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
 	auto        fieldType = fieldCtx.FieldInfo->FieldType->Type;
 	auto        offset    = item->column() - 2;
 	const auto& text      = item->text();
 
 	switch (fieldType)
 	{
-		case Definitions::ENodeFieldType::Uint8:    SetField<uchar >(text.toUShort(),         field, offset); break;
-		case Definitions::ENodeFieldType::Uint16:   SetField<ushort>(text.toUShort(),         field, offset); break;
-		case Definitions::ENodeFieldType::Uint16_3: SetField<ushort>(text.toUShort(),         field, offset); break;
-		case Definitions::ENodeFieldType::Uint32:   SetField<uint  >(text.toUInt(),           field, offset); break;
-		case Definitions::ENodeFieldType::Int8:     SetField<char  >(text.toShort(),          field, offset); break;
-		case Definitions::ENodeFieldType::Int16:    SetField<short >(text.toShort(),          field, offset); break;
-		case Definitions::ENodeFieldType::Int32:    SetField<int   >(text.toInt(),            field, offset); break;
-		case Definitions::ENodeFieldType::Hex8:     SetField<uchar >(text.toUShort(null, 16), field, offset); break;
-		case Definitions::ENodeFieldType::Hex16:    SetField<ushort>(text.toUShort(null, 16), field, offset); break;
-		case Definitions::ENodeFieldType::Hex32:    SetField<uint  >(text.toUInt  (null, 16), field, offset); break;
-		case Definitions::ENodeFieldType::Float:    SetField<float >(text.toFloat(),          field, offset); break;
-		case Definitions::ENodeFieldType::Float2:   SetField<float >(text.toFloat(),          field, offset); break;
-		case Definitions::ENodeFieldType::Float3:   SetField<float >(text.toFloat(),          field, offset); break;
-		case Definitions::ENodeFieldType::Float4:   SetField<float >(text.toFloat(),          field, offset); break;
-		case Definitions::ENodeFieldType::Color:    SetField<float >(text.toFloat(),          field, offset); break;
+		case Definitions::ENodeFieldType::Uint8:    SceneNodeUtility::SetFieldData<uchar >(fieldCtx, offset, text.toUShort()        ); break;
+		case Definitions::ENodeFieldType::Uint16:   SceneNodeUtility::SetFieldData<ushort>(fieldCtx, offset, text.toUShort()        ); break;
+		case Definitions::ENodeFieldType::Uint16_3: SceneNodeUtility::SetFieldData<ushort>(fieldCtx, offset, text.toUShort()        ); break;
+		case Definitions::ENodeFieldType::Uint32:   SceneNodeUtility::SetFieldData<uint  >(fieldCtx, offset, text.toUInt()          ); break;
+		case Definitions::ENodeFieldType::Int8:     SceneNodeUtility::SetFieldData<char  >(fieldCtx, offset, text.toShort()         ); break;
+		case Definitions::ENodeFieldType::Int16:    SceneNodeUtility::SetFieldData<short >(fieldCtx, offset, text.toShort()         ); break;
+		case Definitions::ENodeFieldType::Int32:    SceneNodeUtility::SetFieldData<int   >(fieldCtx, offset, text.toInt()           ); break;
+		case Definitions::ENodeFieldType::Hex8:     SceneNodeUtility::SetFieldData<uchar >(fieldCtx, offset, text.toUShort(null, 16)); break;
+		case Definitions::ENodeFieldType::Hex16:    SceneNodeUtility::SetFieldData<ushort>(fieldCtx, offset, text.toUShort(null, 16)); break;
+		case Definitions::ENodeFieldType::Hex32:    SceneNodeUtility::SetFieldData<uint  >(fieldCtx, offset, text.toUInt  (null, 16)); break;
+		case Definitions::ENodeFieldType::Float:    SceneNodeUtility::SetFieldData<float >(fieldCtx, offset, text.toFloat()         ); break;
+		case Definitions::ENodeFieldType::Float2:   SceneNodeUtility::SetFieldData<float >(fieldCtx, offset, text.toFloat()         ); break;
+		case Definitions::ENodeFieldType::Float3:   SceneNodeUtility::SetFieldData<float >(fieldCtx, offset, text.toFloat()         ); break;
+		case Definitions::ENodeFieldType::Float4:   SceneNodeUtility::SetFieldData<float >(fieldCtx, offset, text.toFloat()         ); break;
+		case Definitions::ENodeFieldType::Color:    SceneNodeUtility::SetFieldData<float >(fieldCtx, offset, text.toFloat()         ); break;
 
 		default: break;
 	}

@@ -7,6 +7,7 @@
 #include "ui_DocumentWindow.h"
 
 #include "Scene/Definitions.h"
+#include "Scene/SceneNodeUtility.h"
 
 
 class QTreeWidget;
@@ -34,6 +35,9 @@ namespace Scene
 
 namespace GUI
 {
+	using namespace Djbozkosz::Application::Scene;
+
+
 	sealed class DocumentWindow : public QWidget
 	{											 
 		private:
@@ -46,37 +50,20 @@ namespace GUI
 		{
 			public:
 
-			Scene::SceneNode* Node;
+			SceneNode* Node;
 
-			explicit NodeItem(QTreeWidget* parent, Scene::SceneNode* node, QString& name);
-			explicit NodeItem(NodeItem* parent, Scene::SceneNode* node, QString& name);
+			explicit NodeItem(QTreeWidget* parent, SceneNode* node, QString& name);
+			explicit NodeItem(NodeItem* parent, SceneNode* node, QString& name);
 			virtual ~NodeItem();
-		};
-
-		sealed class FieldContext
-		{
-			public:
-
-			Scene::SceneNode*                        Node;
-			uint                                     FieldIdx;
-			QVector<void*>*                          Fields;
-			const Scene::Definitions::NodeFieldInfo* FieldInfo;
-
-			explicit inline FieldContext(Scene::SceneNode* node, uint fieldIdx, QVector<void*>* fields, const Scene::Definitions::NodeFieldInfo* fieldInfo) :
-				Node(node), FieldIdx(fieldIdx), Fields(fields), FieldInfo(fieldInfo)
-			{
-			}
-
-			virtual inline ~FieldContext() {}
 		};
 
 		sealed class FieldItem : public QTableWidgetItem
 		{
 			public:
 
-			FieldContext FieldCtx;
+			SceneNodeUtility::FieldContext FieldCtx;
 
-			explicit inline FieldItem(const QString& text, const FieldContext& fieldCtx) : QTableWidgetItem(text), FieldCtx(fieldCtx) {}
+			explicit inline FieldItem(const QString& text, const SceneNodeUtility::FieldContext& fieldCtx) : QTableWidgetItem(text), FieldCtx(fieldCtx) {}
 			virtual inline ~FieldItem() {}
 		};
 
@@ -97,13 +84,13 @@ namespace GUI
 		Ui::DocumentWindow* m_Ui;
 
 		Document*           m_Document;
-		Scene::SceneTree*   m_Tree;
-		Scene::Definitions* m_Definitions;
+		SceneTree*          m_Tree;
+		Definitions*        m_Definitions;
 
 
 		public: // methods
 
-		explicit DocumentWindow(Document* document, Scene::Definitions* definitions, QWidget* parent = null);
+		explicit DocumentWindow(Document* document, Definitions* definitions, QWidget* parent = null);
 		virtual ~DocumentWindow();
 
 		inline Document* GetDocument() const { return m_Document; }
@@ -111,37 +98,43 @@ namespace GUI
 		private: // methods
 
 		void SetupTree();
-		void CreateTree(NodeItem *item, Scene::SceneNode* node);
+		void CreateTree(NodeItem *item, SceneNode* node);
 
-		void SetupTable(Scene::SceneNode* node);
-		void SetupTableField(ushort type, int& row, const FieldContext& fieldCtx);
+		void SetupTable(SceneNode* node);
+		void SetupTableField(const SceneNodeUtility::FieldContext& fieldCtx, int& row);
 
-		template <typename T> inline int SetTableFieldInt(int row, const FieldContext& fieldCtx, int count, int base = 10)
+		template <typename T> inline void SetTableFieldInt(int row, const SceneNodeUtility::FieldContext& fieldCtx, int count, int base = 10)
 		{
-			auto field = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
-			auto data  = reinterpret_cast<const T*>(field);
-			for (int i = 0; i < count; i++)
+			for (int idx = 0; idx < count; idx++)
 			{
-				auto text = QString::number(data[i], base);
+				auto data = SceneNodeUtility::GetFieldData<T>(fieldCtx, idx);
+				auto text = QString::number(data, base);
+
 				if (base == 16)
 				{
 					text = QString("0x%1").arg(text);
 				}
 
-				m_Ui->Table->setItem(row, i + 2, new FieldItem(text, fieldCtx));
-			}
+				if (idx == 0)
+				{
+					auto enumValue = SceneNodeUtility::GetEnumValue(m_Definitions, fieldCtx, (int)data);
+					if (enumValue.isEmpty() == false)
+					{
+						text = QString("%1 [%2]").arg(text).arg(enumValue);
+					}
+				}
 
-			return data[0];
+				m_Ui->Table->setItem(row, idx + 2, new FieldItem(text, fieldCtx));
+			}
 		}
 
-		inline void SetTableFieldFloat(int idx, const FieldContext& fieldCtx, int count)
+		inline void SetTableFieldFloat(int row, const SceneNodeUtility::FieldContext& fieldCtx, int count)
 		{
-			auto field = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
-			auto data  = reinterpret_cast<const float*>(field);
-			for (int i = 0; i < count; i++)
+			for (int idx = 0; idx < count; idx++)
 			{
-				auto text = QString::number(data[i]);
-				m_Ui->Table->setItem(idx, i + 2, new FieldItem(text, fieldCtx));
+				auto data = SceneNodeUtility::GetFieldData<float>(fieldCtx, idx);
+				auto text = QString::number(data);
+				m_Ui->Table->setItem(row, idx + 2, new FieldItem(text, fieldCtx));
 			}
 		}
 
@@ -151,7 +144,8 @@ namespace GUI
 			data[offset] = value;
 		}
 
-		QString GetNodeName(Scene::SceneNode* node) const;
+		QString GetEnumValue(const SceneNodeUtility::FieldContext& fieldCtx, int data);
+		QString GetNodeName(SceneNode* node) const;
 
 		private slots: // handlers
 

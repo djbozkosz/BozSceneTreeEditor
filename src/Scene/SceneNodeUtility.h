@@ -34,19 +34,21 @@ namespace Scene
 
 		public: // methods
 
-		template <typename T> static inline const T& GetFieldData(const FieldContext& fieldCtx, uint idx)
+		template <typename T> static inline const T& GetFieldData(const FieldContext& fieldCtx, int idx)
 		{
 			auto   field = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
 			auto   data  = reinterpret_cast<const T*>(field);
 			return data[idx];
 		}
 
-		template <typename T> static inline void SetFieldData(const FieldContext& fieldCtx, uint idx, const T& value)
+		template <typename T> static inline void SetFieldData(const FieldContext& fieldCtx, int idx, const T& value)
 		{
 			auto field = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
-			auto data  = reinterpret_cast<const T*>(field);
+			auto data  = reinterpret_cast<T*>(field);
 			data[idx]  = value;
 		}
+
+		static QString GetEnumValue(const Definitions* definitions, const FieldContext& fieldCtx, int data);
 
 		// operations:
 		// get field data at index (float3 ...)
