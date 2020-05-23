@@ -88,17 +88,17 @@ void DocumentWindow::SetupTable(SceneNode* node)
 		return;
 
 	auto count = node->Fields.size();
-	if (count == 0)
-	{
-		table->setRowCount(1);
-		table->setItem(0, 0, new ReadOnlyItem("No data"));
-		return;
-	}
 
-	if (node->Definition == null || node->Definition->Fields[0].FieldType->Type == Definitions::ENodeFieldType::Unknown)
+	if (count == 0 || node->Definition == null || node->Definition->Fields[0].FieldType->Type == Definitions::ENodeFieldType::Unknown)
 	{
 		table->setRowCount(1);
-		table->setItem(0, 0, new ReadOnlyItem("Unknown data"));
+		table->setItem(0, 0, new ReadOnlyItem((count == 0) ? "No data" : "Unknown data"));
+
+		for (int idx = 1; idx < 6; idx++)
+		{
+			table->setItem(0, idx, new ReadOnlyItem(QString()));
+		}
+
 		return;
 	}
 
@@ -117,76 +117,60 @@ void DocumentWindow::SetupTable(SceneNode* node)
 
 void DocumentWindow::SetupTableField(const Scene::SceneNodeUtility::FieldContext &fieldCtx, int& row)
 {
+	auto        table     = m_Ui->Table;
 	auto        field     = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
 	const auto& fieldInfo = fieldCtx.FieldInfo;
 	auto        fieldType = fieldInfo->FieldType->Type;
 
-	switch (fieldType)
+	if (fieldType > Definitions::ENodeFieldType::Unknown && fieldType < Definitions::ENodeFieldType::Struct)
 	{
-		case Definitions::ENodeFieldType::Uint8:    SetTableFieldInt<uchar >(row, fieldCtx, 1    ); break;
-		case Definitions::ENodeFieldType::Uint16:   SetTableFieldInt<ushort>(row, fieldCtx, 1    ); break;
-		case Definitions::ENodeFieldType::Uint16_3: SetTableFieldInt<ushort>(row, fieldCtx, 3    ); break;
-		case Definitions::ENodeFieldType::Uint32:   SetTableFieldInt<uint  >(row, fieldCtx, 1    ); break;
-		case Definitions::ENodeFieldType::Int8:     SetTableFieldInt<char  >(row, fieldCtx, 1    ); break;
-		case Definitions::ENodeFieldType::Int16:    SetTableFieldInt<short >(row, fieldCtx, 1    ); break;
-		case Definitions::ENodeFieldType::Int32:    SetTableFieldInt<int   >(row, fieldCtx, 1    ); break;
-		case Definitions::ENodeFieldType::Hex8:     SetTableFieldInt<uchar >(row, fieldCtx, 1, 16); break;
-		case Definitions::ENodeFieldType::Hex16:    SetTableFieldInt<ushort>(row, fieldCtx, 1, 16); break;
-		case Definitions::ENodeFieldType::Hex32:    SetTableFieldInt<uint  >(row, fieldCtx, 1, 16); break;
-		case Definitions::ENodeFieldType::Float:    SetTableFieldFloat      (row, fieldCtx, 1    ); break;
-		case Definitions::ENodeFieldType::Float2:   SetTableFieldFloat      (row, fieldCtx, 2    ); break;
-		case Definitions::ENodeFieldType::Float3:   SetTableFieldFloat      (row, fieldCtx, 3    ); break;
-		case Definitions::ENodeFieldType::Float4:   SetTableFieldFloat      (row, fieldCtx, 4    ); break;
-		case Definitions::ENodeFieldType::Color:    SetTableFieldFloat      (row, fieldCtx, 3    ); break;
+		auto data      = SceneNodeUtility::GetFieldDataAsString(fieldCtx);
+		auto dataCount = data.count();
 
-		case Definitions::ENodeFieldType::String:
-		case Definitions::ENodeFieldType::StringFixed:
+		for (int idx = 0; idx < 4; idx++)
 		{
-			auto dataChar = reinterpret_cast<const char*>(field);
-			m_Ui->Table->setItem(row, 2, new FieldItem(QString::fromLatin1(dataChar), fieldCtx));
-			break;
-		}
-
-		case Definitions::ENodeFieldType::StringArray:
-		case Definitions::ENodeFieldType::StringArray2:
-		{
-			auto dataChar      = reinterpret_cast<const char*>(field);
-			auto dataUInt      = reinterpret_cast<const uint*>(field);
-			auto sizeReduction = (fieldType == Definitions::ENodeFieldType::StringArray2) ? 1 : 0;
-			m_Ui->Table->setItem(row, 2, new FieldItem(QString::fromLatin1(&dataChar[4], dataUInt[0] - sizeReduction), fieldCtx));
-			break;
-		}
-
-		case Definitions::ENodeFieldType::Struct:
-		{
-			auto& structArray      = *reinterpret_cast<QVector<QVector<void*> >*>(field);
-			auto  structArrayCount = structArray.size();
-
-			auto*       table            = m_Ui->Table;
-			table->setRowCount(table->rowCount() + fieldInfo->NestedField->Fields.size() * structArrayCount - 1);
-
-			for (int structIdx = 0; structIdx < structArrayCount; structIdx++)
+			if (idx < dataCount)
 			{
-				auto strukt = &structArray[structIdx];
+				auto text      = data[idx];
+				auto enumValue = SceneNodeUtility::GetFieldDataEnum(m_Definitions, fieldCtx, idx);
 
-				for (int fieldIdx = 0, count = strukt->size(); fieldIdx < count; fieldIdx++)
+				if (enumValue.isEmpty() == false)
 				{
-					auto fieldInf = &fieldInfo->NestedField->Fields[fieldIdx];
-
-					table->setItem(row, 0, new ReadOnlyItem(QString("%1: %2").arg(structIdx).arg(fieldInf->Name)));
-					table->setItem(row, 1, new ReadOnlyItem(fieldInf->FieldType->Name));
-
-					SetupTableField(SceneNodeUtility::FieldContext(fieldCtx.Node, fieldIdx, strukt, fieldInf), row);
-					row++;
+					text = QString("%1 [%2]").arg(text).arg(enumValue);
 				}
-			}
 
-			row--;
-			break;
+				table->setItem(row, 2 + idx, new FieldItem(text, fieldCtx));
+			}
+			else
+			{
+				table->setItem(row, 2 + idx, new ReadOnlyItem(QString()));
+			}
+		}
+	}
+	else if (fieldType == Definitions::ENodeFieldType::Struct)
+	{
+		auto& structArray      = *reinterpret_cast<QVector<QVector<void*> >*>(field);
+		auto  structArrayCount = structArray.size();
+
+		table->setRowCount(table->rowCount() + fieldInfo->NestedField->Fields.size() * structArrayCount - 1);
+
+		for (int structIdx = 0; structIdx < structArrayCount; structIdx++)
+		{
+			auto strukt = &structArray[structIdx];
+
+			for (int fieldIdx = 0, count = strukt->size(); fieldIdx < count; fieldIdx++)
+			{
+				auto fieldInf = &fieldInfo->NestedField->Fields[fieldIdx];
+
+				table->setItem(row, 0, new ReadOnlyItem(QString("%1: %2").arg(structIdx).arg(fieldInf->Name)));
+				table->setItem(row, 1, new ReadOnlyItem(fieldInf->FieldType->Name));
+
+				SetupTableField(SceneNodeUtility::FieldContext(fieldCtx.Node, fieldIdx, strukt, fieldInf), row);
+				row++;
+			}
 		}
 
-		default:
-			break;
+		row--;
 	}
 }
 

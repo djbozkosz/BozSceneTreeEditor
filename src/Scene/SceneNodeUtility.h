@@ -1,6 +1,8 @@
 #ifndef APPLICATION_SCENE_SCENENODEUTILITY_H
 #define APPLICATION_SCENE_SCENENODEUTILITY_H
 
+#include <QStringList>
+
 #include "Scene/Definitions.h"
 
 
@@ -41,6 +43,33 @@ namespace Scene
 			return data[idx];
 		}
 
+		template <typename T> static inline void GetFieldDataInt(QStringList& data, const SceneNodeUtility::FieldContext& fieldCtx, int count)
+		{
+			for (int idx = 0; idx < count; idx++)
+			{
+				auto field = GetFieldData<T>(fieldCtx, idx);
+				data << QString::number(field);
+			}
+		}
+
+		template <typename T> static inline void GetFieldDataHex(QStringList& data, const SceneNodeUtility::FieldContext& fieldCtx, int count)
+		{
+			for (int idx = 0; idx < count; idx++)
+			{
+				auto field = GetFieldData<T>(fieldCtx, idx);
+				data << QString("0x%2").arg(field, 0, 16);
+			}
+		}
+
+		static inline void GetFieldDataFloat(QStringList& data, const SceneNodeUtility::FieldContext& fieldCtx, int count)
+		{
+			for (int idx = 0; idx < count; idx++)
+			{
+				auto field = SceneNodeUtility::GetFieldData<float>(fieldCtx, idx);
+				data << QString::number(field, 'g', 3);
+			}
+		}
+
 		template <typename T> static inline void SetFieldData(const FieldContext& fieldCtx, int idx, const T& value)
 		{
 			auto field = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
@@ -48,7 +77,9 @@ namespace Scene
 			data[idx]  = value;
 		}
 
-		static QString GetEnumValue(const Definitions* definitions, const FieldContext& fieldCtx, int data);
+		static QStringList GetFieldDataAsString(const FieldContext& fieldCtx);
+
+		static QString GetFieldDataEnum(const Definitions* definitions, const FieldContext& fieldCtx, int idx);
 
 		// operations:
 		// get field data at index (float3 ...)

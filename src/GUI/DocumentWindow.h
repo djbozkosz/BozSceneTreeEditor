@@ -103,47 +103,6 @@ namespace GUI
 		void SetupTable(SceneNode* node);
 		void SetupTableField(const SceneNodeUtility::FieldContext& fieldCtx, int& row);
 
-		template <typename T> inline void SetTableFieldInt(int row, const SceneNodeUtility::FieldContext& fieldCtx, int count, int base = 10)
-		{
-			for (int idx = 0; idx < count; idx++)
-			{
-				auto data = SceneNodeUtility::GetFieldData<T>(fieldCtx, idx);
-				auto text = QString::number(data, base);
-
-				if (base == 16)
-				{
-					text = QString("0x%1").arg(text);
-				}
-
-				if (idx == 0)
-				{
-					auto enumValue = SceneNodeUtility::GetEnumValue(m_Definitions, fieldCtx, (int)data);
-					if (enumValue.isEmpty() == false)
-					{
-						text = QString("%1 [%2]").arg(text).arg(enumValue);
-					}
-				}
-
-				m_Ui->Table->setItem(row, idx + 2, new FieldItem(text, fieldCtx));
-			}
-		}
-
-		inline void SetTableFieldFloat(int row, const SceneNodeUtility::FieldContext& fieldCtx, int count)
-		{
-			for (int idx = 0; idx < count; idx++)
-			{
-				auto data = SceneNodeUtility::GetFieldData<float>(fieldCtx, idx);
-				auto text = QString::number(data);
-				m_Ui->Table->setItem(row, idx + 2, new FieldItem(text, fieldCtx));
-			}
-		}
-
-		template <typename T> inline void SetField(const T& value, void* field, uint offset = 0)
-		{
-			auto data = reinterpret_cast<T*>(field);
-			data[offset] = value;
-		}
-
 		QString GetEnumValue(const SceneNodeUtility::FieldContext& fieldCtx, int data);
 		QString GetNodeName(SceneNode* node) const;
 
