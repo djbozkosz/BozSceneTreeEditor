@@ -9,8 +9,9 @@ QStringList SceneNodeUtility::GetFieldDataAsString(const SceneNodeUtility::Field
 {
 	QStringList data;
 
-	auto field     = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
-	auto fieldType = fieldCtx.FieldInfo->FieldType->Type;
+	auto field     = fieldCtx.GetField();
+	auto fieldInfo = fieldCtx.GetFieldInfo();
+	auto fieldType = fieldInfo->FieldType->Type;
 
 	switch (fieldType)
 	{
@@ -61,7 +62,8 @@ QString SceneNodeUtility::GetFieldDataEnum(const Definitions* definitions, const
 	if (enumMap == null)
 		return QString();
 
-	auto fieldType = fieldCtx.FieldInfo->FieldType->Type;
+	auto fieldInfo = fieldCtx.GetFieldInfo();
+	auto fieldType = fieldInfo->FieldType->Type;
 	auto data      = 0;
 
 	switch (fieldType)
@@ -88,7 +90,7 @@ QString SceneNodeUtility::GetFieldDataEnum(const Definitions* definitions, const
 
 void* SceneNodeUtility::ResizeFieldData(const SceneNodeUtility::FieldContext& fieldCtx, int dataSize)
 {
-	auto& field = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
+	auto& field = fieldCtx.GetField();
 	delete[] reinterpret_cast<uchar*>(field);
 	field = new uchar[dataSize];
 	return field;
@@ -98,9 +100,19 @@ void SceneNodeUtility::SetFieldDataFromString(SceneNode* root, const SceneNodeUt
 {
 	QVector<SceneNode*> path;
 	auto result = SceneNodeUtility::GetNodePath(path, root, fieldCtx.Node);
-	Debug::Assert(result) << "Node not found in tree";
+	Debug::Assert(result) << "Node not found in tree!";
 
-	auto fieldType = fieldCtx.FieldInfo->FieldType->Type;
+	auto field      = fieldCtx.GetField();
+	auto fieldInfo  = fieldCtx.GetFieldInfo();
+	auto fieldType  = fieldInfo->FieldType->Type;
+	auto lastNumber = -1;
+	auto number     = -1;
+
+	if (fieldType == Definitions::ENodeFieldType::Uint32)
+	{
+		lastNumber = GetFieldData<uint>(fieldCtx, 0);
+		number     = data.toUInt();
+	}
 
 	switch (fieldType)
 	{
@@ -122,11 +134,9 @@ void SceneNodeUtility::SetFieldDataFromString(SceneNode* root, const SceneNodeUt
 
 		case Definitions::ENodeFieldType::String:
 		{
-			auto lastData       = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
-			auto lastDataChar   = reinterpret_cast<const char*>(lastData);
-			auto lastDataSize   = strlen(lastDataChar) + 1;
-			auto dataSize       = data.length() + 1;
-			auto newData        = ResizeFieldData(fieldCtx, dataSize);
+			auto lastDataSize = GetFieldSize(field, fieldInfo, false);
+			auto dataSize     = data.length() + 1;
+			auto newData      = ResizeFieldData(fieldCtx, dataSize);
 			memcpy(newData, data.toLatin1().constData(), dataSize);
 
 			ApplyNodeSizeOffset(path, dataSize - lastDataSize);
@@ -135,7 +145,7 @@ void SceneNodeUtility::SetFieldDataFromString(SceneNode* root, const SceneNodeUt
 
 		case Definitions::ENodeFieldType::StringFixed:
 		{
-			auto fixedSize = (int)fieldCtx.FieldInfo->Number;
+			auto fixedSize = (int)GetFieldSize(field, fieldInfo, false);
 			auto dataSize  = data.length();
 
 			if (dataSize >= fixedSize)
@@ -143,7 +153,7 @@ void SceneNodeUtility::SetFieldDataFromString(SceneNode* root, const SceneNodeUt
 				dataSize = fixedSize - 1;
 			}
 
-			auto field = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
+			auto field = fieldCtx.GetField();
 			memset(field, 0, fixedSize);
 			memcpy(field, data.toLatin1().constData(), dataSize);
 			break;
@@ -152,10 +162,8 @@ void SceneNodeUtility::SetFieldDataFromString(SceneNode* root, const SceneNodeUt
 		case Definitions::ENodeFieldType::StringArray:
 		case Definitions::ENodeFieldType::StringArray2:
 		{
-			auto lastData       = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
-			auto lastDataInt    = reinterpret_cast<const uint*>(lastData);
 			auto dataTermSize   = (fieldType == Definitions::ENodeFieldType::StringArray2) ? 1 : 0;
-			auto lastDataSize   = lastDataInt[0];
+			auto lastDataSize   = GetFieldSize(field, fieldInfo, false);
 			auto dataSize       = data.length() + dataTermSize;
 			auto newData        = ResizeFieldData(fieldCtx, dataSize + sizeof(uint));
 			auto newDataInt     = reinterpret_cast<uint*>(newData);
@@ -168,6 +176,133 @@ void SceneNodeUtility::SetFieldDataFromString(SceneNode* root, const SceneNodeUt
 
 		default: break;
 	}
+
+	if (fieldType == Definitions::ENodeFieldType::Uint32 && number != lastNumber)
+	{
+		auto offset = number - lastNumber;
+
+		for (int idx = 0, count = fieldCtx.FieldInfos->size(); idx < count; idx++)
+		{
+			auto fieldInf = fieldCtx.GetFieldInfo(idx);
+
+			if (fieldInf->FieldType->Type != Definitions::ENodeFieldType::Struct ||
+				fieldInf->Number != fieldCtx.FieldIdx)
+				continue;
+
+			auto  field           = fieldCtx.GetField(idx);
+			auto  struktArray     = reinterpret_cast<Definitions::StructField*>(field);
+			auto& nestedFieldInfo = fieldInf->NestedField->Fields;
+			auto  size            = 0;
+
+			if (offset >= 0)
+			{
+				for (int i = 0; i < offset; i++)
+				{
+					QVector<void*> fields;
+					size += CreateFieldsData(fields, nestedFieldInfo);
+					struktArray->push_back(fields);
+				}
+			}
+			else
+			{
+				for (int i = 0; i < -offset; i++)
+				{
+					size -= GetFieldsSize(struktArray->back(), nestedFieldInfo);
+					struktArray->pop_back();
+				}
+			}
+
+
+			ApplyNodeSizeOffset(path, size);
+		}
+	}
+}
+
+uint SceneNodeUtility::CreateFieldsData(QVector<void*>& fields, const QVector<Definitions::NodeFieldInfo>& fieldInfos)
+{
+	auto size = 0;
+
+	for (int idx = 0, count = fieldInfos.size(); idx < count; idx++)
+	{
+		auto fieldInfo = fieldInfos[idx];
+		auto fieldType = fieldInfo.FieldType->Type;
+
+		if (fieldType >= Definitions::ENodeFieldType::Uint8 && fieldType <= Definitions::ENodeFieldType::StringFixed)
+		{
+			auto fieldSize = (fieldType == Definitions::ENodeFieldType::StringFixed) ? fieldInfo.Number : fieldInfo.FieldType->Size;
+			auto field     = new uchar[fieldSize];
+
+			memset(field, 0, fieldSize);
+			fields.push_back(field);
+			size += fieldSize;
+		}
+		else if (fieldType == Definitions::ENodeFieldType::Struct)
+		{
+			fields.push_back(new Definitions::StructField());
+		}
+		else
+		{
+			Debug::Assert() << "Cannot create fields data of unknown field type!";
+		}
+	}
+
+	return size;
+}
+
+uint SceneNodeUtility::GetFieldSize(const void* field, const Definitions::NodeFieldInfo* fieldInfo, bool withHeader)
+{
+	auto size      = withHeader ? (sizeof(SceneNode::Type) + sizeof(SceneNode::Size)) : 0;
+	auto fieldType = fieldInfo->FieldType->Type;
+
+	if (fieldType >= Definitions::ENodeFieldType::Uint8 && fieldType <= Definitions::ENodeFieldType::Color)
+		return size + fieldInfo->FieldType->Size;
+
+	if (fieldType == Definitions::ENodeFieldType::String)
+	{
+		auto dataChar = reinterpret_cast<const char*>(field);
+		return size + strlen(dataChar) + 1;
+	}
+
+	if (fieldType == Definitions::ENodeFieldType::StringArray || fieldType == Definitions::ENodeFieldType::StringArray2)
+	{
+		auto dataInt = reinterpret_cast<const uint*>(field);
+		return size + dataInt[0];
+	}
+
+	if (fieldType == Definitions::ENodeFieldType::StringFixed)
+	{
+		return size + fieldInfo->Number;
+	}
+
+	if (fieldType == Definitions::ENodeFieldType::Struct)
+	{
+		auto  struktArray = reinterpret_cast<const Definitions::StructField*>(field);
+		auto& fieldInfs   = fieldInfo->NestedField->Fields;
+
+		for (int idx = 0, count = struktArray->size(); idx < count; idx++)
+		{
+			size += GetFieldsSize((*struktArray)[idx], fieldInfs);
+		}
+
+		return size;
+	}
+
+	Debug::Assert() << "Cannot get size of unknown field!";
+	return 0;
+}
+
+uint SceneNodeUtility::GetFieldsSize(const QVector<void *>& fields, const QVector<Definitions::NodeFieldInfo>& fieldInfos)
+{
+	auto size = 0;
+
+	for (int idx = 0, count = fieldInfos.size(); idx < count; idx++)
+	{
+		auto field     = fields[idx];
+		auto fieldInfo = &fieldInfos[idx];
+		size += GetFieldSize(field, fieldInfo, false);
+	}
+
+	return size;
 }
 
 bool SceneNodeUtility::GetNodePath(QVector<SceneNode*>& path, SceneNode* parent, const SceneNode* node)

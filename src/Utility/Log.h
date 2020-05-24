@@ -96,7 +96,7 @@ namespace Utility
 		{
 			public: // methods
 
-			explicit inline Assert(bool condition) : Log(EType::Assert, condition) {}
+			explicit inline Assert(bool condition = false) : Log(EType::Assert, condition) {}
 			virtual inline ~Assert() {}
 		};
 

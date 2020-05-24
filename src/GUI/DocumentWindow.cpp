@@ -110,21 +110,22 @@ void DocumentWindow::SetupTable(NodeItem* nodeItem)
 
 	for (int fieldIdx = 0; fieldIdx < count; fieldIdx++, row++)
 	{
-		auto fieldInfo = &node->Definition->Fields[fieldIdx];
+		auto& fieldInfos = node->Definition->Fields;
+		auto& fieldInfo  = fieldInfos[fieldIdx];
 
 		table->setRowCount(table->rowCount() + 1);
-		table->setItem(row, 0, new ReadOnlyItem(fieldInfo->Name));
-		table->setItem(row, 1, new ReadOnlyItem(fieldInfo->FieldType->Name));
-		SetupTableField(nodeItem, Scene::SceneNodeUtility::FieldContext(node, fieldIdx, &node->Fields, fieldInfo), row);
+		table->setItem(row, 0, new ReadOnlyItem(fieldInfo.Name));
+		table->setItem(row, 1, new ReadOnlyItem(fieldInfo.FieldType->Name));
+		SetupTableField(nodeItem, Scene::SceneNodeUtility::FieldContext(node, fieldIdx, &node->Fields, &fieldInfos), row);
 	}
 }
 
 void DocumentWindow::SetupTableField(NodeItem* nodeItem, const Scene::SceneNodeUtility::FieldContext &fieldCtx, int& row)
 {
-	auto        table     = m_Ui->Table;
-	auto        field     = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
-	const auto& fieldInfo = fieldCtx.FieldInfo;
-	auto        fieldType = fieldInfo->FieldType->Type;
+	auto table     = m_Ui->Table;
+	auto field     = fieldCtx.GetField();
+	auto fieldInfo = fieldCtx.GetFieldInfo();
+	auto fieldType = fieldInfo->FieldType->Type;
 
 	if (fieldType > Definitions::ENodeFieldType::Unknown && fieldType < Definitions::ENodeFieldType::Struct)
 	{
@@ -153,7 +154,7 @@ void DocumentWindow::SetupTableField(NodeItem* nodeItem, const Scene::SceneNodeU
 	}
 	else if (fieldType == Definitions::ENodeFieldType::Struct)
 	{
-		auto& structArray      = *reinterpret_cast<QVector<QVector<void*> >*>(field);
+		auto& structArray      = *reinterpret_cast<Definitions::StructField*>(field);
 		auto  structArrayCount = structArray.size();
 
 		table->setRowCount(table->rowCount() + fieldInfo->NestedField->Fields.size() * structArrayCount - 1);
@@ -164,12 +165,13 @@ void DocumentWindow::SetupTableField(NodeItem* nodeItem, const Scene::SceneNodeU
 
 			for (int fieldIdx = 0, count = strukt->size(); fieldIdx < count; fieldIdx++)
 			{
-				auto fieldInf = &fieldInfo->NestedField->Fields[fieldIdx];
+				auto& fieldInfs = fieldInfo->NestedField->Fields;
+				auto& fieldInf  = fieldInfs[fieldIdx];
 
-				table->setItem(row, 0, new ReadOnlyItem(QString("%1: %2").arg(structIdx).arg(fieldInf->Name)));
-				table->setItem(row, 1, new ReadOnlyItem(fieldInf->FieldType->Name));
+				table->setItem(row, 0, new ReadOnlyItem(QString("%1: %2").arg(structIdx).arg(fieldInf.Name)));
+				table->setItem(row, 1, new ReadOnlyItem(fieldInf.FieldType->Name));
 
-				SetupTableField(nodeItem, SceneNodeUtility::FieldContext(fieldCtx.Node, fieldIdx, strukt, fieldInf), row);
+				SetupTableField(nodeItem, SceneNodeUtility::FieldContext(fieldCtx.Node, fieldIdx, strukt, &fieldInfs), row);
 				row++;
 			}
 		}
@@ -193,7 +195,7 @@ QString DocumentWindow::GetNodeName(SceneNode* node) const
 
 		if (nodeWithName != null)
 		{
-			auto fieldCtx = SceneNodeUtility::FieldContext(nodeWithName, nameInfo->FieldIdx, &nodeWithName->Fields, &nodeWithName->Definition->Fields[nameInfo->FieldIdx]);
+			auto fieldCtx = SceneNodeUtility::FieldContext(nodeWithName, nameInfo->FieldIdx, &nodeWithName->Fields, &nodeWithName->Definition->Fields);
 			name = SceneNodeUtility::GetFieldDataAsString(fieldCtx)[0];
 		}
 
@@ -222,6 +224,10 @@ void DocumentWindow::UpdateField(QTableWidgetItem* item)
 
 	auto nodeItem = fieldItem->Item;
 	UpdateNode(nodeItem);
+
+	auto tabIndex = m_Ui->Table->currentIndex();
+	UpdateTable(nodeItem, null);
+	m_Ui->Table->setCurrentIndex(tabIndex);
 
 	nodeItem = as(nodeItem->parent(), NodeItem*);
 	if (nodeItem != null)

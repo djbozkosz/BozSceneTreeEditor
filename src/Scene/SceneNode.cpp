@@ -14,7 +14,7 @@ SceneNode::SceneNode(Definitions* definitions) :
 
 SceneNode::~SceneNode()
 {
-	Debug::Assert(false) << "Proper struct cleanup";
+	Debug::Assert() << "Proper struct cleanup";
 
 	for (int idx = 0, count = Fields.size(); idx < count; idx++)
 	{
@@ -29,7 +29,7 @@ SceneNode::~SceneNode()
 
 		while (structFields != null)
 		{
-			auto structArray = reinterpret_cast<QVector<QVector<void*> >*>(field);
+			auto structArray = reinterpret_cast<Definitions::StructField*>(field);
 			foreach (strukt, *structArray)
 			{
 				foreach (field, *strukt)
@@ -155,10 +155,10 @@ void SceneNode::LoadFields(QFile& reader, QVector<void*>& fields, const QVector<
 {
 	foreach (field, fieldInfos)
 	{
-		auto type = field->FieldType->Type;
-		auto data = default_(uchar*);
+		auto fieldType = field->FieldType->Type;
+		auto data      = default_(uchar*);
 
-		switch (type)
+		switch (fieldType)
 		{
 			case Definitions::ENodeFieldType::String:
 			{
@@ -181,7 +181,8 @@ void SceneNode::LoadFields(QFile& reader, QVector<void*>& fields, const QVector<
 			case Definitions::ENodeFieldType::StringArray:
 			case Definitions::ENodeFieldType::StringArray2:
 			{
-				auto lengthSize = field->FieldType->Size;
+				auto dataTermSize = (fieldType == Definitions::ENodeFieldType::StringArray2) ? 1 : 0;
+				auto lengthSize   = field->FieldType->Size - dataTermSize;
 				uint arraySize;
 				LoadData(reader, &arraySize, lengthSize);
 
@@ -204,7 +205,7 @@ void SceneNode::LoadFields(QFile& reader, QVector<void*>& fields, const QVector<
 				auto sizeIdx = field->Number;
 				auto size    = *reinterpret_cast<const uint*>(fields[sizeIdx]);
 
-				auto structArray = new QVector<QVector<void*> >();
+				auto structArray = new Definitions::StructField();
 				structArray->reserve(size);
 
 				for (uint idx = 0; idx < size; idx++)
@@ -236,9 +237,9 @@ void SceneNode::SaveFields(QFile& writer, const QVector<void*>& fields, const QV
 	{
 		const auto* field     = fields[idx];
 		const auto& fieldInfo = fieldInfos[idx];
-		const auto  type      = fieldInfo.FieldType->Type;
+		const auto  fieldType = fieldInfo.FieldType->Type;
 
-		switch (type)
+		switch (fieldType)
 		{
 			case Definitions::ENodeFieldType::String:
 			{
@@ -263,7 +264,7 @@ void SceneNode::SaveFields(QFile& writer, const QVector<void*>& fields, const QV
 
 			case Definitions::ENodeFieldType::Struct:
 			{
-				const auto& structArray = *reinterpret_cast<const QVector<QVector<void*> >*>(field);
+				const auto& structArray = *reinterpret_cast<const Definitions::StructField*>(field);
 				for (int idx = 0, count = structArray.size(); idx < count; idx++)
 				{
 					SaveFields(writer, structArray[idx], fieldInfo.NestedField->Fields);

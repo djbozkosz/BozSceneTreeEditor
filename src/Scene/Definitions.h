@@ -94,6 +94,8 @@ namespace Scene
 			inline NodeName() : Type(0), ChildType(0), FieldIdx(0) {}
 		};
 
+		typedef QVector<QVector<void*> > StructField;
+
 		sealed struct StructDefinition
 		{
 			QString                Name;

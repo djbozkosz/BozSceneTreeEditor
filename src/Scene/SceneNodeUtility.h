@@ -22,17 +22,23 @@ namespace Scene
 		{
 			public:
 
-			SceneNode*                        Node;
-			uint                              FieldIdx;
-			QVector<void*>*                   Fields;
-			const Definitions::NodeFieldInfo* FieldInfo;
+			SceneNode*                                 Node;
+			uint                                       FieldIdx;
+			QVector<void*>*                            Fields;
+			const QVector<Definitions::NodeFieldInfo>* FieldInfos;
 
-			explicit inline FieldContext(SceneNode* node, uint fieldIdx, QVector<void*>* fields, const Definitions::NodeFieldInfo* fieldInfo) :
-				Node(node), FieldIdx(fieldIdx), Fields(fields), FieldInfo(fieldInfo)
+			explicit inline FieldContext(SceneNode* node, uint fieldIdx, QVector<void*>* fields, const QVector<Definitions::NodeFieldInfo>* fieldInfos) :
+				Node(node), FieldIdx(fieldIdx), Fields(fields), FieldInfos(fieldInfos)
 			{
 			}
 
 			virtual inline ~FieldContext() {}
+
+			inline void*& GetField()        const { return (*Fields)[FieldIdx]; }
+			inline void*& GetField(int idx) const { return (*Fields)[idx];      }
+
+			inline const Definitions::NodeFieldInfo* GetFieldInfo()        const { return &(*FieldInfos)[FieldIdx]; }
+			inline const Definitions::NodeFieldInfo* GetFieldInfo(int idx) const { return &(*FieldInfos)[idx];      }
 		};
 
 		public: // get field methods
@@ -87,17 +93,18 @@ namespace Scene
 
 		static void SetFieldDataFromString(SceneNode* root, const FieldContext& fieldCtx, const QString& data, int idx);
 
+		public: // node data methods
+
+		static uint CreateFieldsData(QVector<void*>& fields, const QVector<Definitions::NodeFieldInfo>& fieldInfos);
+		static uint GetFieldSize(const void* field, const Definitions::NodeFieldInfo* fieldInfo, bool withHeader);
+		static uint GetFieldsSize(const QVector<void*>& fields, const QVector<Definitions::NodeFieldInfo>& fieldInfos);
+
 		public: // tree methods
 
 		static bool GetNodePath(QVector<SceneNode*>& path, SceneNode* parent, const SceneNode* node);
 		static void ApplyNodeSizeOffset(QVector<SceneNode*>& path, int offset);
 
 		// operations:
-		// get field data at index (float3 ...)
-		// set field data at index (fixed and variable node length - realloc)
-		// if node length changed:
-		// get node path
-		// and update node sizes in path
 		// add entry into array
 		// remove entry from array
 		// insert node

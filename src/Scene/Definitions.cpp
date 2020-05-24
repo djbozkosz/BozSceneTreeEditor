@@ -27,7 +27,7 @@ const QVector<Definitions::NodeFieldType> Definitions::FIELD_TYPES =
 	{ "Color",        Definitions::ENodeFieldType::Color,        sizeof(float) * 3  },
 	{ "String",       Definitions::ENodeFieldType::String,       1                  },
 	{ "StringArray",  Definitions::ENodeFieldType::StringArray,  sizeof(uint)       },
-	{ "StringArray2", Definitions::ENodeFieldType::StringArray2, sizeof(uint)       },
+	{ "StringArray2", Definitions::ENodeFieldType::StringArray2, sizeof(uint) + 1   },
 	{ "StringFixed",  Definitions::ENodeFieldType::StringFixed,  0                  },
 	{ "Struct",       Definitions::ENodeFieldType::Struct,       0                  }
 };
