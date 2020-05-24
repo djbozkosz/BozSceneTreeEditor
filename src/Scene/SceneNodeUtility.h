@@ -83,7 +83,7 @@ namespace Scene
 			data[idx]  = value;
 		}
 
-		static void SetFieldData(const FieldContext& fieldCtx, const void* data, int dataSize);
+		static void* ResizeFieldData(const FieldContext& fieldCtx, int dataSize);
 
 		static void SetFieldDataFromString(SceneNode* root, const FieldContext& fieldCtx, const QString& data, int idx);
 

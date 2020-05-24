@@ -13,23 +13,6 @@ using namespace Djbozkosz::Application::GUI;
 using namespace Djbozkosz::Application::Scene;
 
 
-DocumentWindow::NodeItem::NodeItem(QTreeWidget* parent, Scene::SceneNode* node, QString& name) :
-	QTreeWidgetItem(parent, QStringList() << name),
-	Node(node)
-{
-}
-
-DocumentWindow::NodeItem::NodeItem(NodeItem* parent, Scene::SceneNode* node, QString& name) :
-	QTreeWidgetItem(parent, QStringList() << name),
-	Node(node)
-{
-}
-
-DocumentWindow::NodeItem::~NodeItem()
-{
-}
-
-
 DocumentWindow::DocumentWindow(Document* document, Definitions* definitions, QWidget* parent) :
 	QWidget(parent),
 	m_Ui(new Ui::DocumentWindow()),
@@ -58,29 +41,35 @@ void DocumentWindow::SetupTree()
 	auto tree = m_Ui->Tree;
 	tree->clear();
 
-	auto root = m_Tree->Root;
-	auto name = GetNodeName(root);
-	auto item = new NodeItem(tree, root, name);
-	CreateTree(item, root);
-	tree->addTopLevelItem(item);
+	auto root     = m_Tree->Root;
+	auto name     = GetNodeName(root);
+	auto nodeItem = new NodeItem(tree, root, name);
+	CreateTree(nodeItem, root);
+	tree->addTopLevelItem(nodeItem);
 
-	tree->expandItem(item);
+	tree->expandItem(nodeItem);
 }
 
-void DocumentWindow::CreateTree(NodeItem* item, Scene::SceneNode* node)
+void DocumentWindow::CreateTree(NodeItem* nodeItem, Scene::SceneNode* node)
 {
 	auto childs = node->Childs;
 	foreach (child, childs)
 	{
 		auto childName = GetNodeName(*child);
-		auto childItem = new NodeItem(item, *child, childName);
+		auto childItem = new NodeItem(nodeItem, *child, childName);
 		CreateTree(childItem, *child);
-		item->addChild(childItem);
+		nodeItem->addChild(childItem);
 	}
 }
 
-void DocumentWindow::SetupTable(SceneNode* node)
+void DocumentWindow::UpdateNode(NodeItem* nodeItem)
 {
+	nodeItem->setText(0, GetNodeName(nodeItem->Node));
+}
+
+void DocumentWindow::SetupTable(NodeItem* nodeItem)
+{
+	auto node  = nodeItem->Node;
 	auto table = m_Ui->Table;
 	table->setRowCount(0);
 
@@ -111,11 +100,11 @@ void DocumentWindow::SetupTable(SceneNode* node)
 		table->setRowCount(table->rowCount() + 1);
 		table->setItem(row, 0, new ReadOnlyItem(fieldInfo->Name));
 		table->setItem(row, 1, new ReadOnlyItem(fieldInfo->FieldType->Name));
-		SetupTableField(Scene::SceneNodeUtility::FieldContext(node, fieldIdx, &node->Fields, fieldInfo), row);
+		SetupTableField(nodeItem, Scene::SceneNodeUtility::FieldContext(node, fieldIdx, &node->Fields, fieldInfo), row);
 	}
 }
 
-void DocumentWindow::SetupTableField(const Scene::SceneNodeUtility::FieldContext &fieldCtx, int& row)
+void DocumentWindow::SetupTableField(NodeItem* nodeItem, const Scene::SceneNodeUtility::FieldContext &fieldCtx, int& row)
 {
 	auto        table     = m_Ui->Table;
 	auto        field     = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
@@ -139,7 +128,7 @@ void DocumentWindow::SetupTableField(const Scene::SceneNodeUtility::FieldContext
 					text = QString("%1 [%2]").arg(text).arg(enumValue);
 				}
 
-				table->setItem(row, 2 + idx, new FieldItem(text, fieldCtx));
+				table->setItem(row, 2 + idx, new FieldItem(text, nodeItem, fieldCtx));
 			}
 			else
 			{
@@ -165,7 +154,7 @@ void DocumentWindow::SetupTableField(const Scene::SceneNodeUtility::FieldContext
 				table->setItem(row, 0, new ReadOnlyItem(QString("%1: %2").arg(structIdx).arg(fieldInf->Name)));
 				table->setItem(row, 1, new ReadOnlyItem(fieldInf->FieldType->Name));
 
-				SetupTableField(SceneNodeUtility::FieldContext(fieldCtx.Node, fieldIdx, strukt, fieldInf), row);
+				SetupTableField(nodeItem, SceneNodeUtility::FieldContext(fieldCtx.Node, fieldIdx, strukt, fieldInf), row);
 				row++;
 			}
 		}
@@ -204,7 +193,7 @@ void DocumentWindow::UpdateTable(QTreeWidgetItem* current, QTreeWidgetItem* prev
 	unused(previous);
 
 	m_Ui->Table->blockSignals(true);
-	SetupTable(as(current, NodeItem*)->Node);
+	SetupTable(as(current, NodeItem*));
 	m_Ui->Table->blockSignals(false);
 }
 
@@ -215,4 +204,13 @@ void DocumentWindow::UpdateField(QTableWidgetItem* item)
 		return;
 
 	SceneNodeUtility::SetFieldDataFromString(m_Tree->Root, fieldItem->FieldCtx, item->text(), item->column() - 2);
+
+	auto nodeItem = fieldItem->Item;
+	UpdateNode(nodeItem);
+
+	nodeItem = as(nodeItem->parent(), NodeItem*);
+	if (nodeItem != null)
+	{
+		UpdateNode(nodeItem);
+	}
 }

@@ -52,18 +52,31 @@ namespace GUI
 
 			SceneNode* Node;
 
-			explicit NodeItem(QTreeWidget* parent, SceneNode* node, QString& name);
-			explicit NodeItem(NodeItem* parent, SceneNode* node, QString& name);
-			virtual ~NodeItem();
+			explicit inline NodeItem(QTreeWidget* parent, SceneNode* node, QString& name) :
+				QTreeWidgetItem(parent, QStringList() << name),
+				Node(node)
+			{
+			}
+
+			explicit inline NodeItem(NodeItem* parent, SceneNode* node, QString& name) :
+				QTreeWidgetItem(parent, QStringList() << name),
+				Node(node)
+			{
+			}
+
+			virtual ~NodeItem()
+			{
+			}
 		};
 
 		sealed class FieldItem : public QTableWidgetItem
 		{
 			public:
 
+			NodeItem*                      Item;
 			SceneNodeUtility::FieldContext FieldCtx;
 
-			explicit inline FieldItem(const QString& text, const SceneNodeUtility::FieldContext& fieldCtx) : QTableWidgetItem(text), FieldCtx(fieldCtx) {}
+			explicit inline FieldItem(const QString& text, NodeItem* item, const SceneNodeUtility::FieldContext& fieldCtx) : QTableWidgetItem(text), Item(item), FieldCtx(fieldCtx) {}
 			virtual inline ~FieldItem() {}
 		};
 
@@ -98,10 +111,11 @@ namespace GUI
 		private: // methods
 
 		void SetupTree();
-		void CreateTree(NodeItem *item, SceneNode* node);
+		void CreateTree(NodeItem* nodeItem, SceneNode* node);
+		void UpdateNode(NodeItem* nodeItem);
 
-		void SetupTable(SceneNode* node);
-		void SetupTableField(const SceneNodeUtility::FieldContext& fieldCtx, int& row);
+		void SetupTable(NodeItem* nodeItem);
+		void SetupTableField(NodeItem* nodeItem, const SceneNodeUtility::FieldContext& fieldCtx, int& row);
 
 		QString GetEnumValue(const SceneNodeUtility::FieldContext& fieldCtx, int data);
 		QString GetNodeName(SceneNode* node) const;

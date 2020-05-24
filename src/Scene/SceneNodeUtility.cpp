@@ -86,16 +86,20 @@ QString SceneNodeUtility::GetFieldDataEnum(const Definitions* definitions, const
 	return enumValue.value();
 }
 
-void SceneNodeUtility::SetFieldData(const SceneNodeUtility::FieldContext& fieldCtx, const void* data, int dataSize)
+void* SceneNodeUtility::ResizeFieldData(const SceneNodeUtility::FieldContext& fieldCtx, int dataSize)
 {
 	auto& field = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
 	delete[] reinterpret_cast<uchar*>(field);
 	field = new uchar[dataSize];
-	memcpy(field, data, dataSize);
+	return field;
 }
 
 void SceneNodeUtility::SetFieldDataFromString(SceneNode* root, const SceneNodeUtility::FieldContext& fieldCtx, const QString& data, int idx)
 {
+	QVector<SceneNode*> path;
+	auto result = SceneNodeUtility::GetNodePath(path, root, fieldCtx.Node);
+	Debug::Assert(result) << "Node not found in tree";
+
 	auto fieldType = fieldCtx.FieldInfo->FieldType->Type;
 
 	switch (fieldType)
@@ -118,17 +122,48 @@ void SceneNodeUtility::SetFieldDataFromString(SceneNode* root, const SceneNodeUt
 
 		case Definitions::ENodeFieldType::String:
 		{
-			auto lastData       = GetFieldDataAsString(fieldCtx)[idx];
-			auto lastDataSize   = lastData.length() + 1;
+			auto lastData       = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
+			auto lastDataChar   = reinterpret_cast<const char*>(lastData);
+			auto lastDataSize   = strlen(lastDataChar) + 1;
 			auto dataSize       = data.length() + 1;
-			auto dataSizeOffset = dataSize - lastDataSize;
+			auto newData        = ResizeFieldData(fieldCtx, dataSize);
+			memcpy(newData, data.toLatin1().constData(), dataSize);
 
-			QVector<SceneNode*> path;
-			auto result = GetNodePath(path, root, fieldCtx.Node);
-			Debug::Assert(result) << "Node not found in tree";
+			ApplyNodeSizeOffset(path, dataSize - lastDataSize);
+			break;
+		}
 
-			SetFieldData(fieldCtx, data.toLatin1().constData(), dataSize);
-			ApplyNodeSizeOffset(path, dataSizeOffset);
+		case Definitions::ENodeFieldType::StringFixed:
+		{
+			auto fixedSize = (int)fieldCtx.FieldInfo->Number;
+			auto dataSize  = data.length();
+
+			if (dataSize >= fixedSize)
+			{
+				dataSize = fixedSize - 1;
+			}
+
+			auto field = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
+			memset(field, 0, fixedSize);
+			memcpy(field, data.toLatin1().constData(), dataSize);
+			break;
+		}
+
+		case Definitions::ENodeFieldType::StringArray:
+		case Definitions::ENodeFieldType::StringArray2:
+		{
+			auto lastData       = (*fieldCtx.Fields)[fieldCtx.FieldIdx];
+			auto lastDataInt    = reinterpret_cast<const uint*>(lastData);
+			auto dataTermSize   = (fieldType == Definitions::ENodeFieldType::StringArray2) ? 1 : 0;
+			auto lastDataSize   = lastDataInt[0];
+			auto dataSize       = data.length() + dataTermSize;
+			auto newData        = ResizeFieldData(fieldCtx, dataSize + sizeof(uint));
+			auto newDataInt     = reinterpret_cast<uint*>(newData);
+			memcpy(&newDataInt[0], &dataSize, sizeof(uint));
+			memcpy(&newDataInt[1], data.toLatin1().constData(), dataSize);
+
+			ApplyNodeSizeOffset(path, dataSize - lastDataSize);
+			break;
 		}
 
 		default: break;
