@@ -100,18 +100,22 @@ namespace GUI
 		SceneTree*          m_Tree;
 		Definitions*        m_Definitions;
 
-
-		public: // methods
+		public: // methodssetup
 
 		explicit DocumentWindow(Document* document, Definitions* definitions, QWidget* parent = null);
 		virtual ~DocumentWindow();
 
+		void SetupTree();
+
 		inline Document* GetDocument() const { return m_Document; }
+
+		signals: // interface
+
+		void ProgressChanged(float value);
 
 		private: // methods
 
-		void SetupTree();
-		void CreateTree(NodeItem* nodeItem, SceneNode* node);
+		void CreateTree(NodeItem* nodeItem, SceneNode* node, float& progress);
 		void UpdateNode(NodeItem* nodeItem);
 
 		void SetupTable(NodeItem* nodeItem);

@@ -24,8 +24,6 @@ DocumentWindow::DocumentWindow(Document* document, Definitions* definitions, QWi
 
 	connect(m_Ui->Tree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(UpdateTable(QTreeWidgetItem*,QTreeWidgetItem*)));
 	connect(m_Ui->Table, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(UpdateField(QTableWidgetItem*)));
-
-	SetupTree();
 }
 
 DocumentWindow::~DocumentWindow()
@@ -44,21 +42,38 @@ void DocumentWindow::SetupTree()
 	auto root     = m_Tree->Root;
 	auto name     = GetNodeName(root);
 	auto nodeItem = new NodeItem(tree, root, name);
-	CreateTree(nodeItem, root);
+	auto progress = 0.0f;
+	CreateTree(nodeItem, root, progress);
 	tree->addTopLevelItem(nodeItem);
 
 	tree->expandItem(nodeItem);
+
+	emit ProgressChanged(1.0f);
 }
 
-void DocumentWindow::CreateTree(NodeItem* nodeItem, Scene::SceneNode* node)
+void DocumentWindow::CreateTree(NodeItem* nodeItem, Scene::SceneNode* node, float& progress)
 {
 	auto childs = node->Childs;
 	foreach (child, childs)
 	{
-		auto childName = GetNodeName(*child);
-		auto childItem = new NodeItem(nodeItem, *child, childName);
-		CreateTree(childItem, *child);
+		auto childNode = *child;
+		auto childName = GetNodeName(childNode);
+		auto childItem = new NodeItem(nodeItem, childNode, childName);
+		CreateTree(childItem, *child, progress);
 		nodeItem->addChild(childItem);
+
+		float progressInc;
+		if (childNode->Definition == null || childNode->Definition->HasChilds == false)
+		{
+			progressInc = childNode->Size;
+		}
+		else
+		{
+			progressInc = sizeof(childNode->Type) + sizeof(childNode->Size);
+		}
+		progress += progressInc / m_Tree->Root->Size;
+
+		emit ProgressChanged(progress);
 	}
 }
 

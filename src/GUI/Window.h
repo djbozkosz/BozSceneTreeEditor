@@ -7,6 +7,10 @@
 #include "Utility/Base.h"
 
 
+class QLabel;
+class QProgressBar;
+
+
 namespace Ui
 {
 	class Window;
@@ -34,7 +38,9 @@ namespace GUI
 
 		private: // members
 
-		Ui::Window* m_Ui;
+		Ui::Window*   m_Ui;
+		QLabel*       m_Status;
+		QProgressBar* m_Progress;
 
 		public: // methods
 
@@ -53,6 +59,7 @@ namespace GUI
 		void OpenFile();
 		void SaveFile();
 		void ExitApp();
+		void UpdateProgress(float value);
 	};
 }}}
 

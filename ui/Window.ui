@@ -43,22 +43,6 @@
       </property>
      </widget>
     </item>
-    <item>
-     <widget class="QFrame" name="Status">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>50</height>
-       </size>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Sunken</enum>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="Menu">
@@ -80,6 +64,7 @@
    </widget>
    <addaction name="Menu_File"/>
   </widget>
+  <widget class="QStatusBar" name="StatusBar"/>
   <action name="Menu_Exit">
    <property name="text">
     <string>Exit</string>
