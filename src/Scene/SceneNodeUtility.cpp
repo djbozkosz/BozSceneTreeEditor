@@ -227,22 +227,31 @@ uint SceneNodeUtility::CreateFieldsData(QVector<void*>& fields, const QVector<De
 		auto fieldInfo = fieldInfos[idx];
 		auto fieldType = fieldInfo.FieldType->Type;
 
-		if (fieldType >= Definitions::ENodeFieldType::Uint8 && fieldType <= Definitions::ENodeFieldType::StringFixed)
+		switch (fieldType)
 		{
-			auto fieldSize = (fieldType == Definitions::ENodeFieldType::StringFixed) ? fieldInfo.Number : fieldInfo.FieldType->Size;
-			auto field     = new uchar[fieldSize];
+			case Definitions::ENodeFieldType::Struct:
+			{
+				fields.push_back(new Definitions::StructField());
+				break;
+			}
 
-			memset(field, 0, fieldSize);
-			fields.push_back(field);
-			size += fieldSize;
-		}
-		else if (fieldType == Definitions::ENodeFieldType::Struct)
-		{
-			fields.push_back(new Definitions::StructField());
-		}
-		else
-		{
-			Debug::Assert() << "Cannot create fields data of unknown field type!";
+			default:
+			{
+				auto fieldSize = (fieldType == Definitions::ENodeFieldType::StringFixed) ? fieldInfo.Number : fieldInfo.FieldType->Size;
+				auto field     = new uchar[fieldSize];
+
+				memset(field, 0, fieldSize);
+
+				if (fieldType == Definitions::ENodeFieldType::StringArray2)
+				{
+					auto fieldInt = reinterpret_cast<uint*>(field);
+					*fieldInt = 1;
+				}
+
+				fields.push_back(field);
+				size += fieldSize;
+				break;
+			}
 		}
 	}
 
@@ -254,41 +263,37 @@ uint SceneNodeUtility::GetFieldSize(const void* field, const Definitions::NodeFi
 	auto size      = withHeader ? (sizeof(SceneNode::Type) + sizeof(SceneNode::Size)) : 0;
 	auto fieldType = fieldInfo->FieldType->Type;
 
-	if (fieldType >= Definitions::ENodeFieldType::Uint8 && fieldType <= Definitions::ENodeFieldType::Color)
-		return size + fieldInfo->FieldType->Size;
-
-	if (fieldType == Definitions::ENodeFieldType::String)
+	switch (fieldType)
 	{
-		auto dataChar = reinterpret_cast<const char*>(field);
-		return size + strlen(dataChar) + 1;
-	}
-
-	if (fieldType == Definitions::ENodeFieldType::StringArray || fieldType == Definitions::ENodeFieldType::StringArray2)
-	{
-		auto dataInt = reinterpret_cast<const uint*>(field);
-		return size + dataInt[0];
-	}
-
-	if (fieldType == Definitions::ENodeFieldType::StringFixed)
-	{
-		return size + fieldInfo->Number;
-	}
-
-	if (fieldType == Definitions::ENodeFieldType::Struct)
-	{
-		auto  struktArray = reinterpret_cast<const Definitions::StructField*>(field);
-		auto& fieldInfs   = fieldInfo->NestedField->Fields;
-
-		for (int idx = 0, count = struktArray->size(); idx < count; idx++)
+		case Definitions::ENodeFieldType::String:
 		{
-			size += GetFieldsSize((*struktArray)[idx], fieldInfs);
+			auto dataChar = reinterpret_cast<const char*>(field);
+			return size + strlen(dataChar) + 1;
 		}
 
-		return size;
-	}
+		case Definitions::ENodeFieldType::StringArray:
+		case Definitions::ENodeFieldType::StringArray2:
+			return size + *reinterpret_cast<const uint*>(field);
 
-	Debug::Assert() << "Cannot get size of unknown field!";
-	return 0;
+		case Definitions::ENodeFieldType::StringFixed:
+			return size + fieldInfo->Number;
+
+		case Definitions::ENodeFieldType::Struct:
+		{
+			auto  struktArray = reinterpret_cast<const Definitions::StructField*>(field);
+			auto& fieldInfs   = fieldInfo->NestedField->Fields;
+
+			for (int idx = 0, count = struktArray->size(); idx < count; idx++)
+			{
+				size += GetFieldsSize((*struktArray)[idx], fieldInfs);
+			}
+
+			return size;
+		}
+
+		default:
+			return size + fieldInfo->FieldType->Size;
+	}
 }
 
 uint SceneNodeUtility::GetFieldsSize(const QVector<void *>& fields, const QVector<Definitions::NodeFieldInfo>& fieldInfos)
