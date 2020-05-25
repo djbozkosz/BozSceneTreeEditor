@@ -29,14 +29,20 @@ Application::~Application()
 {
 	disconnect(m_Window, SIGNAL(FileOpened(QString)),           this, SLOT(LoadDocument(QString)));
 	disconnect(m_Window, SIGNAL(FileSaved(Document*, QString)), this, SLOT(SaveDocument(Document*, QString)));
-
 	delete m_Window;
+
+	foreach (document, m_Documents)
+	{
+		(*document)->deleteLater();
+	}
+	m_Documents.clear();
+
 	delete m_Definitions;
 }
 
 void Application::LoadDocument(const QString& file)
 {
-	auto document = new Document(m_Definitions);
+	auto document = new Document(this, m_Definitions);
 	document->Load(file);
 
 	m_Documents[file] = document;

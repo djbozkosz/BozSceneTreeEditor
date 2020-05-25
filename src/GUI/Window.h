@@ -30,6 +30,9 @@ class Document;
 
 namespace GUI
 {
+	class DocumentWindow;
+
+
 	sealed class Window : public QMainWindow
 	{
 		private:
@@ -51,15 +54,28 @@ namespace GUI
 
 		signals: // public interface
 
+		void FileCreated();
 		void FileOpened(const QString& file);
 		void FileSaved(Document* document, const QString& file);
 
 		private slots: // handlers
 
+		void NewFile();
 		void OpenFile();
 		void SaveFile();
+		void SaveAsFile();
+		void CloseFile();
 		void ExitApp();
+		void ShowAbout();
+
 		void UpdateProgress(float value);
+		void UpdateDirtyState(bool isDirty);
+
+		private: // methods
+
+		inline DocumentWindow* GetCurrentDocument() const;
+
+		void SaveDocument(bool replace);
 	};
 }}}
 

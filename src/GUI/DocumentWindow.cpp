@@ -234,4 +234,6 @@ void DocumentWindow::UpdateField(QTableWidgetItem* item)
 	{
 		UpdateNode(nodeItem);
 	}
+
+	m_Document->SetDirty(true);
 }

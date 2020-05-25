@@ -7,8 +7,10 @@
 using namespace Djbozkosz::Application;
 
 
-Document::Document(Scene::Definitions* definitions) :
-	m_Tree(new Scene::SceneTree(definitions))
+Document::Document(QObject* parent, Scene::Definitions* definitions) :
+	QObject(parent),
+	m_Tree(new Scene::SceneTree(definitions)),
+	m_IsDirty(false)
 {
 }
 
@@ -49,4 +51,14 @@ void Document::Save(const QString& file)
 		return;
 
 	m_Tree->Save(writer);
+	SetDirty(false);
+}
+
+void Document::SetDirty(bool isDirty)
+{
+	if (isDirty == m_IsDirty)
+		return;
+
+	m_IsDirty = isDirty;
+	emit DirtyStateChanged(isDirty);
 }

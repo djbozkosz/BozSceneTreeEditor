@@ -41,6 +41,9 @@
       <property name="currentIndex">
        <number>-1</number>
       </property>
+      <property name="tabsClosable">
+       <bool>true</bool>
+      </property>
      </widget>
     </item>
    </layout>
@@ -58,11 +61,31 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="Menu_New"/>
+    <addaction name="separator"/>
     <addaction name="Menu_Open"/>
+    <addaction name="separator"/>
     <addaction name="Menu_Save"/>
+    <addaction name="Menu_SaveAs"/>
+    <addaction name="separator"/>
+    <addaction name="Menu_Close"/>
+    <addaction name="separator"/>
     <addaction name="Menu_Exit"/>
    </widget>
+   <widget class="QMenu" name="Menu_Help">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="Menu_About"/>
+   </widget>
+   <widget class="QMenu" name="Menu_Edit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+   </widget>
    <addaction name="Menu_File"/>
+   <addaction name="Menu_Edit"/>
+   <addaction name="Menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="StatusBar"/>
   <action name="Menu_Exit">
@@ -75,18 +98,59 @@
   </action>
   <action name="Menu_Open">
    <property name="text">
-    <string>Open</string>
+    <string>Open...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
    </property>
   </action>
   <action name="Menu_Save">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Save</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="Menu_SaveAs">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Save As...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="Menu_New">
+   <property name="text">
+    <string>New</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="Menu_Close">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Close</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="Menu_About">
+   <property name="text">
+    <string>About...</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
    </property>
   </action>
  </widget>

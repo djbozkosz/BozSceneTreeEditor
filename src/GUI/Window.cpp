@@ -33,16 +33,24 @@ Window::Window() :
 	statusBar->addWidget(m_Status, 2);
 	statusBar->addWidget(m_Progress, 1);
 
-	connect(m_Ui->Menu_Open, SIGNAL(triggered()), this, SLOT(OpenFile()));
-	connect(m_Ui->Menu_Save, SIGNAL(triggered()), this, SLOT(SaveFile()));
-	connect(m_Ui->Menu_Exit, SIGNAL(triggered()), this, SLOT(ExitApp()));
+	connect(m_Ui->Menu_New,    SIGNAL(triggered()), this, SLOT(NewFile()));
+	connect(m_Ui->Menu_Open,   SIGNAL(triggered()), this, SLOT(OpenFile()));
+	connect(m_Ui->Menu_Save,   SIGNAL(triggered()), this, SLOT(SaveFile()));
+	connect(m_Ui->Menu_SaveAs, SIGNAL(triggered()), this, SLOT(SaveAsFile()));
+	connect(m_Ui->Menu_Close,  SIGNAL(triggered()), this, SLOT(CloseFile()));
+	connect(m_Ui->Menu_Exit,   SIGNAL(triggered()), this, SLOT(ExitApp()));
+	connect(m_Ui->Menu_About,  SIGNAL(triggered()), this, SLOT(ShowAbout()));
 }
 
 Window::~Window()
 {
-	disconnect(m_Ui->Menu_Open, SIGNAL(triggered()), this, SLOT(OpenFile()));
-	disconnect(m_Ui->Menu_Save, SIGNAL(triggered()), this, SLOT(SaveFile()));
-	disconnect(m_Ui->Menu_Exit, SIGNAL(triggered()), this, SLOT(ExitApp()));
+	disconnect(m_Ui->Menu_New,    SIGNAL(triggered()), this, SLOT(NewFile()));
+	disconnect(m_Ui->Menu_Open,   SIGNAL(triggered()), this, SLOT(OpenFile()));
+	disconnect(m_Ui->Menu_Save,   SIGNAL(triggered()), this, SLOT(SaveFile()));
+	disconnect(m_Ui->Menu_SaveAs, SIGNAL(triggered()), this, SLOT(SaveAsFile()));
+	disconnect(m_Ui->Menu_Close,  SIGNAL(triggered()), this, SLOT(CloseFile()));
+	disconnect(m_Ui->Menu_Exit,   SIGNAL(triggered()), this, SLOT(ExitApp()));
+	disconnect(m_Ui->Menu_About,  SIGNAL(triggered()), this, SLOT(ShowAbout()));
 
 	delete m_Ui;
 }
@@ -52,53 +60,60 @@ void Window::AddDocument(Document* document, Scene::Definitions* definitions)
 	m_Status->setText("Loaded. Refreshing interface...");
 
 	auto tab = new DocumentWindow(document, definitions, m_Ui->Tabs);
-	connect(tab, SIGNAL(ProgressChanged(float)), this, SLOT(UpdateProgress(float)));
+
+	connect(tab,      SIGNAL(ProgressChanged(float)), this, SLOT(UpdateProgress(float)));
+	connect(document, SIGNAL(DirtyStateChanged(bool)), this, SLOT(UpdateDirtyState(bool)));
+
 	tab->SetupTree();
-	disconnect(tab, SIGNAL(ProgressChanged(float)), this, SLOT(UpdateProgress(float)));
+	//disconnect(tab, SIGNAL(ProgressChanged(float)), this, SLOT(UpdateProgress(float)));
 
 	auto tabs = m_Ui->Tabs;
 
 	tabs->addTab(tab, document->GetFile());
 	tabs->setCurrentIndex(tabs->count() - 1);
 
+	m_Ui->Menu_Save->setEnabled(true);
+	m_Ui->Menu_SaveAs->setEnabled(true);
+	m_Ui->Menu_Close->setEnabled(true);
+
 	m_Status->setText("Done.");
+}
+
+void Window::NewFile()
+{
+	emit FileCreated();
 }
 
 void Window::OpenFile()
 {
-#if 1
-	auto file = QFileDialog::getOpenFileName(this, "Open file", "C:\\Hry\\Mafia\\missions", "scene2.bin");
+	auto file = QFileDialog::getOpenFileName(this, "Open file", "C:\\Hry\\Mafia\\missions");
 	if (file.isEmpty() == true)
 		return;
 
 	emit FileOpened(file);
-#else
-	emit FileOpened("C:\\Hry\\Mafia\\missions\\00menu\\scene2.bin");
-#endif
 }
 
 void Window::SaveFile()
 {
-	auto tab      = as(m_Ui->Tabs->currentWidget(), DocumentWindow*);
-	auto document = tab->GetDocument();
-	auto file     = document->GetFile();
+	SaveDocument(true);
+}
 
-	if (file.isEmpty() == true)
-	{
-		file = QFileDialog::getSaveFileName(this, "Save file", "C:\\Hry\\Mafia\\missions", "scene2.bin");
-	}
+void Window::SaveAsFile()
+{
+	SaveDocument(false);
+}
 
-	if (file.isEmpty() == true)
-		return;
-
-	m_Status->setText("Saving...");
-	emit FileSaved(document, file);
-	m_Status->setText("Saved.");
+void Window::CloseFile()
+{
 }
 
 void Window::ExitApp()
 {
 	qApp->quit();
+}
+
+void Window::ShowAbout()
+{
 }
 
 void Window::UpdateProgress(float value)
@@ -112,4 +127,38 @@ void Window::UpdateProgress(float value)
 	}
 
 	m_Progress->setValue(value * 1000.0f);
+}
+
+void Window::UpdateDirtyState(bool isDirty)
+{
+	auto tab      = GetCurrentDocument();
+	auto document = tab->GetDocument();
+	auto file     = document->GetFile();
+
+	auto tabs = m_Ui->Tabs;
+	tabs->setTabText(tabs->currentIndex(), QString("%1%2").arg(file).arg(isDirty ? "*" : ""));
+}
+
+DocumentWindow* Window::GetCurrentDocument() const
+{
+	return as(m_Ui->Tabs->currentWidget(), DocumentWindow*);
+}
+
+void Window::SaveDocument(bool replace)
+{
+	auto tab      = GetCurrentDocument();
+	auto document = tab->GetDocument();
+	auto file     = document->GetFile();
+
+	if (replace == false || file.isEmpty() == true)
+	{
+		file = QFileDialog::getSaveFileName(this, "Save file", "C:\\Hry\\Mafia\\missions");
+	}
+
+	if (file.isEmpty() == true)
+		return;
+
+	m_Status->setText("Saving...");
+	emit FileSaved(document, file);
+	m_Status->setText("Saved.");
 }
