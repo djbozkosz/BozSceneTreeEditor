@@ -31,10 +31,10 @@ namespace Scene
 
 		public: // methods
 
-		explicit Document(QObject* parent, Scene::Definitions* definitions);
+		explicit Document(QObject* parent);
 		virtual ~Document();
 
-		void Load(const QString& file);
+		void Load(const QString& file, const Scene::Definitions& definitions);
 		void Save(const QString& file);
 
 		inline const QString&          GetFile() const { return m_File; }

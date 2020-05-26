@@ -2,14 +2,14 @@
 
 #include "Scene/SceneTree.h"
 #include "Scene/SceneNode.h"
+#include "Scene/SceneNodeSerializer.h"
 
 
 using namespace Djbozkosz::Application::Scene;
 
 
-SceneTree::SceneTree(Definitions* definitions) :
-	Root(null),
-	m_Definitions(definitions)
+SceneTree::SceneTree() :
+	Root(null)
 {
 }
 
@@ -20,28 +20,16 @@ SceneTree::~SceneTree()
 
 void SceneTree::DeleteTree()
 {
-	if (Root == null)
-		return;
-
 	delete Root;
 	Root = null;
 }
 
-bool SceneTree::Load(QFile& reader)
+void SceneTree::Load(QFile& reader, const Definitions& definitions)
 {
-	Root = new SceneNode(m_Definitions);
-
-	auto result = Root->Load(reader, null);
-	if (result == false)
-	{
-		DeleteTree();
-		return false;
-	}
-
-	return true;
+	Root = SceneNodeSerializer::Deserialize(reader, null, definitions);
 }
 
-bool SceneTree::Save(QFile& writer) const
+void SceneTree::Save(QFile& writer) const
 {
-	return Root->Save(writer);
+	SceneNodeSerializer::Serialize(writer, *Root);
 }

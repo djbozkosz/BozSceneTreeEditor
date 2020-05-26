@@ -7,9 +7,9 @@
 using namespace Djbozkosz::Application;
 
 
-Document::Document(QObject* parent, Scene::Definitions* definitions) :
+Document::Document(QObject* parent) :
 	QObject(parent),
-	m_Tree(new Scene::SceneTree(definitions)),
+	m_Tree(new Scene::SceneTree()),
 	m_IsDirty(false)
 {
 }
@@ -19,7 +19,7 @@ Document::~Document()
 	delete m_Tree;
 }
 
-void Document::Load(const QString& file)
+void Document::Load(const QString& file, const Scene::Definitions& definitions)
 {
 	m_File = file;
 
@@ -29,7 +29,7 @@ void Document::Load(const QString& file)
 	if (result == false)
 		return;
 
-	m_Tree->Load(reader);
+	m_Tree->Load(reader, definitions);
 }
 
 void Document::Save(const QString& file)

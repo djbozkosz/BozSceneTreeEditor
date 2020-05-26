@@ -25,15 +25,13 @@ namespace Scene
 
 		private: // members
 
-		Definitions* m_Definitions;
-
 		public: // methods
 
-		explicit SceneTree(Definitions* definitions);
+		explicit SceneTree();
 		virtual ~SceneTree();
 
-		bool Load(QFile& reader);
-		bool Save(QFile& writer) const;
+		void Load(QFile& reader, const Definitions& definitions);
+		void Save(QFile& writer) const;
 
 		private: // methods
 

@@ -42,8 +42,8 @@ Application::~Application()
 
 void Application::LoadDocument(const QString& file)
 {
-	auto document = new Document(this, m_Definitions);
-	document->Load(file);
+	auto document = new Document(this);
+	document->Load(file, *m_Definitions);
 
 	m_Documents[file] = document;
 	m_Window->AddDocument(document, m_Definitions);
