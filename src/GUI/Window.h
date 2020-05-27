@@ -58,6 +58,10 @@ namespace GUI
 		void FileOpened(const QString& file);
 		void FileSaved(Document* document, const QString& file);
 
+		private: // QObject implementation
+
+		bool eventFilter(QObject* object, QEvent* event);
+
 		private slots: // handlers
 
 		void NewFile();

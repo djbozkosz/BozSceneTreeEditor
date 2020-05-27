@@ -1,7 +1,7 @@
-#include <QApplication>
 #include <QFileDialog>
 #include <QLabel>
 #include <QProgressBar>
+#include <QEvent>
 
 #include "ui_Window.h"
 
@@ -33,6 +33,8 @@ Window::Window() :
 	statusBar->addWidget(m_Status, 2);
 	statusBar->addWidget(m_Progress, 1);
 
+	m_Ui->Tabs->installEventFilter(this);
+
 	connect(m_Ui->Menu_New,    SIGNAL(triggered()), this, SLOT(NewFile()));
 	connect(m_Ui->Menu_Open,   SIGNAL(triggered()), this, SLOT(OpenFile()));
 	connect(m_Ui->Menu_Save,   SIGNAL(triggered()), this, SLOT(SaveFile()));
@@ -51,6 +53,8 @@ Window::~Window()
 	disconnect(m_Ui->Menu_Close,  SIGNAL(triggered()), this, SLOT(CloseFile()));
 	disconnect(m_Ui->Menu_Exit,   SIGNAL(triggered()), this, SLOT(ExitApp()));
 	disconnect(m_Ui->Menu_About,  SIGNAL(triggered()), this, SLOT(ShowAbout()));
+
+	m_Ui->Tabs->removeEventFilter(this);
 
 	delete m_Ui;
 }
@@ -77,6 +81,16 @@ void Window::AddDocument(Document* document, Scene::Definitions* definitions)
 	m_Ui->Menu_Close->setEnabled(true);
 
 	m_Status->setText("Done.");
+}
+
+bool Window::eventFilter(QObject* object, QEvent* event)
+{
+	if (object == m_Ui->Tabs && event->type() == QEvent::MouseButtonDblClick)
+	{
+		OpenFile();
+	}
+
+	return QObject::eventFilter(object, event);
 }
 
 void Window::NewFile()
