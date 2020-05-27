@@ -1,98 +1,98 @@
-Node 0x4c53 Scene has_childs []
-Node 0x0001 FileInfo [Hex32 : Version, String : Description, Hex8 : Unknown]
-Node 0xafff FileParams1 [Hex16 : Unknown, Hex16 : Unknown, Hex32 : Unknown]
-Node 0x3200 FileParams2 [Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown]
-Node 0x3010 CameraFov [Float : Fov]
-Node 0x3011 DrawDistance [Float : Distance]
-Node 0x3211 ClippingRange [Float : Near, Float : Far]
+Node 0x4c53 Scene has_childs [] <>
+Node 0x0001 FileInfo [Hex32 : Version, String : Description, Hex8 : Unknown] <>
+Node 0xafff FileParams1 [Hex16 : Unknown, Hex16 : Unknown, Hex32 : Unknown] <>
+Node 0x3200 FileParams2 [Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown] <>
+Node 0x3010 CameraFov [Float : Fov] <>
+Node 0x3011 DrawDistance [Float : Distance] <>
+Node 0x3211 ClippingRange [Float : Near, Float : Far] <>
 
-Node 0x4000 Frames has_childs []
-Node 0x4010 Frame has_childs []
-Node 0x4011 Type [Uint32 : Type]
-Node 0x0010 Name [String : Name]
-Node 0x0020 Position [Float3 : Position]
-Node 0x0022 Rotation [Float4 : Rotation]
-Node 0x002d Scale [Float3 : Scale]
-Node 0x002c Position2 [Float3 : Position2]
-Node 0x4020 Parent has_childs []
+Node 0x4000 Frames has_childs [] <>
+Node 0x4010 Frame has_childs [] <0x0010 : 0, 0x4011 : 0>
+Node 0x4011 Type [Uint32 : Type] <>
+Node 0x0010 Name [String : Name] <>
+Node 0x0020 Position [Float3 : Position] <0>
+Node 0x0022 Rotation [Float4 : Rotation] <>
+Node 0x002d Scale [Float3 : Scale] <>
+Node 0x002c Position2 [Float3 : Position2] <>
+Node 0x4020 Parent has_childs [] <>
 
-Node 0x2012 Model [String : Name]
+Node 0x2012 Model [String : Name] <>
 
-Node 0xb401 Sector has_childs []
-Node 0xb401_0x0000 Unknown [Float : Unknown]
-Node 0xb401_0x0001 Unknown [Float : Unknown]
-Node 0xb401_0x0002 Unknown [Uint32 : Unknown]
-Node 0xb401_0x0003 Unknown [Float : Unknown]
-Node 0xb401_0x0004 Unknown [Float : Unknown]
-Node 0xb401_0x0005 Unknown [Uint32 : Unknown]
-Node 0xb401_0x0006 Unknown [Float : Unknown]
-Node 0xb401_0x0007 Unknown [Uint32 : Unknown]
-Node 0xb401_0x0008 Unknown [Float : Unknown]
-Node 0xb401_0x0009 Unknown [Uint32 : Unknown]
-Node 0xb401_0x000a Unknown [Float : Unknown]
-Node 0xb401_0x000b Unknown [Float : Unknown]
-Node 0xb401_0x000c Unknown [Uint32 : Unknown]
-Node 0xb401_0x000d Unknown [Uint32 : Unknown]
-Node 0xb401_0x000e Unknown [Uint32 : Unknown]
-Node 0xb401_0x000f Unknown [Uint32 : Unknown]
-Node 0xb401_0x0010 Unknown [Uint32 : Unknown]
-Node 0xb401_0x0011 Unknown [Float : Unknown]
-Node 0xb401_0x0012 Unknown [Float : Unknown]
-Node 0xb401_0x0013 Unknown [Float : Unknown]
-Node 0xb401_0x0014 Unknown [Float3 : Unknown]
-Node 0xb401_0x0015 Unknown [Float3 : Unknown]
+Node 0xb401 Sector has_childs [] <>
+Node 0xb401_0x0000 Unknown [Float : Unknown] <>
+Node 0xb401_0x0001 Unknown [Float : Unknown] <>
+Node 0xb401_0x0002 Unknown [Uint32 : Unknown] <>
+Node 0xb401_0x0003 Unknown [Float : Unknown] <>
+Node 0xb401_0x0004 Unknown [Float : Unknown] <>
+Node 0xb401_0x0005 Unknown [Uint32 : Unknown] <>
+Node 0xb401_0x0006 Unknown [Float : Unknown] <>
+Node 0xb401_0x0007 Unknown [Uint32 : Unknown] <>
+Node 0xb401_0x0008 Unknown [Float : Unknown] <>
+Node 0xb401_0x0009 Unknown [Uint32 : Unknown] <>
+Node 0xb401_0x000a Unknown [Float : Unknown] <>
+Node 0xb401_0x000b Unknown [Float : Unknown] <>
+Node 0xb401_0x000c Unknown [Uint32 : Unknown] <>
+Node 0xb401_0x000d Unknown [Uint32 : Unknown] <>
+Node 0xb401_0x000e Unknown [Uint32 : Unknown] <>
+Node 0xb401_0x000f Unknown [Uint32 : Unknown] <>
+Node 0xb401_0x0010 Unknown [Uint32 : Unknown] <>
+Node 0xb401_0x0011 Unknown [Float : Unknown] <>
+Node 0xb401_0x0012 Unknown [Float : Unknown] <>
+Node 0xb401_0x0013 Unknown [Float : Unknown] <>
+Node 0xb401_0x0014 Unknown [Float3 : Unknown] <>
+Node 0xb401_0x0015 Unknown [Float3 : Unknown] <>
 
-Node 0x4033 Hidden []
+Node 0x4033 Hidden [] <>
 
-Node 0x4040 Light has_childs []
-Node 0x4041 Type [Uint32 : Type]
-Node 0x0026 Color [Color : Color]
-Node 0x4042 Power [Float : Power]
-Node 0x4043 Cone [Float : InnerAngle, Float : OuterAngle]
-Node 0x4044 Radius [Float : InnerRadius, Float : OuterRadius]
-Node 0x4045 Flags [Hex32 : Flags]
-Node 0x4046 Sector [String : Name]
+Node 0x4040 Light has_childs [] <>
+Node 0x4041 Type [Uint32 : Type] <>
+Node 0x0026 Color [Color : Color] <>
+Node 0x4042 Power [Float : Power] <>
+Node 0x4043 Cone [Float : InnerAngle, Float : OuterAngle] <>
+Node 0x4044 Radius [Float : InnerRadius, Float : OuterRadius] <>
+Node 0x4045 Flags [Hex32 : Flags] <>
+Node 0x4046 Sector [String : Name] <>
 
-Node 0x4050 BoundingBox [Float3 : Minimum, Float3 : Maximum]
+Node 0x4050 BoundingBox [Float3 : Minimum, Float3 : Maximum] <>
 
-Node 0x4060 Sound has_childs []
-Node 0x4061 Type [Uint32 : Type]
-Node 0x4062 Unknown [Float : Unknown]
-Node 0x4063 Unknown [Float : Unknown]
-Node 0x4064 Unknown [Float2 : Unknown]
-Node 0x4068 Radius [Float : InnerRadius, Float : OuterRadius, Float : Unknown, Float : Unknown]
-Node 0x4066 Empty []
-Node 0x4067 Empty []
-Node 0xb800 Unknown [Float : Unknown]
-Node 0xb200 Sector [String : Name]
+Node 0x4060 Sound has_childs [] <>
+Node 0x4061 Type [Uint32 : Type] <>
+Node 0x4062 Unknown [Float : Unknown] <>
+Node 0x4063 Unknown [Float : Unknown] <>
+Node 0x4064 Unknown [Float2 : Unknown] <>
+Node 0x4068 Radius [Float : InnerRadius, Float : OuterRadius, Float : Unknown, Float : Unknown] <>
+Node 0x4066 Empty [] <>
+Node 0x4067 Empty [] <>
+Node 0xb800 Unknown [Float : Unknown] <>
+Node 0xb200 Sector [String : Name] <>
 
 Struct MeshVertex [Float3 : Vertex]
 Struct MeshTriangleIndices [Uint16_3 : Indices]
 
-Node 0x4083 Occluder [Uint32 : VerticesCount, MeshVertex'0 : Vertices, Uint32 : TrianglesCount, MeshTriangleIndices'2 : TriangleIndices]
-Node 0xb151 Volume [Uint32 : VerticesCount, MeshVertex'0 : Vertices, Uint32 : TrianglesCount, MeshTriangleIndices'2 : TriangleIndices]
+Node 0x4083 Occluder [Uint32 : VerticesCount, MeshVertex'0 : Vertices, Uint32 : TrianglesCount, MeshTriangleIndices'2 : TriangleIndices] <>
+Node 0xb151 Volume [Uint32 : VerticesCount, MeshVertex'0 : Vertices, Uint32 : TrianglesCount, MeshTriangleIndices'2 : TriangleIndices] <>
 
-Node 0x4090 DataSignature [Hex32 : Signature]
+Node 0x4090 DataSignature [Hex32 : Signature] <>
 
-Node 0x40a0 Lightmap [Unknown : Data]
+Node 0x40a0 Lightmap [Unknown : Data] <>
 
-Node 0xb110 Glow has_childs []
-Node 0xb112 Scale [Float : Scale]
-Node 0xb113 Alpha [Float : Alpha]
-Node 0xb114 HideUpdateTimeMs [Float : HideUpdateTimeMs]
-Node 0xb115 IncreaseStep [Float : IncreaseStep]
-Node 0xb116 DecreaseStep [Float : DecreaseStep]
-Node 0xb117 ShowUpdateTimeMs [Float : ShowUpdateTimeMs]
+Node 0xb110 Glow has_childs [] <>
+Node 0xb112 Scale [Float : Scale] <>
+Node 0xb113 Alpha [Float : Alpha] <>
+Node 0xb114 HideUpdateTimeMs [Float : HideUpdateTimeMs] <>
+Node 0xb115 IncreaseStep [Float : IncreaseStep] <>
+Node 0xb116 DecreaseStep [Float : DecreaseStep] <>
+Node 0xb117 ShowUpdateTimeMs [Float : ShowUpdateTimeMs] <>
 
 Struct Traffic [StringFixed'20 : Vehicle, Float : DensityRatio, Hex8 : Color, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Police, Hex8 : Gangster0, Hex8 : Gangster1, Hex8 : Unknown]
 Struct PedestrianName [StringFixed'17 : Pedestrian]
 Struct PedestrianDensity [Uint32 : DensityRatio]
 
-Node 0xae20 Actors has_childs []
-Node 0xae21 Actor has_childs []
-Node 0xae23 Name [String : Name]
-Node 0xae22 Type [Uint32 : Type]
-Node 0xae24 Data [Unknown : Data]
+Node 0xae20 Actors has_childs [] <>
+Node 0xae21 Actor has_childs [] <>
+Node 0xae23 Name [String : Name] <>
+Node 0xae22 Type [Uint32 : Type] <>
+Node 0xae24 Data [Unknown : Data] <>
 NodeFields 0xae24 0xae22 [0] 1 []
 NodeFields 0xae24 0xae22 [0] 2 [Hex8 : Unknown, Hex32 : CharacterType1, Hex32 : CharacterType2, Float : Strength, Float : Energy, Float : LeftHandEnergy, Float : RightHandEnergy, Float : LeftLegEnergy, Float : RightLegEnergy, Float : Reactions, Float : Speed, Float : Aggresivity, Float : Intelligence, Float : Shooting, Float : Sight, Float : Hearing, Float : Driving, Float : Mass, Float : Morale]
 NodeFields 0xae24 0xae22 [0] 5 [Hex8 : Unknown, Hex32 : Unknown, Hex8 : Unknown, Hex32 : Unknown, StringArray : Script]
@@ -112,28 +112,28 @@ NodeFields 0xae24 0xae22 [0] 30 []
 NodeFields 0xae24 0xae22 [0] 34 []
 NodeFields 0xae24 0xae22 [0] 35 [Hex8 : Unknown, Hex8 : Unknown, Float : Unknown, Float : Unknown, Float : Mass, Float : Friction, Float : Unknown, Uint32 : Sound, Hex8 : Unknown, Hex32 : Unknown]
 
-Node 0xae02 FrameAnimations has_childs []
-Node 0xae03 FrameAnimation [Hex16 : Unknown, Float : Unknown, Float : Unknown, StringArray : Frame]
+Node 0xae02 FrameAnimations has_childs [] <>
+Node 0xae03 FrameAnimation [Hex16 : Unknown, Float : Unknown, Float : Unknown, StringArray : Frame] <>
 
 Struct NonRainFrame [StringArray2 : Frame]
 
-Node 0xaef0 RainSetup [Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex32 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown]
-Node 0xaef1 NonRainFrames [Uint32 : FrameCount, NonRainFrame'0 : Frames]
+Node 0xaef0 RainSetup [Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex32 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown] <>
+Node 0xaef1 NonRainFrames [Uint32 : FrameCount, NonRainFrame'0 : Frames] <>
 
-Node 0xae50 InitScripts has_childs []
-Node 0xae51 InitScript [Hex8 : Unknown, StringArray : Name, StringArray : Script]
-
-
-
-Node 0x01f4 City has_childs [Hex32 : Version]
-Node 0x03e8 Part [Unknown : Data]
+Node 0xae50 InitScripts has_childs [] <>
+Node 0xae51 InitScript [Hex8 : Unknown, StringArray : Name, StringArray : Script] <>
 
 
 
-NodeName 0x4010_0x0010 [0]
-NodeName 0xae21_0xae23 [0]
-NodeName 0xae03 [3]
-NodeName 0xae51 [1]
+Node 0x01f4 City has_childs [Hex32 : Version] <>
+Node 0x03e8 Part [Unknown : Data] <>
+
+
+
+//NodeName 0x4010_0x0010 [0]
+//NodeName 0xae21_0xae23 [0]
+//NodeName 0xae03 [3]
+//NodeName 0xae51 [1]
 
 
 

@@ -34,12 +34,12 @@ const QVector<Definitions::NodeFieldType> Definitions::FIELD_TYPES =
 
 
 Definitions::Definitions() :
-	m_RNodeLine("^Node\\s+([a-fx0-9]+)_?([a-fx0-9]*)\\s+([a-zA-Z0-9_]+)\\s+([a-zA-Z0-9_]+)?\\s*\\[(.*)\\]$"),
+	m_RNodeLine("^Node\\s+([a-fx0-9]+)_?([a-fx0-9]*)\\s+([a-zA-Z0-9_]+)\\s+([a-zA-Z0-9_]+)?\\s*\\[(.*)\\]\\s*\\<(.*)\\>$"),
 	m_RStructLine("^Struct\\s+([a-zA-Z0-9_]+)\\s+\\[(.*)\\]$"),
 	m_RNodeFieldList(",\\s*"),
 	m_RNodeField("^([a-zA-Z0-9_]+)\\'?([0-9]*)\\s*\\:\\s*([a-zA-Z0-9_]+)$"),
 	m_RNodeFieldLine("^NodeFields\\s+([a-fx0-9]+)\\s+([a-fx0-9]+)\\s+\\[([0-9]+)\\]\\s+([0-9]+)\\s+\\[(.*)\\]$"),
-	m_RNodeNameLine("^NodeName\\s+([a-fx0-9]+)_?([a-fx0-9]*)\\s*\\[([0-9]+)\\]$"),
+	m_RNodeNameField("^([a-fx0-9]*)\\s*\\:?\\s*([0-9]+)$"),
 	m_RNodeFieldEnumLine("^Enum\\s+([a-fx0-9]+)\\s+\\[([0-9]+)\\]\\s+\\[(.*)\\]$")
 {
 	foreach (field, FIELD_TYPES)
@@ -131,10 +131,6 @@ void Definitions::Load(const QString &file)
 		{
 			LoadNodeFields(*line);
 		}
-		else if (line->startsWith("NodeName ") == true)
-		{
-			LoadNodeName(*line);
-		}
 		else if (line->startsWith("Enum ") == true)
 		{
 			LoadNodeFieldEnum(*line);
@@ -146,7 +142,7 @@ void Definitions::LoadNode(const QString& line)
 {
 	auto match = m_RNodeLine.exactMatch(line);
 	Debug::Assert(match == true) << "Invalid node:" << line;
-	Debug::Assert(m_RNodeLine.captureCount() == 5) << "Invalid parameters count for node:" << line;
+	Debug::Assert(m_RNodeLine.captureCount() == 6) << "Invalid parameters count for node:" << line;
 
 	auto captures = m_RNodeLine.capturedTexts();
 
@@ -163,6 +159,8 @@ void Definitions::LoadNode(const QString& line)
 
 	LoadFields(node.Fields, captures[5]);
 	m_Nodes[key] = node;
+
+	LoadNodeName(type, captures[6]);
 }
 
 void Definitions::LoadStruct(const QString& line)
@@ -247,20 +245,24 @@ void Definitions::LoadField(const QString& field, QString& type, QString& name, 
 	number        = captures[2].toUInt();
 }
 
-void Definitions::LoadNodeName(const QString& line)
+void Definitions::LoadNodeName(ushort type, const QString& fields)
 {
-	auto match = m_RNodeNameLine.exactMatch(line);
-	Debug::Assert(match == true) << "Invalid node name:" << line;
-	Debug::Assert(m_RNodeNameLine.captureCount() == 3) << "Invalid parameters count for node name:" << line;
+	auto fieldList = fields.split(m_RNodeFieldList, QString::SkipEmptyParts);
+	foreach (field, fieldList)
+	{
+		auto match = m_RNodeNameField.exactMatch(*field);
+		Debug::Assert(match == true) << "Invalid node name field format:" << *field;
+		Debug::Assert(m_RNodeNameField.captureCount() == 2) << "Invalid parameters count for node name field:" << *field;
 
-	auto captures = m_RNodeNameLine.capturedTexts();
+		auto captures = m_RNodeNameField.capturedTexts();
 
-	NodeName nodeName;
-	nodeName.Type      = captures[1].toUShort(null, 0);
-	nodeName.ChildType = captures[2].isEmpty() ? (short)0 : captures[2].toUShort(null, 0);
-	nodeName.FieldIdx  = captures[3].toUInt(null, 0);
+		NodeName nodeName;
+		nodeName.Type      = type;
+		nodeName.ChildType = captures[1].isEmpty() ? (short)0 : captures[1].toUShort(null, 0);
+		nodeName.FieldIdx  = captures[2].toUInt(null, 0);
 
-	m_NodeNames[nodeName.Type] = nodeName;
+		m_NodeNames[nodeName.Type] = nodeName;
+	}
 }
 
 void Definitions::LoadNodeFieldEnum(const QString& line)

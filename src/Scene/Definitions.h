@@ -113,7 +113,7 @@ namespace Scene
 		QRegExp                             m_RNodeFieldList;
 		QRegExp                             m_RNodeField;
 		QRegExp                             m_RNodeFieldLine;
-		QRegExp                             m_RNodeNameLine;
+		QRegExp                             m_RNodeNameField;
 		QRegExp                             m_RNodeFieldEnumLine;
 
 		QMap<QString, const NodeFieldType*> m_StringToField;
@@ -147,7 +147,7 @@ namespace Scene
 		void LoadNodeFields(const QString& line);
 		void LoadFields(QVector<NodeFieldInfo>& fieldInfos, const QString& fields);
 		void LoadField(const QString& field, QString& type, QString& name, uint& size);
-		void LoadNodeName(const QString& line);
+		void LoadNodeName(ushort type, const QString& fields);
 		void LoadNodeFieldEnum(const QString& line);
 
 		static inline uint GetKey(ushort parentType, ushort type) { return (parentType << 16) | type; }
