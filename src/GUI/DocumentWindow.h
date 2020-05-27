@@ -29,7 +29,6 @@ class Document;
 namespace Scene
 {
 	class SceneNode;
-	class SceneTree;
 }
 
 
@@ -97,7 +96,6 @@ namespace GUI
 		Ui::DocumentWindow* m_Ui;
 
 		Document*           m_Document;
-		SceneTree*          m_Tree;
 		Definitions*        m_Definitions;
 
 		public: // methodssetup

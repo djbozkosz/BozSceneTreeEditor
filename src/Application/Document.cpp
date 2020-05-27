@@ -1,7 +1,8 @@
 #include <QFile>
 
 #include "Application/Document.h"
-#include "Scene/SceneTree.h"
+#include "Scene/SceneNode.h"
+#include "Scene/SceneNodeSerializer.h"
 
 
 using namespace Djbozkosz::Application;
@@ -9,14 +10,15 @@ using namespace Djbozkosz::Application;
 
 Document::Document(QObject* parent) :
 	QObject(parent),
-	m_Tree(new Scene::SceneTree()),
+	m_Root(null),
 	m_IsDirty(false)
 {
 }
 
 Document::~Document()
 {
-	delete m_Tree;
+	delete m_Root;
+	m_Root = null;
 }
 
 void Document::Load(const QString& file, const Scene::Definitions& definitions)
@@ -29,7 +31,7 @@ void Document::Load(const QString& file, const Scene::Definitions& definitions)
 	if (result == false)
 		return;
 
-	m_Tree->Load(reader, definitions);
+	m_Root = Scene::SceneNodeSerializer::Deserialize(reader, null, definitions);
 }
 
 void Document::Save(const QString& file)
@@ -50,7 +52,7 @@ void Document::Save(const QString& file)
 	if (result == false)
 		return;
 
-	m_Tree->Save(writer);
+	Scene::SceneNodeSerializer::Serialize(writer, *m_Root);
 	SetDirty(false);
 }
 

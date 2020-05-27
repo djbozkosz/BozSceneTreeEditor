@@ -13,8 +13,6 @@ SceneNode::SceneNode() :
 
 SceneNode::~SceneNode()
 {
-	Debug::Assert() << "Proper struct cleanup";
-
 	for (int idx = 0, count = Fields.size(); idx < count; idx++)
 	{
 		auto field        = Fields[idx];

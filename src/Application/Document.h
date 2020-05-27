@@ -11,7 +11,7 @@ namespace Djbozkosz {
 namespace Application {
 namespace Scene
 {
-	class SceneTree;
+	class SceneNode;
 	class Definitions;
 }
 
@@ -25,7 +25,7 @@ namespace Scene
 		private: // members
 
 		QString           m_File;
-		Scene::SceneTree* m_Tree;
+		Scene::SceneNode* m_Root;
 
 		bool              m_IsDirty;
 
@@ -38,7 +38,7 @@ namespace Scene
 		void Save(const QString& file);
 
 		inline const QString&          GetFile() const { return m_File; }
-		inline       Scene::SceneTree* GetTree() const { return m_Tree; }
+		inline       Scene::SceneNode* GetRoot() const { return m_Root; }
 
 		inline bool IsDirty() const { return m_IsDirty; }
 		void        SetDirty(bool isDirty);

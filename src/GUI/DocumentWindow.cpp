@@ -5,7 +5,6 @@
 
 #include "GUI/DocumentWindow.h"
 #include "Application/Document.h"
-#include "Scene/SceneTree.h"
 #include "Scene/SceneNode.h"
 
 
@@ -17,7 +16,6 @@ DocumentWindow::DocumentWindow(Document* document, Definitions* definitions, QWi
 	QWidget(parent),
 	m_Ui(new Ui::DocumentWindow()),
 	m_Document(document),
-	m_Tree(document->GetTree()),
 	m_Definitions(definitions)
 {
 	m_Ui->setupUi(this);
@@ -39,7 +37,7 @@ void DocumentWindow::SetupTree()
 	auto tree = m_Ui->Tree;
 	tree->clear();
 
-	auto root     = m_Tree->Root;
+	auto root     = m_Document->GetRoot();
 	auto name     = GetNodeName(root);
 	auto nodeItem = new NodeItem(tree, root, name);
 	auto progress = 0.0f;
@@ -71,7 +69,7 @@ void DocumentWindow::CreateTree(NodeItem* nodeItem, Scene::SceneNode* node, floa
 		{
 			progressInc = sizeof(childNode->Type) + sizeof(childNode->Size);
 		}
-		progress += progressInc / m_Tree->Root->Size;
+		progress += progressInc / m_Document->GetRoot()->Size;
 
 		emit ProgressChanged(progress);
 	}
@@ -220,7 +218,7 @@ void DocumentWindow::UpdateField(QTableWidgetItem* item)
 	if (fieldItem == null)
 		return;
 
-	SceneNodeUtility::SetFieldDataFromString(m_Tree->Root, fieldItem->FieldCtx, item->text(), item->column() - 2);
+	SceneNodeUtility::SetFieldDataFromString(m_Document->GetRoot(), fieldItem->FieldCtx, item->text(), item->column() - 2);
 
 	auto nodeItem = fieldItem->Item;
 	UpdateNode(nodeItem);

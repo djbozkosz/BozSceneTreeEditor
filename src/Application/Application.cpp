@@ -33,7 +33,7 @@ Application::~Application()
 
 	foreach (document, m_Documents)
 	{
-		(*document)->deleteLater();
+		delete *document;
 	}
 	m_Documents.clear();
 
