@@ -59,7 +59,7 @@
    </property>
    <widget class="QMenu" name="Menu_File">
     <property name="title">
-     <string>File</string>
+     <string>&amp;File</string>
     </property>
     <addaction name="Menu_New"/>
     <addaction name="separator"/>
@@ -74,13 +74,13 @@
    </widget>
    <widget class="QMenu" name="Menu_Help">
     <property name="title">
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="Menu_About"/>
    </widget>
    <widget class="QMenu" name="Menu_Edit">
     <property name="title">
-     <string>Edit</string>
+     <string>&amp;Edit</string>
     </property>
    </widget>
    <addaction name="Menu_File"/>
@@ -90,7 +90,7 @@
   <widget class="QStatusBar" name="StatusBar"/>
   <action name="Menu_Exit">
    <property name="text">
-    <string>Exit</string>
+    <string>&amp;Exit</string>
    </property>
    <property name="shortcut">
     <string>Alt+F4</string>
@@ -98,7 +98,7 @@
   </action>
   <action name="Menu_Open">
    <property name="text">
-    <string>Open...</string>
+    <string>&amp;Open...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -109,7 +109,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Save</string>
+    <string>&amp;Save</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -120,7 +120,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Save As...</string>
+    <string>Save &amp;As...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
@@ -128,7 +128,7 @@
   </action>
   <action name="Menu_New">
    <property name="text">
-    <string>New</string>
+    <string>&amp;New</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -139,7 +139,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Close</string>
+    <string>&amp;Close</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+W</string>
@@ -147,7 +147,7 @@
   </action>
   <action name="Menu_About">
    <property name="text">
-    <string>About...</string>
+    <string>&amp;About...</string>
    </property>
    <property name="shortcut">
     <string>F1</string>
