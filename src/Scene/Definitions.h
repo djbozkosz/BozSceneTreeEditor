@@ -122,7 +122,8 @@ namespace Scene
 
 		QMap<ushort, NodeFieldDefinition>   m_NodeFields;
 
-		QMap<ushort, NodeName>              m_NodeNames;
+		typedef QVector<NodeName> NodeNames;
+		QMap<ushort, NodeNames>             m_NodeNames;
 
 		typedef QMap<int, QString>                       NodeFieldEnum;
 		typedef QMap<ushort, QMap<uint, NodeFieldEnum> > NodeFieldEnums;
@@ -136,7 +137,7 @@ namespace Scene
 		const NodeDefinition*      GetNode(ushort parentType, ushort type) const;
 		const NodeFieldDefinition* GetNodeField(ushort type) const;
 		const NodeDefinition*      GetNodeFieldData(ushort type, uint dataType) const;
-		const NodeName*            GetNodeName(ushort type) const;
+		const NodeNames*           GetNodeNames(ushort type) const;
 		const NodeFieldEnum*       GetNodeFieldEnum(ushort type, uint fieldIdx) const;
 
 		private: // methods

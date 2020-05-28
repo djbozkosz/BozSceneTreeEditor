@@ -87,7 +87,7 @@ const Definitions::NodeDefinition* Definitions::GetNodeFieldData(ushort type, ui
 	return &fieldDefinition.value();
 }
 
-const Definitions::NodeName* Definitions::GetNodeName(ushort type) const
+const Definitions::NodeNames* Definitions::GetNodeNames(ushort type) const
 {
 	auto name = m_NodeNames.find(type);
 
@@ -261,7 +261,7 @@ void Definitions::LoadNodeName(ushort type, const QString& fields)
 		nodeName.ChildType = captures[1].isEmpty() ? (short)0 : captures[1].toUShort(null, 0);
 		nodeName.FieldIdx  = captures[2].toUInt(null, 0);
 
-		m_NodeNames[nodeName.Type] = nodeName;
+		m_NodeNames[nodeName.Type].push_back(nodeName);
 	}
 }
 

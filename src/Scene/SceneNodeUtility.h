@@ -73,7 +73,7 @@ namespace Scene
 			for (int idx = 0; idx < count; idx++)
 			{
 				auto field = SceneNodeUtility::GetFieldData<float>(fieldCtx, idx);
-				data << QString::number(field, 'g', 3);
+				data << QString::number(field);
 			}
 		}
 
