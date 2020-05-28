@@ -1,7 +1,10 @@
-#include <QFileDialog>
+#include <QEvent>
+#include <QCloseEvent>
 #include <QLabel>
 #include <QProgressBar>
-#include <QEvent>
+#include <QMainWindow>
+#include <QFileDialog>
+#include <QMessageBox>
 
 #include "ui_Window.h"
 
@@ -119,6 +122,19 @@ bool Window::eventFilter(QObject* object, QEvent* event)
 	return QObject::eventFilter(object, event);
 }
 
+void Window::closeEvent(QCloseEvent* event)
+{
+	if (ExitApp() == true)
+	{
+		event->accept();
+		QMainWindow::closeEvent(event);
+	}
+	else
+	{
+		event->ignore();
+	}
+}
+
 void Window::NewFile()
 {
 	emit FileCreated();
@@ -135,35 +151,60 @@ void Window::OpenFile()
 
 void Window::SaveFile()
 {
-	SaveDocument(true);
+	SaveDocument(GetCurrentTab(), true);
 }
 
 void Window::SaveAsFile()
 {
-	SaveDocument(false);
+	SaveDocument(GetCurrentTab(), false);
 }
 
-void Window::CloseFile()
+bool Window::CloseFile()
 {
-	CloseFile(m_Ui->Tabs->currentIndex());
+	return CloseFile(m_Ui->Tabs->currentIndex());
 }
 
-void Window::CloseFile(int idx)
+bool Window::CloseFile(int idx)
 {
 	auto tab      = GetTab(idx);
 	auto document = tab->GetDocument();
+	auto result   = 1;
+
+	if (document->IsDirty() == true)
+	{
+		result = QMessageBox::question(this, windowTitle(), QString("Save changed file \"%1\"?").arg(document->GetFile()), "&Yes", "&No", "&Cancel", 0);
+	}
+
+	if (result == 2)
+		return false;
+
+	if (result == 0)
+	{
+		SaveDocument(tab, true);
+	}
 
 	RemoveDocumemt(document);
 	emit FileClosed(document);
+
+	return true;
 }
 
-void Window::ExitApp()
+bool Window::ExitApp()
 {
+	auto tabs = m_Ui->Tabs;
+	while (tabs->count() > 0)
+	{
+		if (CloseFile() == false)
+			return false;
+	}
+
 	qApp->quit();
+	return true;
 }
 
 void Window::ShowAbout()
 {
+	QMessageBox::about(this, windowTitle(), "todo");
 }
 
 void Window::UpdateProgress(float value)
@@ -199,9 +240,8 @@ DocumentWindow* Window::GetCurrentTab() const
 	return GetTab(m_Ui->Tabs->currentIndex());
 }
 
-void Window::SaveDocument(bool replace)
+void Window::SaveDocument(DocumentWindow* tab, bool replace)
 {
-	auto tab      = GetCurrentTab();
 	auto document = tab->GetDocument();
 	auto file     = document->GetFile();
 

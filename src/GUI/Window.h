@@ -57,12 +57,16 @@ namespace GUI
 
 		void FileCreated();
 		void FileOpened(const QString& file);
-		void FileSaved(Document* document, const QString& file);
+		void FileSaved(Document* document, const QString& file = QString());
 		void FileClosed(Document* document);
 
 		private: // QObject implementation
 
 		bool eventFilter(QObject* object, QEvent* event);
+
+		private: // QMainWindow implementation
+
+		void closeEvent(QCloseEvent* event);
 
 		private slots: // handlers
 
@@ -70,9 +74,9 @@ namespace GUI
 		void OpenFile();
 		void SaveFile();
 		void SaveAsFile();
-		void CloseFile();
-		void CloseFile(int idx);
-		void ExitApp();
+		bool CloseFile();
+		bool CloseFile(int idx);
+		bool ExitApp();
 		void ShowAbout();
 
 		void UpdateProgress(float value);
@@ -83,7 +87,7 @@ namespace GUI
 		DocumentWindow* GetTab(int idx) const;
 		DocumentWindow* GetCurrentTab() const;
 
-		void SaveDocument(bool replace);
+		void SaveDocument(DocumentWindow* tab, bool replace);
 	};
 }}}
 
