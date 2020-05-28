@@ -37,7 +37,10 @@ void DocumentWindow::SetupTree()
 	auto tree = m_Ui->Tree;
 	tree->clear();
 
-	auto root     = m_Document->GetRoot();
+	auto root = m_Document->GetRoot();
+	if (root == null)
+		return;
+
 	auto name     = GetNodeName(root);
 	auto nodeItem = new NodeItem(tree, root, name);
 	auto progress = 0.0f;

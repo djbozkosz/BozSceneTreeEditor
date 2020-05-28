@@ -18,6 +18,7 @@ using namespace Djbozkosz::Application::GUI;
 
 Window::Window() :
 	QMainWindow(),
+	m_NewFileCounter(1),
 	m_Ui(new Ui::Window()),
 	m_Status(null),
 	m_Progress(null)
@@ -77,7 +78,7 @@ void Window::AddDocument(Document* document, Scene::Definitions* definitions)
 
 	auto tabs = m_Ui->Tabs;
 
-	tabs->addTab(tab, document->GetFile());
+	tabs->addTab(tab, GetFileName(document));
 	tabs->setCurrentIndex(tabs->count() - 1);
 
 	m_Ui->Menu_Save->setEnabled(true);
@@ -137,7 +138,7 @@ void Window::closeEvent(QCloseEvent* event)
 
 void Window::NewFile()
 {
-	emit FileCreated();
+	emit FileCreated(m_NewFileCounter++);
 }
 
 void Window::OpenFile()
@@ -172,7 +173,7 @@ bool Window::CloseFile(int idx)
 
 	if (document->IsDirty() == true)
 	{
-		result = QMessageBox::question(this, windowTitle(), QString("Save changed file \"%1\"?").arg(document->GetFile()), "&Yes", "&No", "&Cancel", 0);
+		result = QMessageBox::question(this, windowTitle(), QString("Save changed file \"%1\"?").arg(GetFileName(document, false)), "&Yes", "&No", "&Cancel", 0);
 	}
 
 	if (result == 2)
@@ -222,12 +223,13 @@ void Window::UpdateProgress(float value)
 
 void Window::UpdateDirtyState(bool isDirty)
 {
+	unused(isDirty);
+
 	auto tab      = GetCurrentTab();
 	auto document = tab->GetDocument();
-	auto file     = document->GetFile();
 
 	auto tabs = m_Ui->Tabs;
-	tabs->setTabText(tabs->currentIndex(), QString("%1%2").arg(file).arg(isDirty ? "*" : ""));
+	tabs->setTabText(tabs->currentIndex(), GetFileName(document));
 }
 
 DocumentWindow* Window::GetTab(int idx) const
@@ -256,4 +258,18 @@ void Window::SaveDocument(DocumentWindow* tab, bool replace)
 	m_Status->setText("Saving...");
 	emit FileSaved(document, file);
 	m_Status->setText("Saved.");
+}
+
+QString Window::GetFileName(Document* document, bool useDirtyState)
+{
+	auto fileName = document->GetFile();
+	if (fileName.isEmpty() == true)
+	{
+		fileName = QString("new_file_%1").arg(document->GetIdx());
+	}
+
+	if (useDirtyState == false || document->IsDirty() == false)
+		return fileName;
+
+	return QString("%1*").arg(fileName);
 }

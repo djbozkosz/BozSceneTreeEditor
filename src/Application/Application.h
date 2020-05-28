@@ -2,7 +2,7 @@
 #define APPLICATION_APPLICATION_H
 
 #include <QApplication>
-#include <QMap>
+#include <QSet>
 
 #include "Utility/Base.h"
 
@@ -32,10 +32,10 @@ namespace Scene
 
 		private: // members
 
-		GUI::Window*             m_Window;
-		QMap<QString, Document*> m_Documents;
+		GUI::Window*        m_Window;
+		QSet<Document*>     m_Documents;
 
-		Scene::Definitions*      m_Definitions;
+		Scene::Definitions* m_Definitions;
 
 		public: // methods
 
@@ -44,9 +44,10 @@ namespace Scene
 
 		private slots: // handlers
 
+		void CreateDocument(int idx);
 		void LoadDocument(const QString& file);
 		void SaveDocument(Document* document, const QString& file);
-		void CloseDocument(const QString& file);
+		void CloseDocument(Document* document);
 	};
 }}
 

@@ -41,6 +41,8 @@ namespace GUI
 
 		private: // members
 
+		int           m_NewFileCounter;
+
 		Ui::Window*   m_Ui;
 		QLabel*       m_Status;
 		QProgressBar* m_Progress;
@@ -55,7 +57,7 @@ namespace GUI
 
 		signals: // public interface
 
-		void FileCreated();
+		void FileCreated(int idx);
 		void FileOpened(const QString& file);
 		void FileSaved(Document* document, const QString& file = QString());
 		void FileClosed(Document* document);
@@ -88,6 +90,8 @@ namespace GUI
 		DocumentWindow* GetCurrentTab() const;
 
 		void SaveDocument(DocumentWindow* tab, bool replace);
+
+		static QString GetFileName(Document* document, bool useDirtyState = true);
 	};
 }}}
 

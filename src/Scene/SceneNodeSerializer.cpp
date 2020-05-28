@@ -7,15 +7,20 @@ using namespace Djbozkosz::Application::Scene;
 
 SceneNode* SceneNodeSerializer::Deserialize(QIODevice& reader, SceneNode* parent, const Definitions& definitions)
 {
-	auto  sceneNode  = new SceneNode();
-	auto  startPos   = reader.pos();
+	ushort nodeType = 0;
+	auto   startPos = reader.pos();
+	auto   result   = DeserializeData(reader, nodeType);
 
+	if (result == false)
+		return null;
+
+	auto  sceneNode  = new SceneNode();
 	auto& type       = sceneNode->Type;
 	auto& size       = sceneNode->Size;
 	auto& fields     = sceneNode->Fields;
 	auto& definition = sceneNode->Definition;
 
-	DeserializeData(reader, type);
+	type = nodeType;
 	DeserializeData(reader, size);
 
 	auto endPos     = startPos + size;

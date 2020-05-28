@@ -24,6 +24,7 @@ namespace Scene
 
 		private: // members
 
+		int               m_Idx;
 		QString           m_File;
 		Scene::SceneNode* m_Root;
 
@@ -31,7 +32,7 @@ namespace Scene
 
 		public: // methods
 
-		explicit Document(QObject* parent);
+		explicit Document(QObject* parent, int idx = 0);
 		virtual ~Document();
 
 		void Load(const QString& file, const Scene::Definitions& definitions);
@@ -40,6 +41,7 @@ namespace Scene
 		inline const QString&          GetFile() const { return m_File; }
 		inline       Scene::SceneNode* GetRoot() const { return m_Root; }
 
+		inline int  GetIdx()  const { return m_Idx;     }
 		inline bool IsDirty() const { return m_IsDirty; }
 		void        SetDirty(bool isDirty);
 

@@ -8,8 +8,9 @@
 using namespace Djbozkosz::Application;
 
 
-Document::Document(QObject* parent) :
+Document::Document(QObject* parent, int idx) :
 	QObject(parent),
+	m_Idx(idx),
 	m_Root(null),
 	m_IsDirty(false)
 {
