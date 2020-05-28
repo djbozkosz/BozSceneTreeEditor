@@ -139,7 +139,7 @@ void DocumentWindow::SetupTableField(NodeItem* nodeItem, const Scene::SceneNodeU
 
 				if (enumValue.isEmpty() == false)
 				{
-					text = QString("%1 [%2]").arg(text).arg(enumValue);
+					text = QString("%1 - %2").arg(text).arg(enumValue);
 				}
 
 				table->setItem(row, 2 + idx, new FieldItem(text, nodeItem, fieldCtx));
@@ -183,24 +183,36 @@ QString DocumentWindow::GetNodeName(SceneNode* node) const
 	if (node->Definition == null)
 		return QString("Unknown node: 0x%1").arg(node->Type, 4, 16);
 
-	auto nameInfo = m_Definitions->GetNodeName(node->Type);
-	if (nameInfo != null)
+	auto nameInfos = m_Definitions->GetNodeNames(node->Type);
+	if (nameInfos == null)
+		return node->Definition->Name;
+
+	QStringList names;
+
+	foreach (nameInfo, *nameInfos)
 	{
-		auto childType = nameInfo->ChildType;
-		auto nodeWithName  = (childType > 0) ? node->GetChild(childType) : node;
+		auto childType    = nameInfo->ChildType;
+		auto nodeWithName = (childType > 0) ? node->GetChild(childType) : node;
 
-		QString name;
+		if (nodeWithName == null)
+			continue;
 
-		if (nodeWithName != null)
+		auto fieldCtx   = SceneNodeUtility::FieldContext(nodeWithName, nameInfo->FieldIdx, &nodeWithName->Fields, &nodeWithName->Definition->Fields);
+		auto nameFields = SceneNodeUtility::GetFieldDataAsString(fieldCtx);
+
+		for (int idx = 0, count = nameFields.size(); idx < count; idx++)
 		{
-			auto fieldCtx = SceneNodeUtility::FieldContext(nodeWithName, nameInfo->FieldIdx, &nodeWithName->Fields, &nodeWithName->Definition->Fields);
-			name = SceneNodeUtility::GetFieldDataAsString(fieldCtx)[0];
+			auto enumValue = SceneNodeUtility::GetFieldDataEnum(m_Definitions, fieldCtx, idx);
+			if (enumValue.isEmpty() == false)
+			{
+				nameFields[idx] += QString(" - %1").arg(enumValue);
+			}
 		}
 
-		return QString("%1 [%2]").arg(node->Definition->Name, name);
+		names.push_back(nameFields.join(", "));
 	}
 
-	return node->Definition->Name;
+	return QString("%1 [%2]").arg(node->Definition->Name, names.join("; "));
 }
 
 void DocumentWindow::UpdateTable(QTreeWidgetItem* current, QTreeWidgetItem* previous)
