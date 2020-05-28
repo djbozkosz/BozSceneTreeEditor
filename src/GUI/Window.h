@@ -51,12 +51,14 @@ namespace GUI
 		virtual ~Window();
 
 		void AddDocument(Document* document, Scene::Definitions* definitions);
+		void RemoveDocumemt(Document* document);
 
 		signals: // public interface
 
 		void FileCreated();
 		void FileOpened(const QString& file);
 		void FileSaved(Document* document, const QString& file);
+		void FileClosed(Document* document);
 
 		private: // QObject implementation
 
@@ -69,6 +71,7 @@ namespace GUI
 		void SaveFile();
 		void SaveAsFile();
 		void CloseFile();
+		void CloseFile(int idx);
 		void ExitApp();
 		void ShowAbout();
 
@@ -77,7 +80,8 @@ namespace GUI
 
 		private: // methods
 
-		inline DocumentWindow* GetCurrentDocument() const;
+		DocumentWindow* GetTab(int idx) const;
+		DocumentWindow* GetCurrentTab() const;
 
 		void SaveDocument(bool replace);
 	};

@@ -34,6 +34,7 @@ Window::Window() :
 	statusBar->addWidget(m_Progress, 1);
 
 	m_Ui->Tabs->installEventFilter(this);
+	connect(m_Ui->Tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseFile(int)));
 
 	connect(m_Ui->Menu_New,    SIGNAL(triggered()), this, SLOT(NewFile()));
 	connect(m_Ui->Menu_Open,   SIGNAL(triggered()), this, SLOT(OpenFile()));
@@ -55,6 +56,7 @@ Window::~Window()
 	disconnect(m_Ui->Menu_About,  SIGNAL(triggered()), this, SLOT(ShowAbout()));
 
 	m_Ui->Tabs->removeEventFilter(this);
+	disconnect(m_Ui->Tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseFile(int)));
 
 	delete m_Ui;
 }
@@ -69,7 +71,6 @@ void Window::AddDocument(Document* document, Scene::Definitions* definitions)
 	connect(document, SIGNAL(DirtyStateChanged(bool)), this, SLOT(UpdateDirtyState(bool)));
 
 	tab->SetupTree();
-	//disconnect(tab, SIGNAL(ProgressChanged(float)), this, SLOT(UpdateProgress(float)));
 
 	auto tabs = m_Ui->Tabs;
 
@@ -81,6 +82,31 @@ void Window::AddDocument(Document* document, Scene::Definitions* definitions)
 	m_Ui->Menu_Close->setEnabled(true);
 
 	m_Status->setText("Done.");
+}
+
+void Window::RemoveDocumemt(Djbozkosz::Application::Document* document)
+{
+	auto tab    = default_(DocumentWindow*);
+	auto tabIdx = -1;
+
+	for (int idx = 0, count = m_Ui->Tabs->count(); idx < count; idx++)
+	{
+		auto tabToCheck = GetTab(idx);
+		if (tabToCheck->GetDocument() == document)
+		{
+			tab    = tabToCheck;
+			tabIdx = idx;
+			break;
+		}
+	}
+
+	Debug::Assert(tab != null) << "Tab to remove not found!";
+
+	disconnect(tab,      SIGNAL(ProgressChanged(float)), this, SLOT(UpdateProgress(float)));
+	disconnect(document, SIGNAL(DirtyStateChanged(bool)), this, SLOT(UpdateDirtyState(bool)));
+
+	m_Ui->Tabs->removeTab(tabIdx);
+	tab->deleteLater();
 }
 
 bool Window::eventFilter(QObject* object, QEvent* event)
@@ -119,6 +145,16 @@ void Window::SaveAsFile()
 
 void Window::CloseFile()
 {
+	CloseFile(m_Ui->Tabs->currentIndex());
+}
+
+void Window::CloseFile(int idx)
+{
+	auto tab      = GetTab(idx);
+	auto document = tab->GetDocument();
+
+	RemoveDocumemt(document);
+	emit FileClosed(document);
 }
 
 void Window::ExitApp()
@@ -145,7 +181,7 @@ void Window::UpdateProgress(float value)
 
 void Window::UpdateDirtyState(bool isDirty)
 {
-	auto tab      = GetCurrentDocument();
+	auto tab      = GetCurrentTab();
 	auto document = tab->GetDocument();
 	auto file     = document->GetFile();
 
@@ -153,14 +189,19 @@ void Window::UpdateDirtyState(bool isDirty)
 	tabs->setTabText(tabs->currentIndex(), QString("%1%2").arg(file).arg(isDirty ? "*" : ""));
 }
 
-DocumentWindow* Window::GetCurrentDocument() const
+DocumentWindow* Window::GetTab(int idx) const
 {
-	return as(m_Ui->Tabs->currentWidget(), DocumentWindow*);
+	return as(m_Ui->Tabs->widget(idx), DocumentWindow*);
+}
+
+DocumentWindow* Window::GetCurrentTab() const
+{
+	return GetTab(m_Ui->Tabs->currentIndex());
 }
 
 void Window::SaveDocument(bool replace)
 {
-	auto tab      = GetCurrentDocument();
+	auto tab      = GetCurrentTab();
 	auto document = tab->GetDocument();
 	auto file     = document->GetFile();
 
