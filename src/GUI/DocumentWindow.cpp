@@ -2,6 +2,8 @@
 
 #include <QStringList>
 #include <QTableWidgetItem>
+#include <QMenu>
+#include <QPoint>
 
 #include "GUI/DocumentWindow.h"
 #include "Application/Document.h"
@@ -12,21 +14,24 @@ using namespace Djbozkosz::Application::GUI;
 using namespace Djbozkosz::Application::Scene;
 
 
-DocumentWindow::DocumentWindow(Document* document, Definitions* definitions, QWidget* parent) :
+DocumentWindow::DocumentWindow(Document* document, Definitions* definitions, QMenu* editMenu, QWidget* parent) :
 	QWidget(parent),
 	m_Ui(new Ui::DocumentWindow()),
+	m_EditMenu(editMenu),
 	m_Document(document),
 	m_Definitions(definitions)
 {
 	m_Ui->setupUi(this);
 
 	connect(m_Ui->Tree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(UpdateTable(QTreeWidgetItem*,QTreeWidgetItem*)));
+	connect(m_Ui->Tree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(ShowEditMenu(QPoint)));
 	connect(m_Ui->Table, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(UpdateField(QTableWidgetItem*)));
 }
 
 DocumentWindow::~DocumentWindow()
 {
 	disconnect(m_Ui->Tree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(UpdateTable(QTreeWidgetItem*,QTreeWidgetItem*)));
+	disconnect(m_Ui->Tree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(ShowEditMenu(QPoint)));
 	disconnect(m_Ui->Table, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(UpdateField(QTableWidgetItem*)));
 
 	delete m_Ui;
@@ -249,4 +254,16 @@ void DocumentWindow::UpdateField(QTableWidgetItem* item)
 	}
 
 	m_Document->SetDirty(true);
+}
+
+void DocumentWindow::ShowEditMenu(QPoint point)
+{
+	auto tree     = m_Ui->Tree;
+	auto nodeItem = as(tree->itemAt(point), NodeItem*);
+
+	if (nodeItem == null)
+		return;
+
+	auto globalPoint = tree->mapToGlobal(point);
+	m_EditMenu->popup(globalPoint);
 }

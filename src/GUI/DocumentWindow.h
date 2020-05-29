@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QTreeWidgetItem>
+#include <QPoint>
 
 #include "ui_DocumentWindow.h"
 
@@ -94,13 +95,14 @@ namespace GUI
 		private: // members
 
 		Ui::DocumentWindow* m_Ui;
+		QMenu*              m_EditMenu;
 
 		Document*           m_Document;
 		Definitions*        m_Definitions;
 
 		public: // methodssetup
 
-		explicit DocumentWindow(Document* document, Definitions* definitions, QWidget* parent = null);
+		explicit DocumentWindow(Document* document, Definitions* definitions, QMenu* editMenu, QWidget* parent = null);
 		virtual ~DocumentWindow();
 
 		void SetupTree();
@@ -126,6 +128,7 @@ namespace GUI
 
 		void UpdateTable(QTreeWidgetItem* current, QTreeWidgetItem* previous);
 		void UpdateField(QTableWidgetItem* item);
+		void ShowEditMenu(QPoint point);
 	};
 }}}
 

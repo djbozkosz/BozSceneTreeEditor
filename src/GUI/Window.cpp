@@ -3,6 +3,8 @@
 #include <QLabel>
 #include <QProgressBar>
 #include <QMainWindow>
+#include <QMenu>
+#include <QAction>
 #include <QFileDialog>
 #include <QMessageBox>
 
@@ -69,7 +71,7 @@ void Window::AddDocument(Document* document, Scene::Definitions* definitions)
 {
 	m_Status->setText("Loaded. Refreshing interface...");
 
-	auto tab = new DocumentWindow(document, definitions, m_Ui->Tabs);
+	auto tab = new DocumentWindow(document, definitions, m_Ui->Menu_Edit->menuAction()->menu(), m_Ui->Tabs);
 
 	connect(tab,      SIGNAL(ProgressChanged(float)), this, SLOT(UpdateProgress(float)));
 	connect(document, SIGNAL(DirtyStateChanged(bool)), this, SLOT(UpdateDirtyState(bool)));
@@ -109,8 +111,16 @@ void Window::RemoveDocumemt(Djbozkosz::Application::Document* document)
 	disconnect(tab,      SIGNAL(ProgressChanged(float)), this, SLOT(UpdateProgress(float)));
 	disconnect(document, SIGNAL(DirtyStateChanged(bool)), this, SLOT(UpdateDirtyState(bool)));
 
-	m_Ui->Tabs->removeTab(tabIdx);
+	auto tabs = m_Ui->Tabs;
+	tabs->removeTab(tabIdx);
 	tab->deleteLater();
+
+	if (tabs->count() == 0)
+	{
+		m_Ui->Menu_Save->setEnabled(false);
+		m_Ui->Menu_SaveAs->setEnabled(false);
+		m_Ui->Menu_Close->setEnabled(false);
+	}
 }
 
 bool Window::eventFilter(QObject* object, QEvent* event)
