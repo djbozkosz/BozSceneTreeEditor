@@ -39,8 +39,10 @@ Window::Window() :
 	statusBar->addWidget(m_Status, 2);
 	statusBar->addWidget(m_Progress, 1);
 
-	m_Ui->Tabs->installEventFilter(this);
-	connect(m_Ui->Tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseFile(int)));
+	auto tabs = m_Ui->Tabs;
+	tabs->installEventFilter(this);
+	connect(tabs, SIGNAL(currentChanged(int)),    this, SLOT(UpdateEditMenu(int)));
+	connect(tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseFile(int)));
 
 	connect(m_Ui->Menu_New,    SIGNAL(triggered()), this, SLOT(NewFile()));
 	connect(m_Ui->Menu_Open,   SIGNAL(triggered()), this, SLOT(OpenFile()));
@@ -61,8 +63,10 @@ Window::~Window()
 	disconnect(m_Ui->Menu_Exit,   SIGNAL(triggered()), this, SLOT(ExitApp()));
 	disconnect(m_Ui->Menu_About,  SIGNAL(triggered()), this, SLOT(ShowAbout()));
 
-	m_Ui->Tabs->removeEventFilter(this);
-	disconnect(m_Ui->Tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseFile(int)));
+	auto tabs = m_Ui->Tabs;
+	tabs->removeEventFilter(this);
+	disconnect(tabs, SIGNAL(currentChanged(int)),    this, SLOT(UpdateEditMenu(int)));
+	disconnect(tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseFile(int)));
 
 	delete m_Ui;
 }
@@ -120,6 +124,12 @@ void Window::RemoveDocumemt(Djbozkosz::Application::Document* document)
 		m_Ui->Menu_Save->setEnabled(false);
 		m_Ui->Menu_SaveAs->setEnabled(false);
 		m_Ui->Menu_Close->setEnabled(false);
+
+		auto actions = m_Ui->Menu_Edit->actions();
+		foreach (action, actions)
+		{
+			(*action)->setEnabled(false);
+		}
 	}
 }
 
@@ -216,6 +226,14 @@ bool Window::ExitApp()
 void Window::ShowAbout()
 {
 	QMessageBox::about(this, windowTitle(), "todo");
+}
+
+void Window::UpdateEditMenu(int tabIdx)
+{
+	if (tabIdx == -1)
+		return;
+
+	GetTab(tabIdx)->UpdateEditMenu();
 }
 
 void Window::UpdateProgress(float value)

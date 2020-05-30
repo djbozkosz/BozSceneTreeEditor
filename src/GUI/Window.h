@@ -81,6 +81,7 @@ namespace GUI
 		bool ExitApp();
 		void ShowAbout();
 
+		void UpdateEditMenu(int tabIdx);
 		void UpdateProgress(float value);
 		void UpdateDirtyState(bool isDirty);
 

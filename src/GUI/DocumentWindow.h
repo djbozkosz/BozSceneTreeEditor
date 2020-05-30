@@ -106,6 +106,7 @@ namespace GUI
 		virtual ~DocumentWindow();
 
 		void SetupTree();
+		void UpdateEditMenu();
 
 		inline Document* GetDocument() const { return m_Document; }
 
@@ -126,7 +127,7 @@ namespace GUI
 
 		private slots: // handlers
 
-		void UpdateTable(QTreeWidgetItem* current, QTreeWidgetItem* previous);
+		void UpdateMenuAndTable(QTreeWidgetItem* current, QTreeWidgetItem* previous);
 		void UpdateField(QTableWidgetItem* item);
 		void ShowEditMenu(QPoint point);
 	};

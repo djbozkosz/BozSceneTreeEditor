@@ -23,14 +23,14 @@ DocumentWindow::DocumentWindow(Document* document, Definitions* definitions, QMe
 {
 	m_Ui->setupUi(this);
 
-	connect(m_Ui->Tree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(UpdateTable(QTreeWidgetItem*,QTreeWidgetItem*)));
+	connect(m_Ui->Tree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(UpdateMenuAndTable(QTreeWidgetItem*,QTreeWidgetItem*)));
 	connect(m_Ui->Tree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(ShowEditMenu(QPoint)));
 	connect(m_Ui->Table, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(UpdateField(QTableWidgetItem*)));
 }
 
 DocumentWindow::~DocumentWindow()
 {
-	disconnect(m_Ui->Tree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(UpdateTable(QTreeWidgetItem*,QTreeWidgetItem*)));
+	disconnect(m_Ui->Tree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(UpdateMenuAndTable(QTreeWidgetItem*,QTreeWidgetItem*)));
 	disconnect(m_Ui->Tree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(ShowEditMenu(QPoint)));
 	disconnect(m_Ui->Table, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(UpdateField(QTableWidgetItem*)));
 
@@ -53,8 +53,21 @@ void DocumentWindow::SetupTree()
 	tree->addTopLevelItem(nodeItem);
 
 	tree->expandItem(nodeItem);
+	tree->setFocus();
+	nodeItem->setSelected(true);
 
 	emit ProgressChanged(1.0f);
+}
+
+void DocumentWindow::UpdateEditMenu()
+{
+	auto isNodeSelected = is(m_Ui->Tree->currentItem(), NodeItem*);
+	auto actions        = m_EditMenu->actions();
+
+	foreach (action, actions)
+	{
+		(*action)->setEnabled(isNodeSelected);
+	}
 }
 
 void DocumentWindow::CreateTree(NodeItem* nodeItem, Scene::SceneNode* node, float& progress)
@@ -223,9 +236,11 @@ QString DocumentWindow::GetNodeName(SceneNode* node) const
 	return QString("%1 [%2]").arg(node->Definition->Name, names.join("; "));
 }
 
-void DocumentWindow::UpdateTable(QTreeWidgetItem* current, QTreeWidgetItem* previous)
+void DocumentWindow::UpdateMenuAndTable(QTreeWidgetItem* current, QTreeWidgetItem* previous)
 {
 	unused(previous);
+
+	UpdateEditMenu();
 
 	m_Ui->Table->blockSignals(true);
 	SetupTable(as(current, NodeItem*));
@@ -244,7 +259,7 @@ void DocumentWindow::UpdateField(QTableWidgetItem* item)
 	UpdateNode(nodeItem);
 
 	auto tabIndex = m_Ui->Table->currentIndex();
-	UpdateTable(nodeItem, null);
+	UpdateMenuAndTable(nodeItem, null);
 	m_Ui->Table->setCurrentIndex(tabIndex);
 
 	nodeItem = as(nodeItem->parent(), NodeItem*);
