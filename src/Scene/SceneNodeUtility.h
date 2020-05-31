@@ -105,7 +105,8 @@ namespace Scene
 		static void ApplyNodeSizeOffset(QVector<SceneNode*>& path, int offset);
 
 		// operations:
-		// insert node
+		// import / export node
+		// create node from new
 		// remove node
 		// duplicate node
 		// move node
