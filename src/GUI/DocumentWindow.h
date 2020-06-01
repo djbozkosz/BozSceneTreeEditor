@@ -2,16 +2,15 @@
 #define APPLICATION_GUI_DOCUMENTWINDOW_H
 
 #include <QWidget>
+#include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include <QTableWidgetItem>
 #include <QPoint>
-
-#include "ui_DocumentWindow.h"
 
 #include "Scene/Definitions.h"
 #include "Scene/SceneNodeUtility.h"
 
 
-class QTreeWidget;
 class QTreeWidgetItem;
 
 
@@ -38,13 +37,29 @@ namespace GUI
 	using namespace Djbozkosz::Application::Scene;
 
 
+	sealed class TreeWidget : public QTreeWidget
+	{
+		private:
+
+		Q_OBJECT
+
+		public:
+
+		explicit TreeWidget(QWidget* parent = null);
+		virtual ~TreeWidget();
+
+		virtual void dragEnterEvent(QDragEnterEvent* event);
+		virtual void dropEvent(QDropEvent* event);
+	};
+
+
 	sealed class DocumentWindow : public QWidget
 	{											 
 		private:
 
 		Q_OBJECT
 
-		private: // types
+		public: // types
 
 		sealed class NodeItem : public QTreeWidgetItem
 		{

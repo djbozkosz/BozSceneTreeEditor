@@ -40,7 +40,10 @@
      <property name="childrenCollapsible">
       <bool>false</bool>
      </property>
-     <widget class="QTreeWidget" name="Tree">
+     <widget class="Djbozkosz::Application::GUI::TreeWidget" name="Tree">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="minimumSize">
        <size>
         <width>250</width>
@@ -49,6 +52,12 @@
       </property>
       <property name="contextMenuPolicy">
        <enum>Qt::CustomContextMenu</enum>
+      </property>
+      <property name="dragDropMode">
+       <enum>QAbstractItemView::InternalMove</enum>
+      </property>
+      <property name="defaultDropAction">
+       <enum>Qt::MoveAction</enum>
       </property>
       <attribute name="headerVisible">
        <bool>false</bool>
@@ -119,6 +128,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Djbozkosz::Application::GUI::TreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>src/GUI/DocumentWindow.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

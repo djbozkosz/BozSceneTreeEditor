@@ -4,6 +4,11 @@
 #include <QTableWidgetItem>
 #include <QMenu>
 #include <QPoint>
+#include <QEvent>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+
+#include "ui_DocumentWindow.h"
 
 #include "GUI/DocumentWindow.h"
 #include "Application/Document.h"
@@ -12,6 +17,27 @@
 
 using namespace Djbozkosz::Application::GUI;
 using namespace Djbozkosz::Application::Scene;
+
+
+TreeWidget::TreeWidget(QWidget* parent) : QTreeWidget(parent)
+{
+}
+
+TreeWidget::~TreeWidget()
+{
+}
+
+void TreeWidget::dragEnterEvent(QDragEnterEvent* event)
+{
+	Debug::Log() << selectedItems()[0]->text(0);
+	event->accept();
+}
+
+void TreeWidget::dropEvent(QDropEvent* event)
+{
+	event->acceptProposedAction();
+	Debug::Log() << itemAt(event->pos())->text(0);
+}
 
 
 DocumentWindow::DocumentWindow(Document* document, Definitions* definitions, QMenu* editMenu, QWidget* parent) :
@@ -23,15 +49,19 @@ DocumentWindow::DocumentWindow(Document* document, Definitions* definitions, QMe
 {
 	m_Ui->setupUi(this);
 
-	connect(m_Ui->Tree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(UpdateMenuAndTable(QTreeWidgetItem*,QTreeWidgetItem*)));
-	connect(m_Ui->Tree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(ShowEditMenu(QPoint)));
+	auto tree = m_Ui->Tree;
+	connect(tree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(UpdateMenuAndTable(QTreeWidgetItem*,QTreeWidgetItem*)));
+	connect(tree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(ShowEditMenu(QPoint)));
+
 	connect(m_Ui->Table, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(UpdateField(QTableWidgetItem*)));
 }
 
 DocumentWindow::~DocumentWindow()
 {
-	disconnect(m_Ui->Tree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(UpdateMenuAndTable(QTreeWidgetItem*,QTreeWidgetItem*)));
-	disconnect(m_Ui->Tree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(ShowEditMenu(QPoint)));
+	auto tree = m_Ui->Tree;
+	disconnect(tree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(UpdateMenuAndTable(QTreeWidgetItem*,QTreeWidgetItem*)));
+	disconnect(tree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(ShowEditMenu(QPoint)));
+
 	disconnect(m_Ui->Table, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(UpdateField(QTableWidgetItem*)));
 
 	delete m_Ui;
