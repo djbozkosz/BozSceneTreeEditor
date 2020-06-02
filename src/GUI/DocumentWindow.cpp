@@ -19,7 +19,9 @@ using namespace Djbozkosz::Application::GUI;
 using namespace Djbozkosz::Application::Scene;
 
 
-TreeWidget::TreeWidget(QWidget* parent) : QTreeWidget(parent)
+TreeWidget::TreeWidget(QWidget* parent) :
+	QTreeWidget(parent),
+	m_DraggedNode(null)
 {
 }
 
@@ -29,14 +31,31 @@ TreeWidget::~TreeWidget()
 
 void TreeWidget::dragEnterEvent(QDragEnterEvent* event)
 {
-	Debug::Log() << selectedItems()[0]->text(0);
-	event->accept();
+	auto items = selectedItems();
+	if (items.size() > 0)
+	{
+		m_DraggedNode = as(selectedItems()[0], NodeItem*);
+	}
+
+	QTreeWidget::dragEnterEvent(event);
 }
 
 void TreeWidget::dropEvent(QDropEvent* event)
 {
-	event->acceptProposedAction();
-	Debug::Log() << itemAt(event->pos())->text(0);
+	auto oldParent = m_DraggedNode->parent();
+	// find child idx
+
+	QTreeWidget::dropEvent(event);
+	auto newParent = as(m_DraggedNode->parent(), NodeItem*);
+
+	auto parentDefinition = newParent->Node->Definition;
+	if (parentDefinition == null || parentDefinition->HasChilds == false)
+	{
+		Debug::Error() << "ee";
+		// insert child at idx
+	}
+
+	m_DraggedNode = null;
 }
 
 

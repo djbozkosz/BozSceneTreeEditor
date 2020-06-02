@@ -37,13 +37,70 @@ namespace GUI
 	using namespace Djbozkosz::Application::Scene;
 
 
+	sealed class NodeItem : public QTreeWidgetItem
+	{
+		public: // members
+
+		SceneNode* Node;
+
+		public: // methods
+
+		explicit inline NodeItem(QTreeWidget* parent, SceneNode* node, QString& name) :
+			QTreeWidgetItem(parent, QStringList() << name),
+			Node(node)
+		{
+		}
+
+		explicit inline NodeItem(NodeItem* parent, SceneNode* node, QString& name) :
+			QTreeWidgetItem(parent, QStringList() << name),
+			Node(node)
+		{
+		}
+
+		virtual ~NodeItem()
+		{
+		}
+	};
+
+
+	sealed class FieldItem : public QTableWidgetItem
+	{
+		public: // members
+
+		NodeItem*                      Item;
+		SceneNodeUtility::FieldContext FieldCtx;
+
+		public: // methods
+
+		explicit inline FieldItem(const QString& text, NodeItem* item, const SceneNodeUtility::FieldContext& fieldCtx) : QTableWidgetItem(text), Item(item), FieldCtx(fieldCtx) {}
+		virtual inline ~FieldItem() {}
+	};
+
+
+	sealed class ReadOnlyItem : public QTableWidgetItem
+	{
+		public: // methods
+
+		explicit inline ReadOnlyItem(const QString& text) : QTableWidgetItem(text)
+		{
+			setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+		}
+
+		virtual inline ~ReadOnlyItem() {}
+	};
+
+
 	sealed class TreeWidget : public QTreeWidget
 	{
 		private:
 
 		Q_OBJECT
 
-		public:
+		private: // members
+
+		NodeItem* m_DraggedNode;
+
+		public: // methods
 
 		explicit TreeWidget(QWidget* parent = null);
 		virtual ~TreeWidget();
@@ -54,58 +111,10 @@ namespace GUI
 
 
 	sealed class DocumentWindow : public QWidget
-	{											 
+	{
 		private:
 
 		Q_OBJECT
-
-		public: // types
-
-		sealed class NodeItem : public QTreeWidgetItem
-		{
-			public:
-
-			SceneNode* Node;
-
-			explicit inline NodeItem(QTreeWidget* parent, SceneNode* node, QString& name) :
-				QTreeWidgetItem(parent, QStringList() << name),
-				Node(node)
-			{
-			}
-
-			explicit inline NodeItem(NodeItem* parent, SceneNode* node, QString& name) :
-				QTreeWidgetItem(parent, QStringList() << name),
-				Node(node)
-			{
-			}
-
-			virtual ~NodeItem()
-			{
-			}
-		};
-
-		sealed class FieldItem : public QTableWidgetItem
-		{
-			public:
-
-			NodeItem*                      Item;
-			SceneNodeUtility::FieldContext FieldCtx;
-
-			explicit inline FieldItem(const QString& text, NodeItem* item, const SceneNodeUtility::FieldContext& fieldCtx) : QTableWidgetItem(text), Item(item), FieldCtx(fieldCtx) {}
-			virtual inline ~FieldItem() {}
-		};
-
-		sealed class ReadOnlyItem : public QTableWidgetItem
-		{
-			public:
-
-			explicit inline ReadOnlyItem(const QString& text) : QTableWidgetItem(text)
-			{
-				setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-			}
-
-			virtual inline ~ReadOnlyItem() {}
-		};
 
 		private: // members
 
