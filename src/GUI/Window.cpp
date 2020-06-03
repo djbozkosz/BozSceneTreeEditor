@@ -46,6 +46,7 @@ Window::Window() :
 
 	connect(m_Ui->Menu_New,    SIGNAL(triggered()), this, SLOT(NewFile()));
 	connect(m_Ui->Menu_Open,   SIGNAL(triggered()), this, SLOT(OpenFile()));
+	connect(m_Ui->Menu_Reload, SIGNAL(triggered()), this, SLOT(ReloadFile()));
 	connect(m_Ui->Menu_Save,   SIGNAL(triggered()), this, SLOT(SaveFile()));
 	connect(m_Ui->Menu_SaveAs, SIGNAL(triggered()), this, SLOT(SaveAsFile()));
 	connect(m_Ui->Menu_Close,  SIGNAL(triggered()), this, SLOT(CloseFile()));
@@ -57,6 +58,7 @@ Window::~Window()
 {
 	disconnect(m_Ui->Menu_New,    SIGNAL(triggered()), this, SLOT(NewFile()));
 	disconnect(m_Ui->Menu_Open,   SIGNAL(triggered()), this, SLOT(OpenFile()));
+	disconnect(m_Ui->Menu_Reload, SIGNAL(triggered()), this, SLOT(ReloadFile()));
 	disconnect(m_Ui->Menu_Save,   SIGNAL(triggered()), this, SLOT(SaveFile()));
 	disconnect(m_Ui->Menu_SaveAs, SIGNAL(triggered()), this, SLOT(SaveAsFile()));
 	disconnect(m_Ui->Menu_Close,  SIGNAL(triggered()), this, SLOT(CloseFile()));
@@ -170,26 +172,33 @@ void Window::OpenFile()
 	emit FileOpened(file);
 }
 
+void Window::ReloadFile()
+{
+	auto tab      = GetCurrentTab();
+	auto document = tab->GetDocument();
+	auto result   = SaveIfDialog(document);
+
+	if (result == false)
+		return;
+
+	emit FileReloaded(document);
+	tab->SetupTree();
+	document->SetDirty(false);
+}
+
 void Window::SaveFile()
 {
-	SaveDocument(GetCurrentTab(), true);
+	SaveDocument(GetCurrentDocument(), true);
 }
 
 void Window::SaveAsFile()
 {
-	SaveDocument(GetCurrentTab(), false);
+	SaveDocument(GetCurrentDocument(), false);
 }
 
-bool Window::CloseFile()
+bool Window::SaveIfDialog(Document* document)
 {
-	return CloseFile(m_Ui->Tabs->currentIndex());
-}
-
-bool Window::CloseFile(int idx)
-{
-	auto tab      = GetTab(idx);
-	auto document = tab->GetDocument();
-	auto result   = 1;
+	auto result = 1;
 
 	if (document->IsDirty() == true)
 	{
@@ -201,8 +210,24 @@ bool Window::CloseFile(int idx)
 
 	if (result == 0)
 	{
-		SaveDocument(tab, true);
+		SaveDocument(document, true);
 	}
+
+	return true;
+}
+
+bool Window::CloseFile()
+{
+	return CloseFile(GetCurrentTabIdx());
+}
+
+bool Window::CloseFile(int idx)
+{
+	auto document = GetTab(idx)->GetDocument();
+	auto result   = SaveIfDialog(document);
+
+	if (result == false)
+		return false;
 
 	RemoveDocumemt(document);
 	emit FileClosed(document);
@@ -253,11 +278,11 @@ void Window::UpdateDirtyState(bool isDirty)
 {
 	unused(isDirty);
 
-	auto tab      = GetCurrentTab();
-	auto document = tab->GetDocument();
+	auto document = GetCurrentDocument();
+	auto file     = GetFileName(document);
+	auto idx      = GetCurrentTabIdx();
 
-	auto tabs = m_Ui->Tabs;
-	tabs->setTabText(tabs->currentIndex(), GetFileName(document));
+	m_Ui->Tabs->setTabText(idx, file);
 }
 
 DocumentWindow* Window::GetTab(int idx) const
@@ -267,13 +292,22 @@ DocumentWindow* Window::GetTab(int idx) const
 
 DocumentWindow* Window::GetCurrentTab() const
 {
-	return GetTab(m_Ui->Tabs->currentIndex());
+	return GetTab(GetCurrentTabIdx());
 }
 
-void Window::SaveDocument(DocumentWindow* tab, bool replace)
+int Window::GetCurrentTabIdx() const
 {
-	auto document = tab->GetDocument();
-	auto file     = document->GetFile();
+	return m_Ui->Tabs->currentIndex();
+}
+
+Djbozkosz::Application::Document* Window::GetCurrentDocument() const
+{
+	return GetCurrentTab()->GetDocument();
+}
+
+void Window::SaveDocument(Document* document, bool replace)
+{
+	auto file = document->GetFile();
 
 	if (replace == false || file.isEmpty() == true)
 	{

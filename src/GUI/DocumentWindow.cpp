@@ -35,7 +35,14 @@ void TreeWidget::dragEnterEvent(QDragEnterEvent* event)
 	auto items = selectedItems();
 	if (items.size() > 0)
 	{
-		m_DraggedNode = as(selectedItems()[0], NodeItem*);
+		auto item = items[0];
+		if (item == topLevelItem(0))
+		{
+			event->ignore();
+			return;
+		}
+
+		m_DraggedNode = as(item, NodeItem*);
 	}
 
 	QTreeWidget::dragEnterEvent(event);
@@ -48,14 +55,31 @@ void TreeWidget::dropEvent(QDropEvent* event)
 
 	QTreeWidget::dropEvent(event);
 	auto newParent = as(m_DraggedNode->parent(), NodeItem*);
-	auto newIdx    = newParent->indexOfChild(m_DraggedNode);
 
-	auto result = SceneNodeUtility::MoveNode(m_DraggedNode, topLevelItem(0), as(oldParent, NodeItem*)->Node, newParent->Node, oldIdx, newIdx);
-	if (result == false)
+	if (newParent == null)
 	{
-		Debug::Error() << "Child nodes are not allowed in this node!";
-		newParent->removeChild(m_DraggedNode);
+		auto newIdx = indexOfTopLevelItem(m_DraggedNode);
+		takeTopLevelItem(newIdx);
 		oldParent->insertChild(oldIdx, m_DraggedNode);
+
+		Debug::Error() << "Child nodes are not allowed to be in root!";
+	}
+	else
+	{
+		auto newIdx = newParent->indexOfChild(m_DraggedNode);
+		auto result = SceneNodeUtility::MoveNode(m_DraggedNode->Node, m_Document->GetRoot(), as(oldParent, NodeItem*)->Node, newParent->Node, oldIdx, newIdx);
+
+		if (result == true)
+		{
+			m_Document->SetDirty(true);
+		}
+		else
+		{
+			newParent->removeChild(m_DraggedNode);
+			oldParent->insertChild(oldIdx, m_DraggedNode);
+
+			Debug::Error() << "Child nodes are not allowed in node" << newParent->text(0) << "!";
+		}
 	}
 
 	m_DraggedNode = null;
@@ -72,6 +96,8 @@ DocumentWindow::DocumentWindow(Document* document, Definitions* definitions, QMe
 	m_Ui->setupUi(this);
 
 	auto tree = m_Ui->Tree;
+	tree->SetDocument(document);
+
 	connect(tree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(UpdateMenuAndTable(QTreeWidgetItem*,QTreeWidgetItem*)));
 	connect(tree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(ShowEditMenu(QPoint)));
 
@@ -92,6 +118,7 @@ DocumentWindow::~DocumentWindow()
 void DocumentWindow::SetupTree()
 {
 	auto tree = m_Ui->Tree;
+	tree->blockSignals(true);
 	tree->clear();
 
 	auto root = m_Document->GetRoot();
@@ -104,8 +131,10 @@ void DocumentWindow::SetupTree()
 	CreateTree(nodeItem, root, progress);
 	tree->addTopLevelItem(nodeItem);
 
+	tree->blockSignals(false);
 	tree->expandItem(nodeItem);
 	tree->setFocus();
+
 	nodeItem->setSelected(true);
 
 	emit ProgressChanged(1.0f);
@@ -294,9 +323,10 @@ void DocumentWindow::UpdateMenuAndTable(QTreeWidgetItem* current, QTreeWidgetIte
 
 	UpdateEditMenu();
 
-	m_Ui->Table->blockSignals(true);
+	auto table = m_Ui->Table;
+	table->blockSignals(true);
 	SetupTable(as(current, NodeItem*));
-	m_Ui->Table->blockSignals(false);
+	table->blockSignals(false);
 }
 
 void DocumentWindow::UpdateField(QTableWidgetItem* item)

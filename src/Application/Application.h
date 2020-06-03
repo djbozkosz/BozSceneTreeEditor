@@ -46,6 +46,7 @@ namespace Scene
 
 		void CreateDocument(int idx);
 		void LoadDocument(const QString& file);
+		void ReloadDocument(Document* document);
 		void SaveDocument(Document* document, const QString& file);
 		void CloseDocument(Document* document);
 	};

@@ -59,6 +59,7 @@ namespace GUI
 
 		void FileCreated(int idx);
 		void FileOpened(const QString& file);
+		void FileReloaded(Document* document);
 		void FileSaved(Document* document, const QString& file = QString());
 		void FileClosed(Document* document);
 
@@ -74,8 +75,10 @@ namespace GUI
 
 		void NewFile();
 		void OpenFile();
+		void ReloadFile();
 		void SaveFile();
 		void SaveAsFile();
+		bool SaveIfDialog(Document* document);
 		bool CloseFile();
 		bool CloseFile(int idx);
 		bool ExitApp();
@@ -87,10 +90,12 @@ namespace GUI
 
 		private: // methods
 
-		DocumentWindow* GetTab(int idx) const;
-		DocumentWindow* GetCurrentTab() const;
+		DocumentWindow* GetTab(int idx)      const;
+		DocumentWindow* GetCurrentTab()      const;
+		int             GetCurrentTabIdx()   const;
+		Document*       GetCurrentDocument() const;
 
-		void SaveDocument(DocumentWindow* tab, bool replace);
+		void SaveDocument(Document* document, bool replace);
 
 		static QString GetFileName(Document* document, bool useDirtyState = true);
 	};

@@ -36,6 +36,7 @@ namespace Scene
 		virtual ~Document();
 
 		void Load(const QString& file, const Scene::Definitions& definitions);
+		void Reload(const Scene::Definitions& definitions);
 		void Save(const QString& file);
 
 		inline const QString&          GetFile() const { return m_File; }

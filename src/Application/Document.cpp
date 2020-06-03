@@ -35,6 +35,13 @@ void Document::Load(const QString& file, const Scene::Definitions& definitions)
 	m_Root = Scene::SceneNodeSerializer::Deserialize(reader, null, definitions);
 }
 
+void Document::Reload(const Scene::Definitions& definitions)
+{
+	delete m_Root;
+
+	Load(m_File, definitions);
+}
+
 void Document::Save(const QString& file)
 {
 #if 0

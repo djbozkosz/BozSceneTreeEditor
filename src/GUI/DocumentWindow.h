@@ -106,7 +106,9 @@ namespace GUI
 		explicit TreeWidget(QWidget* parent = null);
 		virtual ~TreeWidget();
 
-		//inline void Set();
+		inline void SetDocument(Document* document) { m_Document = document; }
+
+		private: // QWidget implementation
 
 		virtual void dragEnterEvent(QDragEnterEvent* event);
 		virtual void dropEvent(QDropEvent* event);
