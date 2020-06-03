@@ -98,6 +98,7 @@ namespace GUI
 
 		private: // members
 
+		Document* m_Document;
 		NodeItem* m_DraggedNode;
 
 		public: // methods
@@ -105,13 +106,15 @@ namespace GUI
 		explicit TreeWidget(QWidget* parent = null);
 		virtual ~TreeWidget();
 
+		//inline void Set();
+
 		virtual void dragEnterEvent(QDragEnterEvent* event);
 		virtual void dropEvent(QDropEvent* event);
 	};
 
 
 	sealed class DocumentWindow : public QWidget
-	{
+	{											 
 		private:
 
 		Q_OBJECT

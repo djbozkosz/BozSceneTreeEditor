@@ -310,6 +310,24 @@ uint SceneNodeUtility::GetFieldsSize(const QVector<void *>& fields, const QVecto
 	return size;
 }
 
+bool SceneNodeUtility::MoveNode(SceneNode* node, SceneNode* root, SceneNode* parent, SceneNode* newParent, uint oldIdx, uint newIdx)
+{
+	if (parent == null || newParent == null)
+		return false;
+
+	auto parentDefinition = newParent->Definition;
+	if (parentDefinition == null || parentDefinition->HasChilds == false)
+		return false;
+
+	parent->Childs.removeAt(oldIdx);
+	newParent->Childs.insert(newIdx, node);
+
+	QVector<SceneNode*> path;
+	GetNodePath(path, root, node);
+
+	return true;
+}
+
 bool SceneNodeUtility::GetNodePath(QVector<SceneNode*>& path, SceneNode* parent, const SceneNode* node)
 {
 	if (parent == node)

@@ -21,6 +21,7 @@ using namespace Djbozkosz::Application::Scene;
 
 TreeWidget::TreeWidget(QWidget* parent) :
 	QTreeWidget(parent),
+	m_Document(null),
 	m_DraggedNode(null)
 {
 }
@@ -43,16 +44,18 @@ void TreeWidget::dragEnterEvent(QDragEnterEvent* event)
 void TreeWidget::dropEvent(QDropEvent* event)
 {
 	auto oldParent = m_DraggedNode->parent();
-	// find child idx
+	auto oldIdx    = oldParent->indexOfChild(m_DraggedNode);
 
 	QTreeWidget::dropEvent(event);
 	auto newParent = as(m_DraggedNode->parent(), NodeItem*);
+	auto newIdx    = newParent->indexOfChild(m_DraggedNode);
 
-	auto parentDefinition = newParent->Node->Definition;
-	if (parentDefinition == null || parentDefinition->HasChilds == false)
+	auto result = SceneNodeUtility::MoveNode(m_DraggedNode, topLevelItem(0), as(oldParent, NodeItem*)->Node, newParent->Node, oldIdx, newIdx);
+	if (result == false)
 	{
-		Debug::Error() << "ee";
-		// insert child at idx
+		Debug::Error() << "Child nodes are not allowed in this node!";
+		newParent->removeChild(m_DraggedNode);
+		oldParent->insertChild(oldIdx, m_DraggedNode);
 	}
 
 	m_DraggedNode = null;

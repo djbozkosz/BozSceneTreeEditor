@@ -99,6 +99,10 @@ namespace Scene
 		static uint GetFieldSize(const void* field, const Definitions::NodeFieldInfo* fieldInfo, bool withHeader);
 		static uint GetFieldsSize(const QVector<void*>& fields, const QVector<Definitions::NodeFieldInfo>& fieldInfos);
 
+		public: // node methods
+
+		static bool MoveNode(SceneNode* node, SceneNode* root, SceneNode* parent, SceneNode* newParent, uint oldIdx, uint newIdx);
+
 		public: // tree methods
 
 		static bool GetNodePath(QVector<SceneNode*>& path, SceneNode* parent, const SceneNode* node);
