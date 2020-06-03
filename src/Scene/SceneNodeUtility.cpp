@@ -319,11 +319,18 @@ bool SceneNodeUtility::MoveNode(SceneNode* node, SceneNode* root, SceneNode* par
 	if (parentDefinition == null || parentDefinition->HasChilds == false)
 		return false;
 
+	QVector<SceneNode*> path;
+	GetNodePath(path, root, node);
+	path.removeFirst();
+	ApplyNodeSizeOffset(path, -node->Size);
+
 	parent->Childs.removeAt(oldIdx);
 	newParent->Childs.insert(newIdx, node);
 
-	QVector<SceneNode*> path;
+	path.clear();
 	GetNodePath(path, root, node);
+	path.removeFirst();
+	ApplyNodeSizeOffset(path, node->Size);
 
 	return true;
 }
