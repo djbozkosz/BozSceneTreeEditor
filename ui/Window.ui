@@ -86,6 +86,7 @@
     <addaction name="Menu_Cut"/>
     <addaction name="Menu_Copy"/>
     <addaction name="Menu_Paste"/>
+    <addaction name="Menu_Duplicate"/>
     <addaction name="separator"/>
     <addaction name="Menu_Create"/>
     <addaction name="Menu_Delete"/>
@@ -246,6 +247,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+O</string>
+   </property>
+  </action>
+  <action name="Menu_Duplicate">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>D&amp;uplicate</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
  </widget>

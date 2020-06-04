@@ -113,7 +113,6 @@ namespace Scene
 		// create node from new
 		// remove node
 		// duplicate node
-		// move node
 	};
 }}}
 
