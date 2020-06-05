@@ -151,6 +151,15 @@ void DocumentWindow::UpdateEditMenu()
 	}
 }
 
+SceneNode* DocumentWindow::GetSelectedNode() const
+{
+	auto items = m_Ui->Tree->selectedItems();
+	if (items.size() == 0)
+		return null;
+
+	return as(items[0], NodeItem*)->Node;
+}
+
 void DocumentWindow::CreateTree(NodeItem* nodeItem, Scene::SceneNode* node, float& progress)
 {
 	auto childs = node->Childs;

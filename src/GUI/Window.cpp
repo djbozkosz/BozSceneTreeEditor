@@ -248,6 +248,24 @@ bool Window::ExitApp()
 	return true;
 }
 
+void Window::ExportNode()
+{
+	auto directory = QFileDialog::getExistingDirectory(this, "Export node");
+	if (directory.isEmpty() == true)
+		return;
+
+	emit NodeExported(GetCurrentTab()->GetSelectedNode());
+}
+
+void Window::ImportNode()
+{
+	auto file = QFileDialog::getOpenFileName(this, "Import node");
+	if (file.isEmpty() == true)
+		return;
+
+	emit NodeImported(file);
+}
+
 void Window::ShowAbout()
 {
 	QMessageBox::about(this, windowTitle(), "todo");

@@ -137,7 +137,8 @@ namespace GUI
 		void SetupTree();
 		void UpdateEditMenu();
 
-		inline Document* GetDocument() const { return m_Document; }
+		inline Document*  GetDocument()     const { return m_Document; }
+		inline SceneNode* GetSelectedNode() const;
 
 		signals: // interface
 

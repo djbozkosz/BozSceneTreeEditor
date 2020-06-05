@@ -21,6 +21,7 @@ namespace Djbozkosz {
 namespace Application {
 namespace Scene
 {
+	class SceneNode;
 	class Definitions;
 }
 
@@ -63,6 +64,9 @@ namespace GUI
 		void FileSaved(Document* document, const QString& file = QString());
 		void FileClosed(Document* document);
 
+		void NodeExported(Scene::SceneNode* node);
+		void NodeImported(const QString& file);
+
 		private: // QObject implementation
 
 		bool eventFilter(QObject* object, QEvent* event);
@@ -73,6 +77,7 @@ namespace GUI
 
 		private slots: // handlers
 
+		// File
 		void NewFile();
 		void OpenFile();
 		void ReloadFile();
@@ -82,6 +87,12 @@ namespace GUI
 		bool CloseFile();
 		bool CloseFile(int idx);
 		bool ExitApp();
+
+		// Edit
+		void ExportNode();
+		void ImportNode();
+
+		// Help
 		void ShowAbout();
 
 		void UpdateEditMenu(int tabIdx);
