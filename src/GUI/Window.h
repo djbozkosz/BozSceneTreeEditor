@@ -64,9 +64,6 @@ namespace GUI
 		void FileSaved(Document* document, const QString& file = QString());
 		void FileClosed(Document* document);
 
-		void NodeExported(Scene::SceneNode* node);
-		void NodeImported(const QString& file);
-
 		private: // QObject implementation
 
 		bool eventFilter(QObject* object, QEvent* event);

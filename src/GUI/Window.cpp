@@ -1,3 +1,4 @@
+#include <QFile>
 #include <QEvent>
 #include <QCloseEvent>
 #include <QLabel>
@@ -13,6 +14,7 @@
 #include "GUI/DocumentWindow.h"
 #include "GUI/Window.h"
 #include "Application/Document.h"
+#include "Scene/SceneNodeSerializer.h"
 
 
 using namespace Djbozkosz::Application::GUI;
@@ -254,7 +256,9 @@ void Window::ExportNode()
 	if (directory.isEmpty() == true)
 		return;
 
-	emit NodeExported(GetCurrentTab()->GetSelectedNode());
+	auto node = GetCurrentTab()->GetSelectedNode();
+	//QFile file(directory)
+	//SceneNodeSerializer::Serialize(node);
 }
 
 void Window::ImportNode()
