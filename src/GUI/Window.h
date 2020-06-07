@@ -4,11 +4,12 @@
 #include <QMainWindow>
 #include <QString>
 
-#include "Utility/Base.h"
+#include "Scene/Definitions.h"
 
 
 class QLabel;
 class QProgressBar;
+class QSettings;
 
 
 namespace Ui
@@ -22,7 +23,6 @@ namespace Application {
 namespace Scene
 {
 	class SceneNode;
-	class Definitions;
 }
 
 
@@ -34,26 +34,40 @@ namespace GUI
 	class DocumentWindow;
 
 
+	using namespace Djbozkosz::Application::Scene;
+
+
 	sealed class Window : public QMainWindow
 	{
 		private:
 
 		Q_OBJECT
 
+		private: // constants
+
+		static const QString OPEN_FILE_DIALOG_PATH;
+		static const QString SAVE_FILE_DIALOG_PATH;
+
+		static const QString IMPORT_FILE_DIALOG_PATH;
+		static const QString EXPORT_FILE_DIALOG_PATH;
+
 		private: // members
 
-		int           m_NewFileCounter;
+		int                 m_NewFileCounter;
 
-		Ui::Window*   m_Ui;
-		QLabel*       m_Status;
-		QProgressBar* m_Progress;
+		QSettings*          m_Settings;
+		Scene::Definitions* m_Definitions;
+
+		Ui::Window*         m_Ui;
+		QLabel*             m_Status;
+		QProgressBar*       m_Progress;
 
 		public: // methods
 
-		explicit Window();
+		explicit Window(QSettings* settings, Scene::Definitions* definitions);
 		virtual ~Window();
 
-		void AddDocument(Document* document, Scene::Definitions* definitions);
+		void AddDocument(Document* document);
 		void RemoveDocumemt(Document* document);
 
 		signals: // public interface
@@ -106,6 +120,8 @@ namespace GUI
 		void SaveDocument(Document* document, bool replace);
 
 		static QString GetFileName(Document* document, bool useDirtyState = true);
+
+		QString ShowFileDialog(bool isSave, bool isDirectory, const QString& title, const QString& settingsPath, const Definitions::DialogFiles& files = Definitions::DialogFiles(), const QString& file = QString());
 	};
 }}}
 

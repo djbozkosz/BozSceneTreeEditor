@@ -310,6 +310,43 @@ uint SceneNodeUtility::GetFieldsSize(const QVector<void *>& fields, const QVecto
 	return size;
 }
 
+QString SceneNodeUtility::GetNodeName(SceneNode* node, const Definitions* definitions)
+{
+	if (node->Definition == null)
+		return QString("Unknown node: 0x%1").arg(node->Type, 4, 16);
+
+	auto nameInfos = definitions->GetNodeNames(node->Type);
+	if (nameInfos == null)
+		return node->Definition->Name;
+
+	QStringList names;
+
+	foreach (nameInfo, *nameInfos)
+	{
+		auto childType    = nameInfo->ChildType;
+		auto nodeWithName = (childType > 0) ? node->GetChild(childType) : node;
+
+		if (nodeWithName == null)
+			continue;
+
+		auto fieldCtx   = FieldContext(nodeWithName, nameInfo->FieldIdx, &nodeWithName->Fields, &nodeWithName->Definition->Fields);
+		auto nameFields = GetFieldDataAsString(fieldCtx);
+
+		for (int idx = 0, count = nameFields.size(); idx < count; idx++)
+		{
+			auto enumValue = GetFieldDataEnum(definitions, fieldCtx, idx);
+			if (enumValue.isEmpty() == false)
+			{
+				nameFields[idx] += QString(" - %1").arg(enumValue);
+			}
+		}
+
+		names.push_back(nameFields.join(", "));
+	}
+
+	return QString("%1 [%2]").arg(node->Definition->Name, names.join("; "));
+}
+
 bool SceneNodeUtility::MoveNode(SceneNode* node, SceneNode* root, SceneNode* parent, SceneNode* newParent, uint oldIdx, uint newIdx)
 {
 	if (parent == null || newParent == null)

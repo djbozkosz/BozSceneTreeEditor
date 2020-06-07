@@ -1,3 +1,5 @@
+#include <QSettings>
+
 #include "Application/Application.h"
 #include "Application/Document.h"
 #include "GUI/Window.h"
@@ -16,7 +18,12 @@ int main(int argc, char* argv[])
 
 Application::Application(int argc, char* argv[]) : QApplication(argc, argv)
 {
-	m_Window = new GUI::Window();
+	QCoreApplication::setOrganizationName("djbozkosz");
+	QCoreApplication::setApplicationName("BozSceneTreeEditor");
+	m_Settings    = new QSettings();
+	m_Definitions = new Scene::Definitions();
+
+	m_Window      = new GUI::Window(m_Settings, m_Definitions);
 	m_Window->show();
 
 	connect(m_Window, SIGNAL(FileCreated(int)),              this, SLOT(CreateDocument(int)));
@@ -24,8 +31,6 @@ Application::Application(int argc, char* argv[]) : QApplication(argc, argv)
 	connect(m_Window, SIGNAL(FileReloaded(Document*)),       this, SLOT(ReloadDocument(Document*)));
 	connect(m_Window, SIGNAL(FileSaved(Document*, QString)), this, SLOT(SaveDocument(Document*, QString)));
 	connect(m_Window, SIGNAL(FileClosed(Document*)),         this, SLOT(CloseDocument(Document*)));
-
-	m_Definitions = new Scene::Definitions();
 }
 
 Application::~Application()
@@ -45,6 +50,7 @@ Application::~Application()
 	m_Documents.clear();
 
 	delete m_Definitions;
+	delete m_Settings;
 }
 
 void Application::CreateDocument(int idx)
@@ -53,7 +59,7 @@ void Application::CreateDocument(int idx)
 	document->SetDirty(true);
 
 	m_Documents.insert(document);
-	m_Window->AddDocument(document, m_Definitions);
+	m_Window->AddDocument(document);
 }
 
 void Application::LoadDocument(const QString& file)
@@ -62,7 +68,7 @@ void Application::LoadDocument(const QString& file)
 	document->Load(file, *m_Definitions);
 
 	m_Documents.insert(document);
-	m_Window->AddDocument(document, m_Definitions);
+	m_Window->AddDocument(document);
 }
 
 void Application::ReloadDocument(Document* document)

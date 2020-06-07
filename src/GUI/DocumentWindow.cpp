@@ -125,7 +125,7 @@ void DocumentWindow::SetupTree()
 	if (root == null)
 		return;
 
-	auto name     = GetNodeName(root);
+	auto name     = SceneNodeUtility::GetNodeName(root, m_Definitions);
 	auto nodeItem = new NodeItem(tree, root, name);
 	auto progress = 0.0f;
 	CreateTree(nodeItem, root, progress);
@@ -166,7 +166,7 @@ void DocumentWindow::CreateTree(NodeItem* nodeItem, Scene::SceneNode* node, floa
 	foreach (child, childs)
 	{
 		auto childNode = *child;
-		auto childName = GetNodeName(childNode);
+		auto childName = SceneNodeUtility::GetNodeName(childNode, m_Definitions);
 		auto childItem = new NodeItem(nodeItem, childNode, childName);
 		CreateTree(childItem, *child, progress);
 		nodeItem->addChild(childItem);
@@ -188,7 +188,7 @@ void DocumentWindow::CreateTree(NodeItem* nodeItem, Scene::SceneNode* node, floa
 
 void DocumentWindow::UpdateNode(NodeItem* nodeItem)
 {
-	nodeItem->setText(0, GetNodeName(nodeItem->Node));
+	nodeItem->setText(0, SceneNodeUtility::GetNodeName(nodeItem->Node, m_Definitions));
 }
 
 void DocumentWindow::SetupTable(NodeItem* nodeItem)
@@ -287,43 +287,6 @@ void DocumentWindow::SetupTableField(NodeItem* nodeItem, const Scene::SceneNodeU
 
 		row--;
 	}
-}
-
-QString DocumentWindow::GetNodeName(SceneNode* node) const
-{
-	if (node->Definition == null)
-		return QString("Unknown node: 0x%1").arg(node->Type, 4, 16);
-
-	auto nameInfos = m_Definitions->GetNodeNames(node->Type);
-	if (nameInfos == null)
-		return node->Definition->Name;
-
-	QStringList names;
-
-	foreach (nameInfo, *nameInfos)
-	{
-		auto childType    = nameInfo->ChildType;
-		auto nodeWithName = (childType > 0) ? node->GetChild(childType) : node;
-
-		if (nodeWithName == null)
-			continue;
-
-		auto fieldCtx   = SceneNodeUtility::FieldContext(nodeWithName, nameInfo->FieldIdx, &nodeWithName->Fields, &nodeWithName->Definition->Fields);
-		auto nameFields = SceneNodeUtility::GetFieldDataAsString(fieldCtx);
-
-		for (int idx = 0, count = nameFields.size(); idx < count; idx++)
-		{
-			auto enumValue = SceneNodeUtility::GetFieldDataEnum(m_Definitions, fieldCtx, idx);
-			if (enumValue.isEmpty() == false)
-			{
-				nameFields[idx] += QString(" - %1").arg(enumValue);
-			}
-		}
-
-		names.push_back(nameFields.join(", "));
-	}
-
-	return QString("%1 [%2]").arg(node->Definition->Name, names.join("; "));
 }
 
 void DocumentWindow::UpdateMenuAndTable(QTreeWidgetItem* current, QTreeWidgetItem* previous)

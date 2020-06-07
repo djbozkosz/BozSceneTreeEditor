@@ -137,8 +137,8 @@ namespace GUI
 		void SetupTree();
 		void UpdateEditMenu();
 
-		inline Document*  GetDocument()     const { return m_Document; }
-		inline SceneNode* GetSelectedNode() const;
+		inline Document* GetDocument() const { return m_Document; }
+		SceneNode* GetSelectedNode() const;
 
 		signals: // interface
 
@@ -151,9 +151,6 @@ namespace GUI
 
 		void SetupTable(NodeItem* nodeItem);
 		void SetupTableField(NodeItem* nodeItem, const SceneNodeUtility::FieldContext& fieldCtx, int& row);
-
-		QString GetEnumValue(const SceneNodeUtility::FieldContext& fieldCtx, int data);
-		QString GetNodeName(SceneNode* node) const;
 
 		private slots: // handlers
 

@@ -101,6 +101,7 @@ namespace Scene
 
 		public: // node methods
 
+		static QString GetNodeName(SceneNode* node, const Definitions* definitions);
 		static bool MoveNode(SceneNode* node, SceneNode* root, SceneNode* parent, SceneNode* newParent, uint oldIdx, uint newIdx);
 
 		public: // tree methods

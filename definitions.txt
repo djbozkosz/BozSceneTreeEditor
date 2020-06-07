@@ -1,3 +1,8 @@
+File scene2.bin scene2*.bin [LS3D Scene File]
+File cache.bin cache*.bin [LS3D City File]
+
+ExportFile .dnc *.dnc [DCED Export File]
+
 Node 0x4c53 Scene has_childs [] <>
 Node 0x0001 FileInfo [Hex32 : Version, String : Description, Hex8 : Unknown] <>
 Node 0xafff FileParams1 [Hex16 : Unknown, Hex16 : Unknown, Hex32 : Unknown] <>

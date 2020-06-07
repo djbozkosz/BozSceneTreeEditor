@@ -7,6 +7,9 @@
 #include "Utility/Base.h"
 
 
+class QSettings;
+
+
 namespace Djbozkosz {
 namespace Application {
 namespace GUI
@@ -34,6 +37,7 @@ namespace Scene
 
 		GUI::Window*        m_Window;
 		QSet<Document*>     m_Documents;
+		QSettings*          m_Settings;
 
 		Scene::Definitions* m_Definitions;
 

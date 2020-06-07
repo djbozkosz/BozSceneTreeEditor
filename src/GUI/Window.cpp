@@ -1,3 +1,4 @@
+#include <QSettings>
 #include <QFile>
 #include <QEvent>
 #include <QCloseEvent>
@@ -7,6 +8,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QMessageBox>
 
 #include "ui_Window.h"
@@ -20,9 +22,18 @@
 using namespace Djbozkosz::Application::GUI;
 
 
-Window::Window() :
+const QString Window::OPEN_FILE_DIALOG_PATH   = "OpenFileDialogPath";
+const QString Window::SAVE_FILE_DIALOG_PATH   = "SaveFileDialogPath";
+
+const QString Window::IMPORT_FILE_DIALOG_PATH = "ImportFileDialogPath";
+const QString Window::EXPORT_FILE_DIALOG_PATH = "ExportFileDialogPath";
+
+
+Window::Window(QSettings* settings, Scene::Definitions* definitions) :
 	QMainWindow(),
 	m_NewFileCounter(1),
+	m_Settings(settings),
+	m_Definitions(definitions),
 	m_Ui(new Ui::Window()),
 	m_Status(null),
 	m_Progress(null)
@@ -53,6 +64,10 @@ Window::Window() :
 	connect(m_Ui->Menu_SaveAs, SIGNAL(triggered()), this, SLOT(SaveAsFile()));
 	connect(m_Ui->Menu_Close,  SIGNAL(triggered()), this, SLOT(CloseFile()));
 	connect(m_Ui->Menu_Exit,   SIGNAL(triggered()), this, SLOT(ExitApp()));
+
+	connect(m_Ui->Menu_Export, SIGNAL(triggered()), this, SLOT(ExportNode()));
+	connect(m_Ui->Menu_Import, SIGNAL(triggered()), this, SLOT(ImportNode()));
+
 	connect(m_Ui->Menu_About,  SIGNAL(triggered()), this, SLOT(ShowAbout()));
 }
 
@@ -65,6 +80,10 @@ Window::~Window()
 	disconnect(m_Ui->Menu_SaveAs, SIGNAL(triggered()), this, SLOT(SaveAsFile()));
 	disconnect(m_Ui->Menu_Close,  SIGNAL(triggered()), this, SLOT(CloseFile()));
 	disconnect(m_Ui->Menu_Exit,   SIGNAL(triggered()), this, SLOT(ExitApp()));
+
+	disconnect(m_Ui->Menu_Export, SIGNAL(triggered()), this, SLOT(ExportNode()));
+	disconnect(m_Ui->Menu_Import, SIGNAL(triggered()), this, SLOT(ImportNode()));
+
 	disconnect(m_Ui->Menu_About,  SIGNAL(triggered()), this, SLOT(ShowAbout()));
 
 	auto tabs = m_Ui->Tabs;
@@ -75,11 +94,11 @@ Window::~Window()
 	delete m_Ui;
 }
 
-void Window::AddDocument(Document* document, Scene::Definitions* definitions)
+void Window::AddDocument(Document* document)
 {
 	m_Status->setText("Loaded. Refreshing interface...");
 
-	auto tab = new DocumentWindow(document, definitions, m_Ui->Menu_Edit->menuAction()->menu(), m_Ui->Tabs);
+	auto tab = new DocumentWindow(document, m_Definitions, m_Ui->Menu_Edit->menuAction()->menu(), m_Ui->Tabs);
 
 	connect(tab,      SIGNAL(ProgressChanged(float)), this, SLOT(UpdateProgress(float)));
 	connect(document, SIGNAL(DirtyStateChanged(bool)), this, SLOT(UpdateDirtyState(bool)));
@@ -167,7 +186,7 @@ void Window::NewFile()
 
 void Window::OpenFile()
 {
-	auto file = QFileDialog::getOpenFileName(this, "Open file", "C:\\Hry\\Mafia\\missions");
+	auto file = ShowFileDialog(false, false, "Open file", OPEN_FILE_DIALOG_PATH, m_Definitions->GetDialogFiles());
 	if (file.isEmpty() == true)
 		return;
 
@@ -252,22 +271,28 @@ bool Window::ExitApp()
 
 void Window::ExportNode()
 {
-	auto directory = QFileDialog::getExistingDirectory(this, "Export node");
-	if (directory.isEmpty() == true)
+	auto node = GetCurrentTab()->GetSelectedNode();
+	auto name = SceneNodeUtility::GetNodeName(node, m_Definitions);
+
+	auto file = ShowFileDialog(true, false, "Export node", EXPORT_FILE_DIALOG_PATH, m_Definitions->GetDialogExportFiles(), name);
+	if (file.isEmpty() == true)
 		return;
 
-	auto node = GetCurrentTab()->GetSelectedNode();
-	//QFile file(directory)
-	//SceneNodeSerializer::Serialize(node);
+	QFile writer(file);
+	auto result = writer.open(QIODevice::WriteOnly);
+	if (result == false)
+		return;
+
+	SceneNodeSerializer::Serialize(writer, *node);
 }
 
 void Window::ImportNode()
 {
-	auto file = QFileDialog::getOpenFileName(this, "Import node");
+	auto file = QFileDialog::getOpenFileName(this, "Import node", EXPORT_FILE_DIALOG_PATH, m_Definitions->GetDialogExportFiles());
 	if (file.isEmpty() == true)
 		return;
 
-	emit NodeImported(file);
+	//emit NodeImported(file);
 }
 
 void Window::ShowAbout()
@@ -333,7 +358,7 @@ void Window::SaveDocument(Document* document, bool replace)
 
 	if (replace == false || file.isEmpty() == true)
 	{
-		file = QFileDialog::getSaveFileName(this, "Save file", "C:\\Hry\\Mafia\\missions");
+		file = ShowFileDialog(true, false, "Save file", SAVE_FILE_DIALOG_PATH, m_Definitions->GetDialogFiles());
 	}
 
 	if (file.isEmpty() == true)
@@ -356,4 +381,37 @@ QString Window::GetFileName(Document* document, bool useDirtyState)
 		return fileName;
 
 	return QString("%1*").arg(fileName);
+}
+
+QString Window::ShowFileDialog(bool isSave, bool isDirectory, const QString& title, const QString& settingsPath, const Definitions::DialogFiles& files, const QString& file)
+{
+	auto directory    = m_Settings->value(settingsPath).toString();
+	auto fileToDialog = file;
+
+	if ((fileToDialog.isEmpty() == true || fileToDialog.contains('.') == false) && files.size() > 0)
+	{
+		fileToDialog = QString("%1%2").arg(fileToDialog).arg(files[0].File);
+	}
+
+	directory = QString("%1/%2").arg(directory).arg(fileToDialog);
+
+	QStringList filterList;
+	foreach (f, files)
+	{
+		filterList.push_back(QString("%1 (%2)").arg(f->Name).arg(f->Filter));
+	}
+	auto filter = filterList.join(";;");
+
+	auto fileFromDialog =
+		isDirectory ? QFileDialog::getExistingDirectory(this, title, directory) :
+		isSave      ? QFileDialog::getSaveFileName(this, title, directory, filter) :
+					  QFileDialog::getOpenFileName(this, title, directory, filter);
+
+	if (fileFromDialog.isEmpty() == false)
+	{
+		directory = QFileInfo(fileFromDialog).absoluteDir().path();
+		m_Settings->setValue(settingsPath, directory);
+	}
+
+	return fileFromDialog;
 }

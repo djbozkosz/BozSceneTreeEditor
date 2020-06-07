@@ -34,6 +34,8 @@ const QVector<Definitions::NodeFieldType> Definitions::FIELD_TYPES =
 
 
 Definitions::Definitions() :
+	m_RDialogFileLine("^File\\s+(.*)\\s+(.*)\\s+\\[(.*)\\]$"),
+	m_RDialogExportFileLine("^ExportFile\\s+(.*)\\s+(.*)\\s+\\[(.*)\\]$"),
 	m_RNodeLine("^Node\\s+([a-fx0-9]+)_?([a-fx0-9]*)\\s+([a-zA-Z0-9_]+)\\s+([a-zA-Z0-9_]+)?\\s*\\[(.*)\\]\\s*\\<(.*)\\>$"),
 	m_RStructLine("^Struct\\s+([a-zA-Z0-9_]+)\\s+\\[(.*)\\]$"),
 	m_RNodeFieldList(",\\s*"),
@@ -119,7 +121,15 @@ void Definitions::Load(const QString &file)
 	auto lines = QString::fromLatin1(reader.readAll()).split("\r\n", QString::SkipEmptyParts);
 	foreach (line, lines)
 	{
-		if (line->startsWith("Node ") == true)
+		if (line->startsWith("File ") == true)
+		{
+			LoadDialogFile(m_RDialogFileLine, m_DialogFiles, *line);
+		}
+		else if (line->startsWith("ExportFile ") == true)
+		{
+			LoadDialogFile(m_RDialogExportFileLine, m_DialogExportFiles, *line);
+		}
+		else if (line->startsWith("Node ") == true)
 		{
 			LoadNode(*line);
 		}
@@ -136,6 +146,17 @@ void Definitions::Load(const QString &file)
 			LoadNodeFieldEnum(*line);
 		}
 	}
+}
+
+void Definitions::LoadDialogFile(QRegExp& regExp, QVector<DialogFile>& files, const QString& line)
+{
+	auto match = regExp.exactMatch(line);
+	Debug::Assert(match == true) << "Invalid dialog file:" << line;
+	Debug::Assert(regExp.captureCount() == 3) << "Invalid parameters count for dialog file:" << line;
+
+	auto captures = regExp.capturedTexts();
+	DialogFile dialogFile(captures[1], captures[2], captures[3]);
+	files.push_back(dialogFile);
 }
 
 void Definitions::LoadNode(const QString& line)

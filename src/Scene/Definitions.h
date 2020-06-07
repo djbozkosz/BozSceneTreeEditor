@@ -42,14 +42,28 @@ namespace Scene
 			Struct
 		};
 
+		sealed struct DialogFile
+		{
+			QString File;
+			QString Filter;
+			QString Name;
+
+			inline DialogFile(const QString& file = QString(), const QString& filter = QString(), const QString& name = QString()) :
+				File(file), Filter(filter), Name(name)
+			{
+			}
+		};
+
+		typedef QVector<DialogFile> DialogFiles;
+
 		sealed struct NodeFieldType
 		{
 			ENodeFieldType Type;
 			uint           Size;
 			QString        Name;
 
-			inline NodeFieldType(const QString& name, ENodeFieldType type, uint size)
-				: Type(type), Size(size), Name(name)
+			inline NodeFieldType(const QString& name, ENodeFieldType type, uint size) :
+				Type(type), Size(size), Name(name)
 			{
 			}
 		};
@@ -108,6 +122,8 @@ namespace Scene
 
 		private: // members
 
+		QRegExp                             m_RDialogFileLine;
+		QRegExp                             m_RDialogExportFileLine;
 		QRegExp                             m_RNodeLine;
 		QRegExp                             m_RStructLine;
 		QRegExp                             m_RNodeFieldList;
@@ -115,6 +131,9 @@ namespace Scene
 		QRegExp                             m_RNodeFieldLine;
 		QRegExp                             m_RNodeNameField;
 		QRegExp                             m_RNodeFieldEnumLine;
+
+		DialogFiles                         m_DialogFiles;
+		DialogFiles                         m_DialogExportFiles;
 
 		QMap<QString, const NodeFieldType*> m_StringToField;
 		QMap<uint, NodeDefinition>          m_Nodes;
@@ -134,6 +153,9 @@ namespace Scene
 		explicit Definitions();
 		virtual ~Definitions();
 
+		inline const DialogFiles& GetDialogFiles()       const { return m_DialogFiles;       }
+		inline const DialogFiles& GetDialogExportFiles() const { return m_DialogExportFiles; }
+
 		const NodeDefinition*      GetNode(ushort parentType, ushort type) const;
 		const NodeFieldDefinition* GetNodeField(ushort type) const;
 		const NodeDefinition*      GetNodeFieldData(ushort type, uint dataType) const;
@@ -143,6 +165,7 @@ namespace Scene
 		private: // methods
 
 		void Load(const QString& file);
+		void LoadDialogFile(QRegExp& regExp, QVector<DialogFile>& files, const QString& line);
 		void LoadNode(const QString& line);
 		void LoadStruct(const QString& line);
 		void LoadNodeFields(const QString& line);
