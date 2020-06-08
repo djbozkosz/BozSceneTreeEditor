@@ -98,8 +98,8 @@ void* SceneNodeUtility::ResizeFieldData(const SceneNodeUtility::FieldContext& fi
 
 void SceneNodeUtility::SetFieldDataFromString(SceneNode* root, const SceneNodeUtility::FieldContext& fieldCtx, const QString& data, int idx)
 {
-	QVector<SceneNode*> path;
-	auto result = SceneNodeUtility::GetNodePath(path, root, fieldCtx.Node);
+	NodePath path;
+	auto result = GetNodePath(path, root, fieldCtx.Node);
 	Debug::Assert(result) << "Node not found in tree!";
 
 	auto field      = fieldCtx.GetField();
@@ -356,7 +356,7 @@ bool SceneNodeUtility::MoveNode(SceneNode* node, SceneNode* root, SceneNode* par
 	if (parentDefinition == null || parentDefinition->HasChilds == false)
 		return false;
 
-	QVector<SceneNode*> path;
+	NodePath path;
 	GetNodePath(path, root, node);
 	path.removeFirst();
 	ApplyNodeSizeOffset(path, -node->Size);
@@ -372,7 +372,7 @@ bool SceneNodeUtility::MoveNode(SceneNode* node, SceneNode* root, SceneNode* par
 	return true;
 }
 
-bool SceneNodeUtility::GetNodePath(QVector<SceneNode*>& path, SceneNode* parent, const SceneNode* node)
+bool SceneNodeUtility::GetNodePath(NodePath& path, SceneNode* parent, const SceneNode* node)
 {
 	if (parent == node)
 	{

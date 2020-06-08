@@ -124,25 +124,28 @@ namespace GUI
 		private: // members
 
 		Ui::DocumentWindow* m_Ui;
-		QMenu*              m_EditMenu;
 
 		Document*           m_Document;
 		Definitions*        m_Definitions;
 
 		public: // methodssetup
 
-		explicit DocumentWindow(Document* document, Definitions* definitions, QMenu* editMenu, QWidget* parent = null);
+		explicit DocumentWindow(Document* document, Definitions* definitions, QWidget* parent = null);
 		virtual ~DocumentWindow();
 
 		void SetupTree();
-		void UpdateEditMenu();
 
-		inline Document* GetDocument() const { return m_Document; }
-		SceneNode* GetSelectedNode() const;
+		void AddNode(SceneNode* node);
+
+		inline Document* GetDocument()          const { return m_Document; }
+		NodeItem*        GetSelectedNode()      const;
+		SceneNode*       GetSelectedSceneNode() const;
 
 		signals: // interface
 
 		void ProgressChanged(float value);
+		void EditMenuUpdateRequested();
+		void EditMenuShowRequested(QPoint point);
 
 		private: // methods
 
@@ -151,6 +154,8 @@ namespace GUI
 
 		void SetupTable(NodeItem* nodeItem);
 		void SetupTableField(NodeItem* nodeItem, const SceneNodeUtility::FieldContext& fieldCtx, int& row);
+
+		void UpdateProgress(SceneNode* node, float& progress);
 
 		private slots: // handlers
 

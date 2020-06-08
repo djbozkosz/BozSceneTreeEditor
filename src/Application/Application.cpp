@@ -56,7 +56,7 @@ Application::~Application()
 void Application::CreateDocument(int idx)
 {
 	auto document = new Document(this, idx);
-	document->SetDirty(true);
+	document->SetDirty();
 
 	m_Documents.insert(document);
 	m_Window->AddDocument(document);

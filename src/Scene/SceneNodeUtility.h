@@ -18,6 +18,8 @@ namespace Scene
 	{
 		public: // types
 
+		typedef QVector<SceneNode*> NodePath;
+
 		sealed class FieldContext
 		{
 			public:
@@ -106,14 +108,13 @@ namespace Scene
 
 		public: // tree methods
 
-		static bool GetNodePath(QVector<SceneNode*>& path, SceneNode* parent, const SceneNode* node);
-		static void ApplyNodeSizeOffset(QVector<SceneNode*>& path, int offset);
+		static bool GetNodePath(NodePath& path, SceneNode* parent, const SceneNode* node);
+		static void ApplyNodeSizeOffset(NodePath& path, int offset);
 
 		// operations:
-		// import / export node
-		// create node from new
 		// remove node
-		// duplicate node
+		// cut, copy, paste, duplicate node
+		// create node from new
 	};
 }}}
 

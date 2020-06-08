@@ -106,7 +106,8 @@ namespace GUI
 		// Help
 		void ShowAbout();
 
-		void UpdateEditMenu(int tabIdx);
+		void UpdateEditMenu(int tabIdx = -1);
+		void ShowEditMenu(QPoint point);
 		void UpdateProgress(float value);
 		void UpdateDirtyState(bool isDirty);
 

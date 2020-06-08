@@ -32,18 +32,14 @@ TreeWidget::~TreeWidget()
 
 void TreeWidget::dragEnterEvent(QDragEnterEvent* event)
 {
-	auto items = selectedItems();
-	if (items.size() > 0)
+	auto item = currentItem();
+	if (item == topLevelItem(0))
 	{
-		auto item = items[0];
-		if (item == topLevelItem(0))
-		{
-			event->ignore();
-			return;
-		}
-
-		m_DraggedNode = as(item, NodeItem*);
+		event->ignore();
+		return;
 	}
+
+	m_DraggedNode = as(item, NodeItem*);
 
 	QTreeWidget::dragEnterEvent(event);
 }
@@ -71,7 +67,7 @@ void TreeWidget::dropEvent(QDropEvent* event)
 
 		if (result == true)
 		{
-			m_Document->SetDirty(true);
+			m_Document->SetDirty();
 		}
 		else
 		{
@@ -86,10 +82,9 @@ void TreeWidget::dropEvent(QDropEvent* event)
 }
 
 
-DocumentWindow::DocumentWindow(Document* document, Definitions* definitions, QMenu* editMenu, QWidget* parent) :
+DocumentWindow::DocumentWindow(Document* document, Definitions* definitions, QWidget* parent) :
 	QWidget(parent),
 	m_Ui(new Ui::DocumentWindow()),
-	m_EditMenu(editMenu),
 	m_Document(document),
 	m_Definitions(definitions)
 {
@@ -140,24 +135,78 @@ void DocumentWindow::SetupTree()
 	emit ProgressChanged(1.0f);
 }
 
-void DocumentWindow::UpdateEditMenu()
+void DocumentWindow::AddNode(SceneNode* node)
 {
-	auto isNodeSelected = is(m_Ui->Tree->currentItem(), NodeItem*);
-	auto actions        = m_EditMenu->actions();
+	auto root    = m_Document->GetRoot();
+	auto sibling = GetSelectedNode();
+	auto name    = SceneNodeUtility::GetNodeName(node, m_Definitions);
+	auto item    = default_(NodeItem*);
 
-	foreach (action, actions)
+	if (root == null)
 	{
-		(*action)->setEnabled(isNodeSelected);
+		m_Document->SetRoot(node);
+
+		auto tree = m_Ui->Tree;
+		item = new NodeItem(tree, node, name);
+		tree->addTopLevelItem(item);
 	}
+	else
+	{
+		SceneNodeUtility::NodePath path;
+		SceneNodeUtility::GetNodePath(path, root, sibling->Node);
+		path.pop_front();
+
+		auto parentNode = path.back();
+		auto parentItem = as(sibling->parent(), NodeItem*);
+		auto siblingIdx = parentItem->indexOfChild(sibling);
+		auto targetIdx  = siblingIdx + 1;
+
+		parentNode->Childs.insert(targetIdx, node);
+		SceneNodeUtility::ApplyNodeSizeOffset(path, node->Size);
+
+		item = new NodeItem(parentItem, node, name);
+		//parentItem->insertChild(targetIdx, item); // this does not work !?
+
+		QVector<QTreeWidgetItem*> childs;
+		childs.resize(parentItem->childCount());
+
+		while (parentItem->childCount() > 0)
+		{
+			auto idx = parentItem->childCount() - 1;
+			auto child = parentItem->child(idx);
+
+			childs[idx] = child;
+			parentItem->removeChild(child);
+		}
+
+		childs.insert(targetIdx, item);
+		parentItem->addChildren(childs.toList());
+	}
+
+	if (sibling != null)
+	{
+		sibling->setSelected(false);
+	}
+
+	item->setSelected(true);
+	UpdateMenuAndTable(item, sibling);
+
+	m_Document->SetDirty();
 }
 
-SceneNode* DocumentWindow::GetSelectedNode() const
+NodeItem* DocumentWindow::GetSelectedNode() const
 {
-	auto items = m_Ui->Tree->selectedItems();
-	if (items.size() == 0)
+	auto item = m_Ui->Tree->currentItem();
+	return as(item, NodeItem*);
+}
+
+SceneNode* DocumentWindow::GetSelectedSceneNode() const
+{
+	auto item = GetSelectedNode();
+	if (item == null)
 		return null;
 
-	return as(items[0], NodeItem*)->Node;
+	return item->Node;
 }
 
 void DocumentWindow::CreateTree(NodeItem* nodeItem, Scene::SceneNode* node, float& progress)
@@ -171,18 +220,7 @@ void DocumentWindow::CreateTree(NodeItem* nodeItem, Scene::SceneNode* node, floa
 		CreateTree(childItem, *child, progress);
 		nodeItem->addChild(childItem);
 
-		float progressInc;
-		if (childNode->Definition == null || childNode->Definition->HasChilds == false)
-		{
-			progressInc = childNode->Size;
-		}
-		else
-		{
-			progressInc = sizeof(childNode->Type) + sizeof(childNode->Size);
-		}
-		progress += progressInc / m_Document->GetRoot()->Size;
-
-		emit ProgressChanged(progress);
+		UpdateProgress(childNode, progress);
 	}
 }
 
@@ -289,11 +327,27 @@ void DocumentWindow::SetupTableField(NodeItem* nodeItem, const Scene::SceneNodeU
 	}
 }
 
+void DocumentWindow::UpdateProgress(SceneNode* node, float& progress)
+{
+	float progressInc;
+	if (node->Definition == null || node->Definition->HasChilds == false)
+	{
+		progressInc = node->Size;
+	}
+	else
+	{
+		progressInc = sizeof(node->Type) + sizeof(node->Size);
+	}
+	progress += progressInc / m_Document->GetRoot()->Size;
+
+	emit ProgressChanged(progress);
+}
+
 void DocumentWindow::UpdateMenuAndTable(QTreeWidgetItem* current, QTreeWidgetItem* previous)
 {
 	unused(previous);
 
-	UpdateEditMenu();
+	emit EditMenuUpdateRequested();
 
 	auto table = m_Ui->Table;
 	table->blockSignals(true);
@@ -322,7 +376,7 @@ void DocumentWindow::UpdateField(QTableWidgetItem* item)
 		UpdateNode(nodeItem);
 	}
 
-	m_Document->SetDirty(true);
+	m_Document->SetDirty();
 }
 
 void DocumentWindow::ShowEditMenu(QPoint point)
@@ -334,5 +388,5 @@ void DocumentWindow::ShowEditMenu(QPoint point)
 		return;
 
 	auto globalPoint = tree->mapToGlobal(point);
-	m_EditMenu->popup(globalPoint);
+	emit EditMenuShowRequested(globalPoint);
 }

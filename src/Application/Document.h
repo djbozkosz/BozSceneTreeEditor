@@ -39,12 +39,13 @@ namespace Scene
 		void Reload(const Scene::Definitions& definitions);
 		void Save(const QString& file);
 
-		inline const QString&          GetFile() const { return m_File; }
-		inline       Scene::SceneNode* GetRoot() const { return m_Root; }
+		inline const QString&          GetFile() const                 { return m_File; }
+		inline       Scene::SceneNode* GetRoot() const                 { return m_Root; }
+		inline       void              SetRoot(Scene::SceneNode* root) { m_Root = root; }
 
 		inline int  GetIdx()  const { return m_Idx;     }
 		inline bool IsDirty() const { return m_IsDirty; }
-		void        SetDirty(bool isDirty);
+		void        SetDirty(bool isDirty = true);
 
 		signals: // interface
 

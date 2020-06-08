@@ -16,6 +16,7 @@
 #include "GUI/DocumentWindow.h"
 #include "GUI/Window.h"
 #include "Application/Document.h"
+#include "Scene/SceneNode.h"
 #include "Scene/SceneNodeSerializer.h"
 
 
@@ -98,10 +99,12 @@ void Window::AddDocument(Document* document)
 {
 	m_Status->setText("Loaded. Refreshing interface...");
 
-	auto tab = new DocumentWindow(document, m_Definitions, m_Ui->Menu_Edit->menuAction()->menu(), m_Ui->Tabs);
+	auto tab = new DocumentWindow(document, m_Definitions, m_Ui->Tabs);
 
-	connect(tab,      SIGNAL(ProgressChanged(float)), this, SLOT(UpdateProgress(float)));
-	connect(document, SIGNAL(DirtyStateChanged(bool)), this, SLOT(UpdateDirtyState(bool)));
+	connect(tab,      SIGNAL(ProgressChanged(float)),        this, SLOT(UpdateProgress(float)));
+	connect(tab,      SIGNAL(EditMenuUpdateRequested()),     this, SLOT(UpdateEditMenu()));
+	connect(tab,      SIGNAL(EditMenuShowRequested(QPoint)), this, SLOT(ShowEditMenu(QPoint)));
+	connect(document, SIGNAL(DirtyStateChanged(bool)),       this, SLOT(UpdateDirtyState(bool)));
 
 	tab->SetupTree();
 
@@ -135,8 +138,10 @@ void Window::RemoveDocumemt(Djbozkosz::Application::Document* document)
 
 	Debug::Assert(tab != null) << "Tab to remove not found!";
 
-	disconnect(tab,      SIGNAL(ProgressChanged(float)), this, SLOT(UpdateProgress(float)));
-	disconnect(document, SIGNAL(DirtyStateChanged(bool)), this, SLOT(UpdateDirtyState(bool)));
+	disconnect(tab,      SIGNAL(ProgressChanged(float)),        this, SLOT(UpdateProgress(float)));
+	disconnect(tab,      SIGNAL(EditMenuUpdateRequested()),     this, SLOT(UpdateEditMenu()));
+	disconnect(tab,      SIGNAL(EditMenuShowRequested(QPoint)), this, SLOT(ShowEditMenu(QPoint)));
+	disconnect(document, SIGNAL(DirtyStateChanged(bool)),       this, SLOT(UpdateDirtyState(bool)));
 
 	auto tabs = m_Ui->Tabs;
 	tabs->removeTab(tabIdx);
@@ -271,7 +276,7 @@ bool Window::ExitApp()
 
 void Window::ExportNode()
 {
-	auto node = GetCurrentTab()->GetSelectedNode();
+	auto node = GetCurrentTab()->GetSelectedSceneNode();
 	auto name = SceneNodeUtility::GetNodeName(node, m_Definitions);
 
 	auto file = ShowFileDialog(true, false, "Export node", EXPORT_FILE_DIALOG_PATH, m_Definitions->GetDialogExportFiles(), name);
@@ -288,11 +293,20 @@ void Window::ExportNode()
 
 void Window::ImportNode()
 {
-	auto file = QFileDialog::getOpenFileName(this, "Import node", EXPORT_FILE_DIALOG_PATH, m_Definitions->GetDialogExportFiles());
+	auto file = ShowFileDialog(false, false, "Import node", EXPORT_FILE_DIALOG_PATH, m_Definitions->GetDialogExportFiles());
 	if (file.isEmpty() == true)
 		return;
 
-	//emit NodeImported(file);
+	QFile reader(file);
+	auto result = reader.open(QIODevice::ReadOnly);
+	if (result == false)
+		return;
+
+	auto tab     = GetCurrentTab();
+	auto sibling = tab->GetSelectedNode();
+	auto parent  = (sibling != null) ? as(sibling->parent(), NodeItem*)->Node : null;
+	auto node    = SceneNodeSerializer::Deserialize(reader, parent, *m_Definitions);
+	tab->AddNode(node);
 }
 
 void Window::ShowAbout()
@@ -302,10 +316,32 @@ void Window::ShowAbout()
 
 void Window::UpdateEditMenu(int tabIdx)
 {
-	if (tabIdx == -1)
+	auto tab = (tabIdx == -1) ? GetCurrentTab() : GetTab(tabIdx);
+	if (tab == null)
 		return;
 
-	GetTab(tabIdx)->UpdateEditMenu();
+	auto selectedNode   = tab->GetSelectedNode();
+	auto isNodeSelected = (selectedNode != null);
+	auto actions        = m_Ui->Menu_Edit->actions();
+
+	foreach (action, actions)
+	{
+		(*action)->setEnabled(isNodeSelected);
+	}
+
+	if (selectedNode != null && tab->GetDocument()->GetRoot() == selectedNode->Node)
+	{
+		m_Ui->Menu_Import->setEnabled(false);
+	}
+	else if (m_Ui->Tabs->count() > 0)
+	{
+		m_Ui->Menu_Import->setEnabled(true);
+	}
+}
+
+void Window::ShowEditMenu(QPoint point)
+{
+	m_Ui->Menu_Edit->popup(point);
 }
 
 void Window::UpdateProgress(float value)

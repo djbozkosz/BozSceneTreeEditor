@@ -44,23 +44,26 @@ void Document::Reload(const Scene::Definitions& definitions)
 
 void Document::Save(const QString& file)
 {
-#if 0
 	if (file.isEmpty() == false)
 	{
 		m_File = file;
 	}
 
+#if 0
 	QFile writer(m_File);
 #else
-	unused(file);
-	QFile writer("C:\\Users\\Tomáš\\Desktop\\a.bin");
+	QFile writer("C:\\Users\\Tomáš\\Desktop\\scene2.bin");
 #endif
 
 	auto result = writer.open(QIODevice::WriteOnly);
 	if (result == false)
 		return;
 
-	Scene::SceneNodeSerializer::Serialize(writer, *m_Root);
+	if (m_Root != null)
+	{
+		Scene::SceneNodeSerializer::Serialize(writer, *m_Root);
+	}
+
 	SetDirty(false);
 }
 
