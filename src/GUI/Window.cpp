@@ -66,6 +66,7 @@ Window::Window(QSettings* settings, Scene::Definitions* definitions) :
 	connect(m_Ui->Menu_Close,  SIGNAL(triggered()), this, SLOT(CloseFile()));
 	connect(m_Ui->Menu_Exit,   SIGNAL(triggered()), this, SLOT(ExitApp()));
 
+	connect(m_Ui->Menu_Delete, SIGNAL(triggered()), this, SLOT(DeleteNode()));
 	connect(m_Ui->Menu_Export, SIGNAL(triggered()), this, SLOT(ExportNode()));
 	connect(m_Ui->Menu_Import, SIGNAL(triggered()), this, SLOT(ImportNode()));
 
@@ -82,6 +83,7 @@ Window::~Window()
 	disconnect(m_Ui->Menu_Close,  SIGNAL(triggered()), this, SLOT(CloseFile()));
 	disconnect(m_Ui->Menu_Exit,   SIGNAL(triggered()), this, SLOT(ExitApp()));
 
+	disconnect(m_Ui->Menu_Delete, SIGNAL(triggered()), this, SLOT(DeleteNode()));
 	disconnect(m_Ui->Menu_Export, SIGNAL(triggered()), this, SLOT(ExportNode()));
 	disconnect(m_Ui->Menu_Import, SIGNAL(triggered()), this, SLOT(ImportNode()));
 
@@ -272,6 +274,12 @@ bool Window::ExitApp()
 
 	qApp->quit();
 	return true;
+}
+
+void Window::DeleteNode()
+{
+	auto tab = GetCurrentTab();
+	tab->RemoveNode(tab->GetSelectedNode());
 }
 
 void Window::ExportNode()

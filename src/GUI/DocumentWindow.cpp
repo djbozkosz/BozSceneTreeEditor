@@ -137,18 +137,23 @@ void DocumentWindow::SetupTree()
 
 void DocumentWindow::AddNode(SceneNode* node)
 {
-	auto root    = m_Document->GetRoot();
-	auto sibling = GetSelectedNode();
-	auto name    = SceneNodeUtility::GetNodeName(node, m_Definitions);
-	auto item    = default_(NodeItem*);
+	auto root       = m_Document->GetRoot();
+	auto sibling    = GetSelectedNode();
+	auto parentItem = (sibling != null) ? as(sibling->parent(), NodeItem*) : null;
+	auto name       = SceneNodeUtility::GetNodeName(node, m_Definitions);
+	auto nodeItem   = default_(NodeItem*);
 
-	if (root == null)
+	if (parentItem == null)
 	{
-		m_Document->SetRoot(node);
+		// fake multiple roots to be able to create new childs under root
+		if (root == null)
+		{
+			m_Document->SetRoot(node);
+		}
 
 		auto tree = m_Ui->Tree;
-		item = new NodeItem(tree, node, name);
-		tree->addTopLevelItem(item);
+		nodeItem = new NodeItem(tree, node, name);
+		tree->addTopLevelItem(nodeItem);
 	}
 	else
 	{
@@ -157,15 +162,14 @@ void DocumentWindow::AddNode(SceneNode* node)
 		path.pop_front();
 
 		auto parentNode = path.back();
-		auto parentItem = as(sibling->parent(), NodeItem*);
 		auto siblingIdx = parentItem->indexOfChild(sibling);
 		auto targetIdx  = siblingIdx + 1;
 
 		parentNode->Childs.insert(targetIdx, node);
 		SceneNodeUtility::ApplyNodeSizeOffset(path, node->Size);
 
-		item = new NodeItem(parentItem, node, name);
-		//parentItem->insertChild(targetIdx, item); // this does not work !?
+		nodeItem = new NodeItem(parentItem, node, name);
+		//parentItem->insertChild(targetIdx, item); // this does not work !?!
 
 		QVector<QTreeWidgetItem*> childs;
 		childs.resize(parentItem->childCount());
@@ -179,7 +183,7 @@ void DocumentWindow::AddNode(SceneNode* node)
 			parentItem->removeChild(child);
 		}
 
-		childs.insert(targetIdx, item);
+		childs.insert(targetIdx, nodeItem);
 		parentItem->addChildren(childs.toList());
 	}
 
@@ -188,25 +192,55 @@ void DocumentWindow::AddNode(SceneNode* node)
 		sibling->setSelected(false);
 	}
 
-	item->setSelected(true);
-	UpdateMenuAndTable(item, sibling);
+	nodeItem->setSelected(true);
+	UpdateMenuAndTable(nodeItem, sibling);
 
+	m_Document->SetDirty();
+}
+
+void DocumentWindow::RemoveNode(NodeItem* nodeItem)
+{
+	auto parentItem = nodeItem->parent();
+	auto node       = nodeItem->Node;
+
+	if (parentItem == null)
+	{
+		m_Document->SetRoot(null);
+		m_Ui->Tree->clear();
+	}
+	else
+	{
+		auto idx = parentItem->indexOfChild(nodeItem);
+		parentItem->removeChild(nodeItem);
+
+		SceneNodeUtility::NodePath path;
+		SceneNodeUtility::GetNodePath(path, m_Document->GetRoot(), node);
+		path.pop_front();
+
+		auto parentNode = path.back();
+		parentNode->Childs.removeAt(idx);
+		SceneNodeUtility::ApplyNodeSizeOffset(path, -node->Size);
+	}
+
+	delete node;
+
+	UpdateMenuAndTable(null, null);
 	m_Document->SetDirty();
 }
 
 NodeItem* DocumentWindow::GetSelectedNode() const
 {
-	auto item = m_Ui->Tree->currentItem();
-	return as(item, NodeItem*);
+	auto nodeItem = m_Ui->Tree->currentItem();
+	return as(nodeItem, NodeItem*);
 }
 
 SceneNode* DocumentWindow::GetSelectedSceneNode() const
 {
-	auto item = GetSelectedNode();
-	if (item == null)
+	auto nodeItem = GetSelectedNode();
+	if (nodeItem == null)
 		return null;
 
-	return item->Node;
+	return nodeItem->Node;
 }
 
 void DocumentWindow::CreateTree(NodeItem* nodeItem, Scene::SceneNode* node, float& progress)
@@ -231,13 +265,13 @@ void DocumentWindow::UpdateNode(NodeItem* nodeItem)
 
 void DocumentWindow::SetupTable(NodeItem* nodeItem)
 {
-	auto node  = nodeItem->Node;
 	auto table = m_Ui->Table;
 	table->setRowCount(0);
 
-	if (node == null)
+	if (nodeItem == null)
 		return;
 
+	auto node  = nodeItem->Node;
 	auto count = node->Fields.size();
 
 	if (count == 0 || node->Definition == null || node->Definition->Fields[0].FieldType->Type == Definitions::ENodeFieldType::Unknown)

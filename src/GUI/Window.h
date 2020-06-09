@@ -100,6 +100,7 @@ namespace GUI
 		bool ExitApp();
 
 		// Edit
+		void DeleteNode();
 		void ExportNode();
 		void ImportNode();
 
