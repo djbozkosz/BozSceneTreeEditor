@@ -145,7 +145,7 @@ namespace GUI
 		signals: // interface
 
 		void ProgressChanged(float value);
-		void EditMenuUpdateRequested();
+		void EditMenuUpdateRequested(NodeItem* nodeItem);
 		void EditMenuShowRequested(QPoint point);
 
 		private: // methods

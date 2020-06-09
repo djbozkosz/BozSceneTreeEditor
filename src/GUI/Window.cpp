@@ -103,10 +103,10 @@ void Window::AddDocument(Document* document)
 
 	auto tab = new DocumentWindow(document, m_Definitions, m_Ui->Tabs);
 
-	connect(tab,      SIGNAL(ProgressChanged(float)),        this, SLOT(UpdateProgress(float)));
-	connect(tab,      SIGNAL(EditMenuUpdateRequested()),     this, SLOT(UpdateEditMenu()));
-	connect(tab,      SIGNAL(EditMenuShowRequested(QPoint)), this, SLOT(ShowEditMenu(QPoint)));
-	connect(document, SIGNAL(DirtyStateChanged(bool)),       this, SLOT(UpdateDirtyState(bool)));
+	connect(tab,      SIGNAL(ProgressChanged(float)),             this, SLOT(UpdateProgress(float)));
+	connect(tab,      SIGNAL(EditMenuUpdateRequested(NodeItem*)), this, SLOT(UpdateEditMenu(NodeItem*)));
+	connect(tab,      SIGNAL(EditMenuShowRequested(QPoint)),      this, SLOT(ShowEditMenu(QPoint)));
+	connect(document, SIGNAL(DirtyStateChanged(bool)),            this, SLOT(UpdateDirtyState(bool)));
 
 	tab->SetupTree();
 
@@ -140,10 +140,10 @@ void Window::RemoveDocumemt(Djbozkosz::Application::Document* document)
 
 	Debug::Assert(tab != null) << "Tab to remove not found!";
 
-	disconnect(tab,      SIGNAL(ProgressChanged(float)),        this, SLOT(UpdateProgress(float)));
-	disconnect(tab,      SIGNAL(EditMenuUpdateRequested()),     this, SLOT(UpdateEditMenu()));
-	disconnect(tab,      SIGNAL(EditMenuShowRequested(QPoint)), this, SLOT(ShowEditMenu(QPoint)));
-	disconnect(document, SIGNAL(DirtyStateChanged(bool)),       this, SLOT(UpdateDirtyState(bool)));
+	disconnect(tab,      SIGNAL(ProgressChanged(float)),             this, SLOT(UpdateProgress(float)));
+	disconnect(tab,      SIGNAL(EditMenuUpdateRequested(NodeItem*)), this, SLOT(UpdateEditMenu(NodeItem*)));
+	disconnect(tab,      SIGNAL(EditMenuShowRequested(QPoint)),      this, SLOT(ShowEditMenu(QPoint)));
+	disconnect(document, SIGNAL(DirtyStateChanged(bool)),            this, SLOT(UpdateDirtyState(bool)));
 
 	auto tabs = m_Ui->Tabs;
 	tabs->removeTab(tabIdx);
@@ -312,8 +312,9 @@ void Window::ImportNode()
 
 	auto tab     = GetCurrentTab();
 	auto sibling = tab->GetSelectedNode();
-	auto parent  = (sibling != null) ? as(sibling->parent(), NodeItem*)->Node : null;
-	auto node    = SceneNodeSerializer::Deserialize(reader, parent, *m_Definitions);
+	auto parentItem = (sibling    != null) ? as(sibling->parent(), NodeItem*) : null;
+	auto parentNode = (parentItem != null) ? parentItem->Node                 : null;
+	auto node    = SceneNodeSerializer::Deserialize(reader, parentNode, *m_Definitions);
 	tab->AddNode(node);
 }
 
@@ -324,12 +325,15 @@ void Window::ShowAbout()
 
 void Window::UpdateEditMenu(int tabIdx)
 {
-	auto tab = (tabIdx == -1) ? GetCurrentTab() : GetTab(tabIdx);
-	if (tab == null)
-		return;
+	auto tab          = (tabIdx != -1)   ? GetTab(tabIdx)         : null;
+	auto selectedNode = (tab    != null) ? tab->GetSelectedNode() : null;
 
-	auto selectedNode   = tab->GetSelectedNode();
-	auto isNodeSelected = (selectedNode != null);
+	UpdateEditMenu(selectedNode);
+}
+
+void Window::UpdateEditMenu(NodeItem* nodeItem)
+{
+	auto isNodeSelected = (nodeItem != null);
 	auto actions        = m_Ui->Menu_Edit->actions();
 
 	foreach (action, actions)
@@ -337,11 +341,7 @@ void Window::UpdateEditMenu(int tabIdx)
 		(*action)->setEnabled(isNodeSelected);
 	}
 
-	if (selectedNode != null && tab->GetDocument()->GetRoot() == selectedNode->Node)
-	{
-		m_Ui->Menu_Import->setEnabled(false);
-	}
-	else if (m_Ui->Tabs->count() > 0)
+	if (m_Ui->Tabs->count() > 0)
 	{
 		m_Ui->Menu_Import->setEnabled(true);
 	}

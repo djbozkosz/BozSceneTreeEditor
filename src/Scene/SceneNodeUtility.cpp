@@ -99,8 +99,13 @@ void* SceneNodeUtility::ResizeFieldData(const SceneNodeUtility::FieldContext& fi
 void SceneNodeUtility::SetFieldDataFromString(SceneNode* root, const SceneNodeUtility::FieldContext& fieldCtx, const QString& data, int idx)
 {
 	NodePath path;
-	auto result = GetNodePath(path, root, fieldCtx.Node);
-	Debug::Assert(result) << "Node not found in tree!";
+	auto node   = fieldCtx.Node;
+	auto result = GetNodePath(path, root, node);
+
+	if (result == false)
+	{
+		path.push_back(node);
+	}
 
 	auto field      = fieldCtx.GetField();
 	auto fieldInfo  = fieldCtx.GetFieldInfo();
@@ -349,7 +354,7 @@ QString SceneNodeUtility::GetNodeName(SceneNode* node, const Definitions* defini
 
 bool SceneNodeUtility::MoveNode(SceneNode* node, SceneNode* root, SceneNode* parent, SceneNode* newParent, uint oldIdx, uint newIdx)
 {
-	if (parent == null || newParent == null)
+	if (newParent == null)
 		return false;
 
 	auto parentDefinition = newParent->Definition;
@@ -358,10 +363,18 @@ bool SceneNodeUtility::MoveNode(SceneNode* node, SceneNode* root, SceneNode* par
 
 	NodePath path;
 	GetNodePath(path, root, node);
-	path.removeFirst();
-	ApplyNodeSizeOffset(path, -node->Size);
 
-	parent->Childs.removeAt(oldIdx);
+	if (path.isEmpty() == false)
+	{
+		path.removeFirst();
+		ApplyNodeSizeOffset(path, -node->Size);
+	}
+
+	if (parent != null)
+	{
+		parent->Childs.removeAt(oldIdx);
+	}
+
 	newParent->Childs.insert(newIdx, node);
 
 	path.clear();

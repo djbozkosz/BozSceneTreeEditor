@@ -46,13 +46,17 @@ void TreeWidget::dragEnterEvent(QDragEnterEvent* event)
 
 void TreeWidget::dropEvent(QDropEvent* event)
 {
-	auto oldParent = m_DraggedNode->parent();
-	auto oldIdx    = oldParent->indexOfChild(m_DraggedNode);
+	auto oldParent = as(m_DraggedNode->parent(), NodeItem*);
+	auto oldIdx    = (oldParent != null) ? oldParent->indexOfChild(m_DraggedNode) : indexOfTopLevelItem(m_DraggedNode);
 
 	QTreeWidget::dropEvent(event);
 	auto newParent = as(m_DraggedNode->parent(), NodeItem*);
 
-	if (newParent == null)
+	if (newParent == null && oldParent == null)
+	{
+		Debug::Error() << "Child nodes are not allowed to be in root!";
+	}
+	else if (newParent == null)
 	{
 		auto newIdx = indexOfTopLevelItem(m_DraggedNode);
 		takeTopLevelItem(newIdx);
@@ -63,7 +67,7 @@ void TreeWidget::dropEvent(QDropEvent* event)
 	else
 	{
 		auto newIdx = newParent->indexOfChild(m_DraggedNode);
-		auto result = SceneNodeUtility::MoveNode(m_DraggedNode->Node, m_Document->GetRoot(), as(oldParent, NodeItem*)->Node, newParent->Node, oldIdx, newIdx);
+		auto result = SceneNodeUtility::MoveNode(m_DraggedNode->Node, m_Document->GetRoot(), (oldParent != null) ? oldParent->Node : null, newParent->Node, oldIdx, newIdx);
 
 		if (result == true)
 		{
@@ -72,7 +76,15 @@ void TreeWidget::dropEvent(QDropEvent* event)
 		else
 		{
 			newParent->removeChild(m_DraggedNode);
-			oldParent->insertChild(oldIdx, m_DraggedNode);
+
+			if (oldParent != null)
+			{
+				oldParent->insertChild(oldIdx, m_DraggedNode);
+			}
+			else
+			{
+				addTopLevelItem(m_DraggedNode);
+			}
 
 			Debug::Error() << "Child nodes are not allowed in node" << newParent->text(0) << "!";
 		}
@@ -205,8 +217,15 @@ void DocumentWindow::RemoveNode(NodeItem* nodeItem)
 
 	if (parentItem == null)
 	{
-		m_Document->SetRoot(null);
-		m_Ui->Tree->clear();
+		auto tree = m_Ui->Tree;
+		auto idx  = tree->indexOfTopLevelItem(nodeItem);
+
+		if (idx == 0)
+		{
+			m_Document->SetRoot(null);
+		}
+
+		tree->takeTopLevelItem(idx);
 	}
 	else
 	{
@@ -222,6 +241,7 @@ void DocumentWindow::RemoveNode(NodeItem* nodeItem)
 		SceneNodeUtility::ApplyNodeSizeOffset(path, -node->Size);
 	}
 
+	delete nodeItem;
 	delete node;
 
 	UpdateMenuAndTable(null, null);
@@ -381,11 +401,13 @@ void DocumentWindow::UpdateMenuAndTable(QTreeWidgetItem* current, QTreeWidgetIte
 {
 	unused(previous);
 
-	emit EditMenuUpdateRequested();
+	auto nodeItem = as(current, NodeItem*);
+
+	emit EditMenuUpdateRequested(nodeItem);
 
 	auto table = m_Ui->Table;
 	table->blockSignals(true);
-	SetupTable(as(current, NodeItem*));
+	SetupTable(nodeItem);
 	table->blockSignals(false);
 }
 

@@ -1,5 +1,6 @@
 File scene2.bin scene2*.bin [LS3D Scene File]
 File cache.bin cache*.bin [LS3D City File]
+File file.dnc *.dnc [DCED Export File]
 
 ExportFile .dnc *.dnc [DCED Export File]
 

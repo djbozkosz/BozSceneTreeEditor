@@ -31,6 +31,7 @@ class Document;
 
 namespace GUI
 {
+	class NodeItem;
 	class DocumentWindow;
 
 
@@ -107,7 +108,8 @@ namespace GUI
 		// Help
 		void ShowAbout();
 
-		void UpdateEditMenu(int tabIdx = -1);
+		void UpdateEditMenu(int tabIdx);
+		void UpdateEditMenu(NodeItem* nodeItem);
 		void ShowEditMenu(QPoint point);
 		void UpdateProgress(float value);
 		void UpdateDirtyState(bool isDirty);
