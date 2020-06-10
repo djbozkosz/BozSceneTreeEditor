@@ -49,7 +49,7 @@ void Document::Save(const QString& file)
 		m_File = file;
 	}
 
-#if 0
+#ifdef RELEASE_BUILD
 	QFile writer(m_File);
 #else
 	QFile writer("C:\\Users\\Tomáš\\Desktop\\scene2.bin");
