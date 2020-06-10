@@ -258,6 +258,32 @@ uint SceneNodeUtility::CreateFieldsData(QVector<void*>& fields, const QVector<De
 	return size;
 }
 
+void SceneNodeUtility::DestroyFieldsData(QVector<void*>& fields, const QVector<Definitions::NodeFieldInfo>* fieldInfos)
+{
+	for (int idx = 0, count = fields.size(); idx < count; idx++)
+	{
+		auto field        = fields[idx];
+		auto structFields = (fieldInfos != null) ? (*fieldInfos)[idx].NestedField : null;
+
+		if (structFields == null)
+		{
+			delete[] reinterpret_cast<uchar*>(field);
+			continue;
+		}
+		else
+		{
+			auto structArray = reinterpret_cast<Definitions::StructField*>(field);
+			foreach (strukt, *structArray)
+			{
+				foreach (field, *strukt)
+				{
+					delete[] reinterpret_cast<uchar*>(*field);
+				}
+			}
+		}
+	}
+}
+
 uint SceneNodeUtility::GetFieldSize(const void* field, const Definitions::NodeFieldInfo* fieldInfo, bool withHeader)
 {
 	auto size      = withHeader ? (sizeof(SceneNode::Type) + sizeof(SceneNode::Size)) : 0;

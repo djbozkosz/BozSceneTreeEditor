@@ -1,4 +1,5 @@
 #include "Scene/SceneNode.h"
+#include "Scene/SceneNodeUtility.h"
 
 
 using namespace Djbozkosz::Application::Scene;
@@ -13,29 +14,7 @@ SceneNode::SceneNode() :
 
 SceneNode::~SceneNode()
 {
-	for (int idx = 0, count = Fields.size(); idx < count; idx++)
-	{
-		auto field        = Fields[idx];
-		auto structFields = (Definition != null) ? Definition->Fields[idx].NestedField : null;
-
-		if (structFields == null)
-		{
-			delete[] reinterpret_cast<uchar*>(field);
-			continue;
-		}
-
-		while (structFields != null)
-		{
-			auto structArray = reinterpret_cast<Definitions::StructField*>(field);
-			foreach (strukt, *structArray)
-			{
-				foreach (field, *strukt)
-				{
-					delete[] reinterpret_cast<uchar*>(*field);
-				}
-			}
-		}
-	}
+	SceneNodeUtility::DestroyFieldsData(Fields, (Definition != null) ? &Definition->Fields : null);
 
 	foreach (child, Childs)
 	{

@@ -98,6 +98,7 @@ namespace Scene
 		public: // node data methods
 
 		static uint CreateFieldsData(QVector<void*>& fields, const QVector<Definitions::NodeFieldInfo>& fieldInfos);
+		static void DestroyFieldsData(QVector<void*>& fields, const QVector<Definitions::NodeFieldInfo>* fieldInfos);
 		static uint GetFieldSize(const void* field, const Definitions::NodeFieldInfo* fieldInfo, bool withHeader);
 		static uint GetFieldsSize(const QVector<void*>& fields, const QVector<Definitions::NodeFieldInfo>& fieldInfos);
 
@@ -112,7 +113,6 @@ namespace Scene
 		static void ApplyNodeSizeOffset(NodePath& path, int offset);
 
 		// operations:
-		// remove node
 		// cut, copy, paste, duplicate node
 		// create node from new
 	};
