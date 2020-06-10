@@ -86,11 +86,11 @@ namespace GUI
 
 		private: // QObject implementation
 
-		bool eventFilter(QObject* object, QEvent* event);
+		override bool eventFilter(QObject* object, QEvent* event);
 
 		private: // QMainWindow implementation
 
-		void closeEvent(QCloseEvent* event);
+		override void closeEvent(QCloseEvent* event);
 
 		private slots: // handlers
 
@@ -107,6 +107,10 @@ namespace GUI
 		bool ExitApp();
 
 		// Edit
+		void CutNode();
+		void CopyNode();
+		void PasteNode();
+		void DuplicateNode();
 		void DeleteNode();
 		void ExportNode();
 		void ImportNode();
@@ -127,11 +131,15 @@ namespace GUI
 		int             GetCurrentTabIdx()   const;
 		Document*       GetCurrentDocument() const;
 
+		void AddNode(QIODevice& reader);
+
 		void SaveDocument(Document* document, bool replace);
 
 		static QString GetFileName(Document* document, bool useDirtyState = true);
 
 		QString ShowFileDialog(bool isSave, bool isDirectory, const QString& title, const QString& settingsPath, const Definitions::DialogFiles& files = Definitions::DialogFiles(), const QString& file = QString());
+
+		void ResetClipboard();
 	};
 }}}
 

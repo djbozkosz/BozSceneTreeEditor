@@ -110,8 +110,8 @@ namespace GUI
 
 		private: // QWidget implementation
 
-		virtual void dragEnterEvent(QDragEnterEvent* event);
-		virtual void dropEvent(QDropEvent* event);
+		override void dragEnterEvent(QDragEnterEvent* event);
+		override void dropEvent(QDropEvent* event);
 	};
 
 

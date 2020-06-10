@@ -1,3 +1,4 @@
+#include <QBuffer>
 #include <QSettings>
 #include <QFile>
 #include <QEvent>
@@ -38,11 +39,10 @@ Window::Window(QSettings* settings, Scene::Definitions* definitions) :
 	m_Definitions(definitions),
 	m_Ui(new Ui::Window()),
 	m_Status(null),
-	m_Progress(null),
-	m_ClipboardTab(null),
-	m_ClipboardNode(null),
-	m_ClipboardIsCut(false)
+	m_Progress(null)
 {
+	ResetClipboard();
+
 	m_Ui->setupUi(this);
 
 	auto statusBar = m_Ui->StatusBar;
@@ -71,6 +71,10 @@ Window::Window(QSettings* settings, Scene::Definitions* definitions) :
 	connect(m_Ui->Menu_Close,      SIGNAL(triggered()), this, SLOT(CloseFile()));
 	connect(m_Ui->Menu_Exit,       SIGNAL(triggered()), this, SLOT(ExitApp()));
 
+	connect(m_Ui->Menu_Cut,        SIGNAL(triggered()), this, SLOT(CutNode()));
+	connect(m_Ui->Menu_Copy,       SIGNAL(triggered()), this, SLOT(CopyNode()));
+	connect(m_Ui->Menu_Paste,      SIGNAL(triggered()), this, SLOT(PasteNode()));
+	connect(m_Ui->Menu_Duplicate,  SIGNAL(triggered()), this, SLOT(DuplicateNode()));
 	connect(m_Ui->Menu_Delete,     SIGNAL(triggered()), this, SLOT(DeleteNode()));
 	connect(m_Ui->Menu_Export,     SIGNAL(triggered()), this, SLOT(ExportNode()));
 	connect(m_Ui->Menu_Import,     SIGNAL(triggered()), this, SLOT(ImportNode()));
@@ -89,6 +93,10 @@ Window::~Window()
 	disconnect(m_Ui->Menu_Close,      SIGNAL(triggered()), this, SLOT(CloseFile()));
 	disconnect(m_Ui->Menu_Exit,       SIGNAL(triggered()), this, SLOT(ExitApp()));
 
+	disconnect(m_Ui->Menu_Cut,        SIGNAL(triggered()), this, SLOT(CutNode()));
+	disconnect(m_Ui->Menu_Copy,       SIGNAL(triggered()), this, SLOT(CopyNode()));
+	disconnect(m_Ui->Menu_Paste,      SIGNAL(triggered()), this, SLOT(PasteNode()));
+	disconnect(m_Ui->Menu_Duplicate,  SIGNAL(triggered()), this, SLOT(DuplicateNode()));
 	disconnect(m_Ui->Menu_Delete,     SIGNAL(triggered()), this, SLOT(DeleteNode()));
 	disconnect(m_Ui->Menu_Export,     SIGNAL(triggered()), this, SLOT(ExportNode()));
 	disconnect(m_Ui->Menu_Import,     SIGNAL(triggered()), this, SLOT(ImportNode()));
@@ -270,11 +278,17 @@ bool Window::CloseFile()
 
 bool Window::CloseFile(int idx)
 {
-	auto document = GetTab(idx)->GetDocument();
+	auto tab      = GetTab(idx);
+	auto document = tab->GetDocument();
 	auto result   = SaveIfDialog(document);
 
 	if (result == false)
 		return false;
+
+	if (m_ClipboardTab == tab)
+	{
+		ResetClipboard();
+	}
 
 	RemoveDocumemt(document);
 	emit FileClosed(document);
@@ -295,10 +309,51 @@ bool Window::ExitApp()
 	return true;
 }
 
+void Window::CutNode()
+{
+	CopyNode();
+	m_ClipboardIsCut = true;
+}
+
+void Window::CopyNode()
+{
+	auto tab         = GetCurrentTab();
+	m_ClipboardTab   = tab;
+	m_ClipboardNode  = tab->GetSelectedSceneNode();
+	m_ClipboardIsCut = false;
+}
+
+void Window::PasteNode()
+{
+	if (m_ClipboardNode == null)
+		return;
+
+	QBuffer data;
+	data.open(QIODevice::ReadWrite);
+
+	SceneNodeSerializer::Serialize(data, *m_ClipboardNode);
+	data.seek(0);
+
+	AddNode(data);
+}
+
+void Window::DuplicateNode()
+{
+	CopyNode();
+	PasteNode();
+}
+
 void Window::DeleteNode()
 {
-	auto tab = GetCurrentTab();
-	tab->RemoveNode(tab->GetSelectedNode());
+	auto tab      = GetCurrentTab();
+	auto nodeItem = tab->GetSelectedNode();
+
+	if (m_ClipboardNode == nodeItem->Node)
+	{
+		ResetClipboard();
+	}
+
+	tab->RemoveNode(nodeItem);
 }
 
 void Window::ExportNode()
@@ -329,31 +384,7 @@ void Window::ImportNode()
 	if (result == false)
 		return;
 
-	auto tab        = GetCurrentTab();
-	auto sibling    = tab->GetSelectedNode();
-	auto parentItem = (sibling != null) ? as(sibling->parent(), NodeItem*) : null;
-
-	if (parentItem == null && sibling != null)
-	{
-		parentItem = sibling;
-	}
-
-	auto parentNode = default_(SceneNode*);
-	auto idx        = 0;
-
-	if (parentItem != null)
-	{
-		parentNode = parentItem->Node;
-		idx        = parentItem->indexOfChild(sibling) + 1;
-	}
-
-	auto node = SceneNodeSerializer::Deserialize(reader, parentNode, *m_Definitions);
-	result    = tab->AddNode(node, parentItem, idx);
-
-	if (result == false)
-	{
-		delete node;
-	}
+	AddNode(reader);
 }
 
 void Window::ShowAbout()
@@ -434,6 +465,35 @@ Djbozkosz::Application::Document* Window::GetCurrentDocument() const
 	return GetCurrentTab()->GetDocument();
 }
 
+void Window::AddNode(QIODevice& reader)
+{
+	auto tab        = GetCurrentTab();
+	auto sibling    = tab->GetSelectedNode();
+	auto parentItem = (sibling != null) ? as(sibling->parent(), NodeItem*) : null;
+
+	if (parentItem == null && sibling != null)
+	{
+		parentItem = sibling;
+	}
+
+	auto parentNode = default_(SceneNode*);
+	auto idx        = 0;
+
+	if (parentItem != null)
+	{
+		parentNode = parentItem->Node;
+		idx        = parentItem->indexOfChild(sibling) + 1;
+	}
+
+	auto node   = SceneNodeSerializer::Deserialize(reader, parentNode, *m_Definitions);
+	auto result = tab->AddNode(node, parentItem, idx);
+
+	if (result == false)
+	{
+		delete node;
+	}
+}
+
 void Window::SaveDocument(Document* document, bool replace)
 {
 	auto file = document->GetFile();
@@ -498,4 +558,11 @@ QString Window::ShowFileDialog(bool isSave, bool isDirectory, const QString& tit
 	}
 
 	return fileFromDialog;
+}
+
+void Window::ResetClipboard()
+{
+	m_ClipboardTab   = null;
+	m_ClipboardNode  = null;
+	m_ClipboardIsCut = false;
 }

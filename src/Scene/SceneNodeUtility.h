@@ -111,10 +111,6 @@ namespace Scene
 
 		static bool GetNodePath(NodePath& path, SceneNode* parent, const SceneNode* node);
 		static void ApplyNodeSizeOffset(NodePath& path, int offset);
-
-		// operations:
-		// cut, copy, paste, duplicate node
-		// create node from new
 	};
 }}}
 
