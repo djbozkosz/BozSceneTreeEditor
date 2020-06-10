@@ -310,12 +310,31 @@ void Window::ImportNode()
 	if (result == false)
 		return;
 
-	auto tab     = GetCurrentTab();
-	auto sibling = tab->GetSelectedNode();
-	auto parentItem = (sibling    != null) ? as(sibling->parent(), NodeItem*) : null;
-	auto parentNode = (parentItem != null) ? parentItem->Node                 : null;
-	auto node    = SceneNodeSerializer::Deserialize(reader, parentNode, *m_Definitions);
-	tab->AddNode(node);
+	auto tab        = GetCurrentTab();
+	auto sibling    = tab->GetSelectedNode();
+	auto parentItem = (sibling != null) ? as(sibling->parent(), NodeItem*) : null;
+
+	if (parentItem == null && sibling != null)
+	{
+		parentItem = sibling;
+	}
+
+	auto parentNode = default_(SceneNode*);
+	auto idx        = 0;
+
+	if (parentItem != null)
+	{
+		parentNode = parentItem->Node;
+		idx        = parentItem->indexOfChild(sibling) + 1;
+	}
+
+	auto node = SceneNodeSerializer::Deserialize(reader, parentNode, *m_Definitions);
+	result    = tab->AddNode(node, parentItem, idx);
+
+	if (result == false)
+	{
+		delete node;
+	}
 }
 
 void Window::ShowAbout()

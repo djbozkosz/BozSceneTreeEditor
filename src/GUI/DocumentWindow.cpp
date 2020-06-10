@@ -46,17 +46,13 @@ void TreeWidget::dragEnterEvent(QDragEnterEvent* event)
 
 void TreeWidget::dropEvent(QDropEvent* event)
 {
-	auto oldParent = as(m_DraggedNode->parent(), NodeItem*);
-	auto oldIdx    = (oldParent != null) ? oldParent->indexOfChild(m_DraggedNode) : indexOfTopLevelItem(m_DraggedNode);
+	auto oldParent = m_DraggedNode->parent();
+	auto oldIdx    = oldParent->indexOfChild(m_DraggedNode);
 
 	QTreeWidget::dropEvent(event);
 	auto newParent = as(m_DraggedNode->parent(), NodeItem*);
 
-	if (newParent == null && oldParent == null)
-	{
-		Debug::Error() << "Child nodes are not allowed to be in root!";
-	}
-	else if (newParent == null)
+	if (newParent == null)
 	{
 		auto newIdx = indexOfTopLevelItem(m_DraggedNode);
 		takeTopLevelItem(newIdx);
@@ -67,7 +63,7 @@ void TreeWidget::dropEvent(QDropEvent* event)
 	else
 	{
 		auto newIdx = newParent->indexOfChild(m_DraggedNode);
-		auto result = SceneNodeUtility::MoveNode(m_DraggedNode->Node, m_Document->GetRoot(), (oldParent != null) ? oldParent->Node : null, newParent->Node, oldIdx, newIdx);
+		auto result = SceneNodeUtility::MoveNode(m_DraggedNode->Node, m_Document->GetRoot(), as(oldParent, NodeItem*)->Node, newParent->Node, oldIdx, newIdx);
 
 		if (result == true)
 		{
@@ -76,15 +72,7 @@ void TreeWidget::dropEvent(QDropEvent* event)
 		else
 		{
 			newParent->removeChild(m_DraggedNode);
-
-			if (oldParent != null)
-			{
-				oldParent->insertChild(oldIdx, m_DraggedNode);
-			}
-			else
-			{
-				addTopLevelItem(m_DraggedNode);
-			}
+			oldParent->insertChild(oldIdx, m_DraggedNode);
 
 			Debug::Error() << "Child nodes are not allowed in node" << newParent->text(0) << "!";
 		}
@@ -141,43 +129,41 @@ void DocumentWindow::SetupTree()
 	tree->blockSignals(false);
 	tree->expandItem(nodeItem);
 	tree->setFocus();
-
-	nodeItem->setSelected(true);
+	tree->setCurrentItem(nodeItem);
 
 	emit ProgressChanged(1.0f);
 }
 
-void DocumentWindow::AddNode(SceneNode* node)
+bool DocumentWindow::AddNode(SceneNode* node, NodeItem* parentItem, int idx)
 {
-	auto root       = m_Document->GetRoot();
-	auto sibling    = GetSelectedNode();
-	auto parentItem = (sibling != null) ? as(sibling->parent(), NodeItem*) : null;
-	auto name       = SceneNodeUtility::GetNodeName(node, m_Definitions);
-	auto nodeItem   = default_(NodeItem*);
+	auto tree     = m_Ui->Tree;
+	auto root     = m_Document->GetRoot();
+	auto name     = SceneNodeUtility::GetNodeName(node, m_Definitions);
+	auto nodeItem = default_(NodeItem*);
 
-	if (parentItem == null)
+	if (root == null)
 	{
-		// fake multiple roots to be able to create new childs under root
-		if (root == null)
-		{
-			m_Document->SetRoot(node);
-		}
+		Debug::Assert(m_Document->GetRoot() == null) << "There is currently set another node!";
+		m_Document->SetRoot(node);
 
-		auto tree = m_Ui->Tree;
 		nodeItem = new NodeItem(tree, node, name);
 		tree->addTopLevelItem(nodeItem);
 	}
 	else
 	{
+		auto parentNode       = parentItem->Node;
+		auto parentDefinition = parentNode->Definition;
+
+		if (parentDefinition == null || parentDefinition->HasChilds == false)
+		{
+			Debug::Error() << "Child nodes are not allowed in node" << parentItem->text(0) << "!";
+			return false;
+		}
+
+		parentNode->Childs.insert(idx, node);
+
 		SceneNodeUtility::NodePath path;
-		SceneNodeUtility::GetNodePath(path, root, sibling->Node);
-		path.pop_front();
-
-		auto parentNode = path.back();
-		auto siblingIdx = parentItem->indexOfChild(sibling);
-		auto targetIdx  = siblingIdx + 1;
-
-		parentNode->Childs.insert(targetIdx, node);
+		SceneNodeUtility::GetNodePath(path, root, parentNode);
 		SceneNodeUtility::ApplyNodeSizeOffset(path, node->Size);
 
 		nodeItem = new NodeItem(parentItem, node, name);
@@ -195,19 +181,15 @@ void DocumentWindow::AddNode(SceneNode* node)
 			parentItem->removeChild(child);
 		}
 
-		childs.insert(targetIdx, nodeItem);
+		childs.insert(idx, nodeItem);
 		parentItem->addChildren(childs.toList());
 	}
 
-	if (sibling != null)
-	{
-		sibling->setSelected(false);
-	}
-
-	nodeItem->setSelected(true);
-	UpdateMenuAndTable(nodeItem, sibling);
+	tree->setCurrentItem(nodeItem);
+	UpdateMenuAndTable(nodeItem, null);
 
 	m_Document->SetDirty();
+	return true;
 }
 
 void DocumentWindow::RemoveNode(NodeItem* nodeItem)
@@ -217,15 +199,8 @@ void DocumentWindow::RemoveNode(NodeItem* nodeItem)
 
 	if (parentItem == null)
 	{
-		auto tree = m_Ui->Tree;
-		auto idx  = tree->indexOfTopLevelItem(nodeItem);
-
-		if (idx == 0)
-		{
-			m_Document->SetRoot(null);
-		}
-
-		tree->takeTopLevelItem(idx);
+		m_Document->SetRoot(null);
+		m_Ui->Tree->takeTopLevelItem(0);
 	}
 	else
 	{

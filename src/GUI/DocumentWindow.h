@@ -135,7 +135,7 @@ namespace GUI
 
 		void SetupTree();
 
-		void AddNode(SceneNode* node);
+		bool AddNode(SceneNode* node, NodeItem* parentItem, int idx);
 		void RemoveNode(NodeItem* nodeItem);
 
 		inline Document* GetDocument()          const { return m_Document; }
