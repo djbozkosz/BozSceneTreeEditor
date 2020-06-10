@@ -25,6 +25,7 @@ using namespace Djbozkosz::Application::GUI;
 
 const QString Window::OPEN_FILE_DIALOG_PATH   = "OpenFileDialogPath";
 const QString Window::SAVE_FILE_DIALOG_PATH   = "SaveFileDialogPath";
+const QString Window::RECENT_FILE_PATH        = "RecentFilePath";
 
 const QString Window::IMPORT_FILE_DIALOG_PATH = "ImportFileDialogPath";
 const QString Window::EXPORT_FILE_DIALOG_PATH = "ExportFileDialogPath";
@@ -37,7 +38,10 @@ Window::Window(QSettings* settings, Scene::Definitions* definitions) :
 	m_Definitions(definitions),
 	m_Ui(new Ui::Window()),
 	m_Status(null),
-	m_Progress(null)
+	m_Progress(null),
+	m_ClipboardTab(null),
+	m_ClipboardNode(null),
+	m_ClipboardIsCut(false)
 {
 	m_Ui->setupUi(this);
 
@@ -58,36 +62,38 @@ Window::Window(QSettings* settings, Scene::Definitions* definitions) :
 	connect(tabs, SIGNAL(currentChanged(int)),    this, SLOT(UpdateEditMenu(int)));
 	connect(tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseFile(int)));
 
-	connect(m_Ui->Menu_New,    SIGNAL(triggered()), this, SLOT(NewFile()));
-	connect(m_Ui->Menu_Open,   SIGNAL(triggered()), this, SLOT(OpenFile()));
-	connect(m_Ui->Menu_Reload, SIGNAL(triggered()), this, SLOT(ReloadFile()));
-	connect(m_Ui->Menu_Save,   SIGNAL(triggered()), this, SLOT(SaveFile()));
-	connect(m_Ui->Menu_SaveAs, SIGNAL(triggered()), this, SLOT(SaveAsFile()));
-	connect(m_Ui->Menu_Close,  SIGNAL(triggered()), this, SLOT(CloseFile()));
-	connect(m_Ui->Menu_Exit,   SIGNAL(triggered()), this, SLOT(ExitApp()));
+	connect(m_Ui->Menu_New,        SIGNAL(triggered()), this, SLOT(NewFile()));
+	connect(m_Ui->Menu_Open,       SIGNAL(triggered()), this, SLOT(OpenFile()));
+	connect(m_Ui->Menu_OpenRecent, SIGNAL(triggered()), this, SLOT(OpenRecentFile()));
+	connect(m_Ui->Menu_Reload,     SIGNAL(triggered()), this, SLOT(ReloadFile()));
+	connect(m_Ui->Menu_Save,       SIGNAL(triggered()), this, SLOT(SaveFile()));
+	connect(m_Ui->Menu_SaveAs,     SIGNAL(triggered()), this, SLOT(SaveAsFile()));
+	connect(m_Ui->Menu_Close,      SIGNAL(triggered()), this, SLOT(CloseFile()));
+	connect(m_Ui->Menu_Exit,       SIGNAL(triggered()), this, SLOT(ExitApp()));
 
-	connect(m_Ui->Menu_Delete, SIGNAL(triggered()), this, SLOT(DeleteNode()));
-	connect(m_Ui->Menu_Export, SIGNAL(triggered()), this, SLOT(ExportNode()));
-	connect(m_Ui->Menu_Import, SIGNAL(triggered()), this, SLOT(ImportNode()));
+	connect(m_Ui->Menu_Delete,     SIGNAL(triggered()), this, SLOT(DeleteNode()));
+	connect(m_Ui->Menu_Export,     SIGNAL(triggered()), this, SLOT(ExportNode()));
+	connect(m_Ui->Menu_Import,     SIGNAL(triggered()), this, SLOT(ImportNode()));
 
-	connect(m_Ui->Menu_About,  SIGNAL(triggered()), this, SLOT(ShowAbout()));
+	connect(m_Ui->Menu_About,      SIGNAL(triggered()), this, SLOT(ShowAbout()));
 }
 
 Window::~Window()
 {
-	disconnect(m_Ui->Menu_New,    SIGNAL(triggered()), this, SLOT(NewFile()));
-	disconnect(m_Ui->Menu_Open,   SIGNAL(triggered()), this, SLOT(OpenFile()));
-	disconnect(m_Ui->Menu_Reload, SIGNAL(triggered()), this, SLOT(ReloadFile()));
-	disconnect(m_Ui->Menu_Save,   SIGNAL(triggered()), this, SLOT(SaveFile()));
-	disconnect(m_Ui->Menu_SaveAs, SIGNAL(triggered()), this, SLOT(SaveAsFile()));
-	disconnect(m_Ui->Menu_Close,  SIGNAL(triggered()), this, SLOT(CloseFile()));
-	disconnect(m_Ui->Menu_Exit,   SIGNAL(triggered()), this, SLOT(ExitApp()));
+	disconnect(m_Ui->Menu_New,        SIGNAL(triggered()), this, SLOT(NewFile()));
+	disconnect(m_Ui->Menu_Open,       SIGNAL(triggered()), this, SLOT(OpenFile()));
+	disconnect(m_Ui->Menu_OpenRecent, SIGNAL(triggered()), this, SLOT(OpenRecentFile()));
+	disconnect(m_Ui->Menu_Reload,     SIGNAL(triggered()), this, SLOT(ReloadFile()));
+	disconnect(m_Ui->Menu_Save,       SIGNAL(triggered()), this, SLOT(SaveFile()));
+	disconnect(m_Ui->Menu_SaveAs,     SIGNAL(triggered()), this, SLOT(SaveAsFile()));
+	disconnect(m_Ui->Menu_Close,      SIGNAL(triggered()), this, SLOT(CloseFile()));
+	disconnect(m_Ui->Menu_Exit,       SIGNAL(triggered()), this, SLOT(ExitApp()));
 
-	disconnect(m_Ui->Menu_Delete, SIGNAL(triggered()), this, SLOT(DeleteNode()));
-	disconnect(m_Ui->Menu_Export, SIGNAL(triggered()), this, SLOT(ExportNode()));
-	disconnect(m_Ui->Menu_Import, SIGNAL(triggered()), this, SLOT(ImportNode()));
+	disconnect(m_Ui->Menu_Delete,     SIGNAL(triggered()), this, SLOT(DeleteNode()));
+	disconnect(m_Ui->Menu_Export,     SIGNAL(triggered()), this, SLOT(ExportNode()));
+	disconnect(m_Ui->Menu_Import,     SIGNAL(triggered()), this, SLOT(ImportNode()));
 
-	disconnect(m_Ui->Menu_About,  SIGNAL(triggered()), this, SLOT(ShowAbout()));
+	disconnect(m_Ui->Menu_About,      SIGNAL(triggered()), this, SLOT(ShowAbout()));
 
 	auto tabs = m_Ui->Tabs;
 	tabs->removeEventFilter(this);
@@ -115,6 +121,7 @@ void Window::AddDocument(Document* document)
 	tabs->addTab(tab, GetFileName(document));
 	tabs->setCurrentIndex(tabs->count() - 1);
 
+	m_Ui->Menu_Reload->setEnabled(true);
 	m_Ui->Menu_Save->setEnabled(true);
 	m_Ui->Menu_SaveAs->setEnabled(true);
 	m_Ui->Menu_Close->setEnabled(true);
@@ -151,6 +158,7 @@ void Window::RemoveDocumemt(Djbozkosz::Application::Document* document)
 
 	if (tabs->count() == 0)
 	{
+		m_Ui->Menu_Reload->setEnabled(false);
 		m_Ui->Menu_Save->setEnabled(false);
 		m_Ui->Menu_SaveAs->setEnabled(false);
 		m_Ui->Menu_Close->setEnabled(false);
@@ -194,6 +202,17 @@ void Window::NewFile()
 void Window::OpenFile()
 {
 	auto file = ShowFileDialog(false, false, "Open file", OPEN_FILE_DIALOG_PATH, m_Definitions->GetDialogFiles());
+	if (file.isEmpty() == true)
+		return;
+
+	emit FileOpened(file);
+
+	m_Settings->setValue(RECENT_FILE_PATH, file);
+}
+
+void Window::OpenRecentFile()
+{
+	auto file = m_Settings->value(RECENT_FILE_PATH).toString();
 	if (file.isEmpty() == true)
 		return;
 
@@ -430,6 +449,8 @@ void Window::SaveDocument(Document* document, bool replace)
 	m_Status->setText("Saving...");
 	emit FileSaved(document, file);
 	m_Status->setText("Saved.");
+
+	m_Settings->setValue(RECENT_FILE_PATH, file);
 }
 
 QString Window::GetFileName(Document* document, bool useDirtyState)

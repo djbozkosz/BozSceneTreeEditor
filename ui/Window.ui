@@ -64,6 +64,7 @@
     <addaction name="Menu_New"/>
     <addaction name="separator"/>
     <addaction name="Menu_Open"/>
+    <addaction name="Menu_OpenRecent"/>
     <addaction name="Menu_Reload"/>
     <addaction name="separator"/>
     <addaction name="Menu_Save"/>
@@ -242,11 +243,14 @@
    </property>
   </action>
   <action name="Menu_Reload">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Reload</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Shift+O</string>
+    <string>Ctrl+R</string>
    </property>
   </action>
   <action name="Menu_Duplicate">
@@ -258,6 +262,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="Menu_OpenRecent">
+   <property name="text">
+    <string>O&amp;pen Recent</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+O</string>
    </property>
   </action>
  </widget>

@@ -48,6 +48,7 @@ namespace GUI
 
 		static const QString OPEN_FILE_DIALOG_PATH;
 		static const QString SAVE_FILE_DIALOG_PATH;
+		static const QString RECENT_FILE_PATH;
 
 		static const QString IMPORT_FILE_DIALOG_PATH;
 		static const QString EXPORT_FILE_DIALOG_PATH;
@@ -62,6 +63,10 @@ namespace GUI
 		Ui::Window*         m_Ui;
 		QLabel*             m_Status;
 		QProgressBar*       m_Progress;
+
+		DocumentWindow*     m_ClipboardTab;
+		SceneNode*          m_ClipboardNode;
+		bool                m_ClipboardIsCut;
 
 		public: // methods
 
@@ -92,6 +97,7 @@ namespace GUI
 		// File
 		void NewFile();
 		void OpenFile();
+		void OpenRecentFile();
 		void ReloadFile();
 		void SaveFile();
 		void SaveAsFile();
