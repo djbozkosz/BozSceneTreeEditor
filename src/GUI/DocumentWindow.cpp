@@ -194,13 +194,14 @@ bool DocumentWindow::AddNode(SceneNode* node, NodeItem* parentItem, int idx)
 
 void DocumentWindow::RemoveNode(NodeItem* nodeItem)
 {
+	auto tree       = m_Ui->Tree;
 	auto parentItem = nodeItem->parent();
 	auto node       = nodeItem->Node;
 
 	if (parentItem == null)
 	{
 		m_Document->SetRoot(null);
-		m_Ui->Tree->takeTopLevelItem(0);
+		tree->takeTopLevelItem(0);
 	}
 	else
 	{
@@ -219,7 +220,7 @@ void DocumentWindow::RemoveNode(NodeItem* nodeItem)
 	delete nodeItem;
 	delete node;
 
-	UpdateMenuAndTable(null, null);
+	UpdateMenuAndTable(tree->currentItem(), null);
 	m_Document->SetDirty();
 }
 
