@@ -153,8 +153,9 @@ namespace Scene
 		explicit Definitions();
 		virtual ~Definitions();
 
-		inline const DialogFiles& GetDialogFiles()       const { return m_DialogFiles;       }
-		inline const DialogFiles& GetDialogExportFiles() const { return m_DialogExportFiles; }
+		inline const QMap<uint, NodeDefinition>& GetNodes()             const { return m_Nodes;             }
+		inline const DialogFiles&                GetDialogFiles()       const { return m_DialogFiles;       }
+		inline const DialogFiles&                GetDialogExportFiles() const { return m_DialogExportFiles; }
 
 		const NodeDefinition*      GetNode(ushort parentType, ushort type) const;
 		const NodeFieldDefinition* GetNodeField(ushort type) const;

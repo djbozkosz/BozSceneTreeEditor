@@ -1,4 +1,6 @@
 #include <QBuffer>
+#include <QList>
+#include <QVariant>
 #include <QSettings>
 #include <QFile>
 #include <QEvent>
@@ -7,7 +9,6 @@
 #include <QProgressBar>
 #include <QMainWindow>
 #include <QMenu>
-#include <QAction>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -80,6 +81,24 @@ Window::Window(QSettings* settings, Scene::Definitions* definitions) :
 	connect(m_Ui->Menu_Import,     SIGNAL(triggered()), this, SLOT(ImportNode()));
 
 	connect(m_Ui->Menu_About,      SIGNAL(triggered()), this, SLOT(ShowAbout()));
+
+	auto  menuCreate      = m_Ui->Menu_Create;
+	auto  actionsCreate   = QList<QAction*>();
+	auto& nodeDefinitions = m_Definitions->GetNodes();
+
+	foreach (definition, nodeDefinitions)
+	{
+		if ((definition->Fields.isEmpty() == false && definition->Fields[0].FieldType->Type == Definitions::ENodeFieldType::Unknown) ||
+			(definition->Name == "Unknown"))
+			continue;
+
+		auto action = new CreateAction(&(*definition), menuCreate);
+		connect(action, SIGNAL(triggered()), this, SLOT(CreateNode()));
+
+		actionsCreate.push_back(action);
+	}
+
+	menuCreate->addActions(actionsCreate);
 }
 
 Window::~Window()
@@ -102,6 +121,12 @@ Window::~Window()
 	disconnect(m_Ui->Menu_Import,     SIGNAL(triggered()), this, SLOT(ImportNode()));
 
 	disconnect(m_Ui->Menu_About,      SIGNAL(triggered()), this, SLOT(ShowAbout()));
+
+	auto actionsCreate = m_Ui->Menu_Create->actions();
+	foreach (action, actionsCreate)
+	{
+		disconnect(*action, SIGNAL(triggered()), this, SLOT(CreateNode()));
+	}
 
 	auto tabs = m_Ui->Tabs;
 	tabs->removeEventFilter(this);
@@ -343,6 +368,25 @@ void Window::DuplicateNode()
 	PasteNode();
 }
 
+void Window::CreateNode()
+{
+	auto action      = as(sender(), CreateAction*);
+	auto definition  = action->Definition;
+
+	auto node        = new SceneNode();
+	node->Type       = definition->Type;
+	node->Definition = definition;
+
+	auto fieldsSize  = SceneNodeUtility::CreateFieldsData(node->Fields, definition->Fields);
+	node->Size       = sizeof(node->Type) + sizeof(node->Size) + fieldsSize;
+
+	auto result      = AddNode(node);
+	if (result == false)
+	{
+		delete node;
+	}
+}
+
 void Window::DeleteNode()
 {
 	auto tab      = GetCurrentTab();
@@ -412,6 +456,7 @@ void Window::UpdateEditMenu(NodeItem* nodeItem)
 
 	if (m_Ui->Tabs->count() > 0)
 	{
+		m_Ui->Menu_Create->setEnabled(true);
 		m_Ui->Menu_Import->setEnabled(true);
 	}
 }
@@ -465,33 +510,50 @@ Djbozkosz::Application::Document* Window::GetCurrentDocument() const
 	return GetCurrentTab()->GetDocument();
 }
 
-void Window::AddNode(QIODevice& reader)
+void Window::GetAddNodeContext(NodeItem*& parentItem, SceneNode*& parentNode, int& idx)
 {
-	auto tab        = GetCurrentTab();
-	auto sibling    = tab->GetSelectedNode();
-	auto parentItem = (sibling != null) ? as(sibling->parent(), NodeItem*) : null;
+	auto sibling = GetCurrentTab()->GetSelectedNode();
+	parentItem   = (sibling != null) ? as(sibling->parent(), NodeItem*) : null;
 
 	if (parentItem == null && sibling != null)
 	{
 		parentItem = sibling;
 	}
 
-	auto parentNode = default_(SceneNode*);
-	auto idx        = 0;
+	parentNode = null;
+	idx        = 0;
 
-	if (parentItem != null)
-	{
-		parentNode = parentItem->Node;
-		idx        = parentItem->indexOfChild(sibling) + 1;
-	}
+	if (parentItem == null)
+		return;
+
+	parentNode = parentItem->Node;
+	idx        = parentItem->indexOfChild(sibling) + 1;
+}
+
+void Window::AddNode(QIODevice& reader)
+{
+	NodeItem*  parentItem;
+	SceneNode* parentNode;
+	int        idx;
+	GetAddNodeContext(parentItem, parentNode, idx);
 
 	auto node   = SceneNodeSerializer::Deserialize(reader, parentNode, *m_Definitions);
-	auto result = tab->AddNode(node, parentItem, idx);
+	auto result = GetCurrentTab()->AddNode(node, parentItem, idx);
 
 	if (result == false)
 	{
 		delete node;
 	}
+}
+
+bool Window::AddNode(SceneNode* node)
+{
+	NodeItem*  parentItem;
+	SceneNode* parentNode;
+	int        idx;
+	GetAddNodeContext(parentItem, parentNode, idx);
+
+	return GetCurrentTab()->AddNode(node, parentItem, idx);
 }
 
 void Window::SaveDocument(Document* document, bool replace)

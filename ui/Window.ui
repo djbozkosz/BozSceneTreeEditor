@@ -84,6 +84,14 @@
     <property name="title">
      <string>&amp;Edit</string>
     </property>
+    <widget class="QMenu" name="Menu_Create">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>&amp;Create</string>
+     </property>
+    </widget>
     <addaction name="Menu_Cut"/>
     <addaction name="Menu_Copy"/>
     <addaction name="Menu_Paste"/>
@@ -163,17 +171,6 @@
    </property>
    <property name="shortcut">
     <string>F1</string>
-   </property>
-  </action>
-  <action name="Menu_Create">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>&amp;Create</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+N</string>
    </property>
   </action>
   <action name="Menu_Import">
@@ -270,6 +267,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+O</string>
+   </property>
+  </action>
+  <action name="actionAaa">
+   <property name="text">
+    <string>aaa</string>
    </property>
   </action>
  </widget>

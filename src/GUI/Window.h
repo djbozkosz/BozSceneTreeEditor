@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QString>
+#include <QAction>
 
 #include "Scene/Definitions.h"
 
@@ -36,6 +37,27 @@ namespace GUI
 
 
 	using namespace Djbozkosz::Application::Scene;
+
+
+	sealed class CreateAction : public QAction
+	{
+		private:
+
+		Q_OBJECT
+
+		public: // members
+
+		const Definitions::NodeDefinition* Definition;
+
+		public: // methods
+
+		explicit inline CreateAction(const Definitions::NodeDefinition* definition, QObject* parent = null) :
+			QAction(parent),
+			Definition(definition)
+		{
+			setText(definition->Name);
+		}
+	};
 
 
 	sealed class Window : public QMainWindow
@@ -111,6 +133,7 @@ namespace GUI
 		void CopyNode();
 		void PasteNode();
 		void DuplicateNode();
+		void CreateNode();
 		void DeleteNode();
 		void ExportNode();
 		void ImportNode();
@@ -131,7 +154,9 @@ namespace GUI
 		int             GetCurrentTabIdx()   const;
 		Document*       GetCurrentDocument() const;
 
+		void GetAddNodeContext(NodeItem*& parentItem, SceneNode*& parentNode, int& idx);
 		void AddNode(QIODevice& reader);
+		bool AddNode(SceneNode* node);
 
 		void SaveDocument(Document* document, bool replace);
 
