@@ -183,6 +183,9 @@ bool DocumentWindow::AddNode(SceneNode* node, NodeItem* parentItem, int idx)
 
 		childs.insert(idx, nodeItem);
 		parentItem->addChildren(childs.toList());
+
+		auto progress = 1.0f;
+		CreateTree(nodeItem, node, progress);
 	}
 
 	tree->setCurrentItem(nodeItem);
@@ -212,7 +215,7 @@ void DocumentWindow::RemoveNode(NodeItem* nodeItem)
 		SceneNodeUtility::GetNodePath(path, m_Document->GetRoot(), node);
 		path.pop_front();
 
-		auto parentNode = path.back();
+		auto parentNode = path.front();
 		parentNode->Childs.removeAt(idx);
 		SceneNodeUtility::ApplyNodeSizeOffset(path, -node->Size);
 	}
