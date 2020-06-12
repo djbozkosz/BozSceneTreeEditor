@@ -198,6 +198,9 @@
        </item>
        <item>
         <widget class="QFrame" name="TextFrameControls">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <layout class="QHBoxLayout" name="TextFrameControlsHorizontalLayout">
           <property name="spacing">
            <number>0</number>

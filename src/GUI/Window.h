@@ -142,7 +142,7 @@ namespace GUI
 		void ShowAbout();
 
 		void UpdateEditMenu(int tabIdx);
-		void UpdateEditMenu(NodeItem* nodeItem);
+		void UpdateEditMenu(NodeItem* nodeItem, bool isFullyDisabled = false);
 		void ShowEditMenu(QPoint point);
 		void UpdateProgress(float value);
 		void UpdateDirtyState(bool isDirty);

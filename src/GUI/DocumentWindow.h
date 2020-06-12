@@ -145,7 +145,7 @@ namespace GUI
 		signals: // interface
 
 		void ProgressChanged(float value);
-		void EditMenuUpdateRequested(NodeItem* nodeItem);
+		void EditMenuUpdateRequested(NodeItem* nodeItem, bool isFullyDisabled = false);
 		void EditMenuShowRequested(QPoint point);
 
 		private: // methods
@@ -157,11 +157,16 @@ namespace GUI
 		void SetupTableField(NodeItem* nodeItem, const SceneNodeUtility::FieldContext& fieldCtx, int& row);
 
 		void UpdateProgress(SceneNode* node, float& progress);
+		void SwitchEditMode(bool textChanged);
 
 		private slots: // handlers
 
 		void UpdateMenuAndTable(QTreeWidgetItem* current, QTreeWidgetItem* previous);
 		void UpdateField(QTableWidgetItem* item);
+		void UpdateTextEdit(int currentRow, int currentColumn, int previousRow, int previousColumn);
+		void EnableTextControls();
+		void ApplyTextChanges();
+		void RevertTextChanges();
 		void ShowEditMenu(QPoint point);
 	};
 }}}

@@ -96,7 +96,13 @@ DocumentWindow::DocumentWindow(Document* document, Definitions* definitions, QWi
 	connect(tree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(UpdateMenuAndTable(QTreeWidgetItem*,QTreeWidgetItem*)));
 	connect(tree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(ShowEditMenu(QPoint)));
 
-	connect(m_Ui->Table, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(UpdateField(QTableWidgetItem*)));
+	auto table = m_Ui->Table;
+	connect(table, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(UpdateField(QTableWidgetItem*)));
+	connect(table, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(UpdateTextEdit(int, int, int, int)));
+
+	connect(m_Ui->TextEdit, SIGNAL(textChanged()), this, SLOT(EnableTextControls()));
+	connect(m_Ui->Apply, SIGNAL(clicked()), this, SLOT(ApplyTextChanges()));
+	connect(m_Ui->Revert, SIGNAL(clicked()), this, SLOT(RevertTextChanges()));
 }
 
 DocumentWindow::~DocumentWindow()
@@ -105,7 +111,13 @@ DocumentWindow::~DocumentWindow()
 	disconnect(tree, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(UpdateMenuAndTable(QTreeWidgetItem*,QTreeWidgetItem*)));
 	disconnect(tree, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(ShowEditMenu(QPoint)));
 
-	disconnect(m_Ui->Table, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(UpdateField(QTableWidgetItem*)));
+	auto table = m_Ui->Table;
+	disconnect(table, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(UpdateField(QTableWidgetItem*)));
+	disconnect(table, SIGNAL(currentCellChanged(int, int, int, int)), this, SLOT(UpdateTextEdit(int, int, int, int)));
+
+	disconnect(m_Ui->TextEdit, SIGNAL(textChanged()), this, SLOT(EnableTextControls()));
+	disconnect(m_Ui->Apply, SIGNAL(clicked()), this, SLOT(ApplyTextChanges()));
+	disconnect(m_Ui->Revert, SIGNAL(clicked()), this, SLOT(RevertTextChanges()));
 
 	delete m_Ui;
 }
@@ -298,6 +310,8 @@ void DocumentWindow::SetupTable(NodeItem* nodeItem)
 		table->setItem(row, 1, new ReadOnlyItem(fieldInfo.FieldType->Name));
 		SetupTableField(nodeItem, Scene::SceneNodeUtility::FieldContext(node, fieldIdx, &node->Fields, &fieldInfos), row);
 	}
+
+	m_Ui->TextEdit->setText(QString());
 }
 
 void DocumentWindow::SetupTableField(NodeItem* nodeItem, const Scene::SceneNodeUtility::FieldContext &fieldCtx, int& row)
@@ -376,6 +390,17 @@ void DocumentWindow::UpdateProgress(SceneNode* node, float& progress)
 	emit ProgressChanged(progress);
 }
 
+void DocumentWindow::SwitchEditMode(bool textChanged)
+{
+	auto textUnchanged = (textChanged == false);
+
+	m_Ui->TextFrameControls->setEnabled(textChanged);
+	m_Ui->Table->            setEnabled(textUnchanged);
+	m_Ui->TreeFrame->        setEnabled(textUnchanged);
+
+	EditMenuUpdateRequested(textUnchanged ? as(m_Ui->Tree->currentItem(), NodeItem*) : null, textChanged);
+}
+
 void DocumentWindow::UpdateMenuAndTable(QTreeWidgetItem* current, QTreeWidgetItem* previous)
 {
 	unused(previous);
@@ -412,6 +437,45 @@ void DocumentWindow::UpdateField(QTableWidgetItem* item)
 	}
 
 	m_Document->SetDirty();
+}
+
+void DocumentWindow::UpdateTextEdit(int currentRow, int currentColumn, int previousRow, int previousColumn)
+{
+	unused(currentColumn);
+	unused(previousRow);
+	unused(previousColumn);
+
+	auto table = m_Ui->Table;
+	auto item  = as(table->item(currentRow, 2), FieldItem*);
+	auto text  = (item != null) ? item->text() : QString();
+
+	m_Ui->TextEdit->setText(text);
+}
+
+void DocumentWindow::EnableTextControls()
+{
+	if (m_Ui->TextEdit->hasFocus() == false)
+		return;
+
+	SwitchEditMode(true);
+}
+
+void DocumentWindow::ApplyTextChanges()
+{
+	auto table = m_Ui->Table;
+	auto item  = as(table->item(table->currentRow(), 2), FieldItem*);
+	item->setText(m_Ui->TextEdit->toPlainText());
+
+	SwitchEditMode(false);
+}
+
+void DocumentWindow::RevertTextChanges()
+{
+	auto table = m_Ui->Table;
+	auto item  = as(table->item(table->currentRow(), 2), FieldItem*);
+	m_Ui->TextEdit->setText(item->text());
+
+	SwitchEditMode(false);
 }
 
 void DocumentWindow::ShowEditMenu(QPoint point)

@@ -142,10 +142,10 @@ void Window::AddDocument(Document* document)
 
 	auto tab = new DocumentWindow(document, m_Definitions, m_Ui->Tabs);
 
-	connect(tab,      SIGNAL(ProgressChanged(float)),             this, SLOT(UpdateProgress(float)));
-	connect(tab,      SIGNAL(EditMenuUpdateRequested(NodeItem*)), this, SLOT(UpdateEditMenu(NodeItem*)));
-	connect(tab,      SIGNAL(EditMenuShowRequested(QPoint)),      this, SLOT(ShowEditMenu(QPoint)));
-	connect(document, SIGNAL(DirtyStateChanged(bool)),            this, SLOT(UpdateDirtyState(bool)));
+	connect(tab,      SIGNAL(ProgressChanged(float)),                   this, SLOT(UpdateProgress(float)));
+	connect(tab,      SIGNAL(EditMenuUpdateRequested(NodeItem*, bool)), this, SLOT(UpdateEditMenu(NodeItem*, bool)));
+	connect(tab,      SIGNAL(EditMenuShowRequested(QPoint)),            this, SLOT(ShowEditMenu(QPoint)));
+	connect(document, SIGNAL(DirtyStateChanged(bool)),                  this, SLOT(UpdateDirtyState(bool)));
 
 	tab->SetupTree();
 
@@ -180,10 +180,10 @@ void Window::RemoveDocumemt(Djbozkosz::Application::Document* document)
 
 	Debug::Assert(tab != null) << "Tab to remove not found!";
 
-	disconnect(tab,      SIGNAL(ProgressChanged(float)),             this, SLOT(UpdateProgress(float)));
-	disconnect(tab,      SIGNAL(EditMenuUpdateRequested(NodeItem*)), this, SLOT(UpdateEditMenu(NodeItem*)));
-	disconnect(tab,      SIGNAL(EditMenuShowRequested(QPoint)),      this, SLOT(ShowEditMenu(QPoint)));
-	disconnect(document, SIGNAL(DirtyStateChanged(bool)),            this, SLOT(UpdateDirtyState(bool)));
+	disconnect(tab,      SIGNAL(ProgressChanged(float)),                   this, SLOT(UpdateProgress(float)));
+	disconnect(tab,      SIGNAL(EditMenuUpdateRequested(NodeItem*, bool)), this, SLOT(UpdateEditMenu(NodeItem*, bool)));
+	disconnect(tab,      SIGNAL(EditMenuShowRequested(QPoint)),            this, SLOT(ShowEditMenu(QPoint)));
+	disconnect(document, SIGNAL(DirtyStateChanged(bool)),                  this, SLOT(UpdateDirtyState(bool)));
 
 	auto tabs = m_Ui->Tabs;
 	tabs->removeTab(tabIdx);
@@ -444,7 +444,7 @@ void Window::UpdateEditMenu(int tabIdx)
 	UpdateEditMenu(selectedNode);
 }
 
-void Window::UpdateEditMenu(NodeItem* nodeItem)
+void Window::UpdateEditMenu(NodeItem* nodeItem, bool isFullyDisabled)
 {
 	auto isNodeSelected = (nodeItem != null);
 	auto actions        = m_Ui->Menu_Edit->actions();
@@ -454,7 +454,7 @@ void Window::UpdateEditMenu(NodeItem* nodeItem)
 		(*action)->setEnabled(isNodeSelected);
 	}
 
-	if (m_Ui->Tabs->count() > 0)
+	if (m_Ui->Tabs->count() > 0 && isFullyDisabled == false)
 	{
 		m_Ui->Menu_Create->setEnabled(true);
 		m_Ui->Menu_Import->setEnabled(true);
