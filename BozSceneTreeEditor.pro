@@ -1,12 +1,15 @@
 # qt
 QT                 += core gui widgets
 TEMPLATE            = app
+VERSION             = 1.0.0
 
 TARGET              = BozSceneTreeEditor
 
 CONFIG(release, debug|release) {
 	DEFINES        += RELEASE_BUILD
 }
+
+DEFINES            += VERSION=\"\\\"$${VERSION}\\\"\"
 
 # compiler options
 QMAKE_CXXFLAGS     += -std=c++11

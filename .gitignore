@@ -3,6 +3,7 @@ build/object_script*
 build/*.cpp
 build/*.h
 build/*.o
+build/*.rc
 build/*/*.exe
 build/*/*.cpp
 build/*/*.h

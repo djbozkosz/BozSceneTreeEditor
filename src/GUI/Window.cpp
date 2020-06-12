@@ -45,6 +45,7 @@ Window::Window(QSettings* settings, Scene::Definitions* definitions) :
 	ResetClipboard();
 
 	m_Ui->setupUi(this);
+	setWindowTitle(QString("%1 %2").arg(windowTitle()).arg(VERSION));
 
 	auto statusBar = m_Ui->StatusBar;
 
