@@ -45,13 +45,13 @@ namespace GUI
 
 		public: // methods
 
-		explicit inline NodeItem(QTreeWidget* parent, SceneNode* node, QString& name) :
+		explicit inline NodeItem(QTreeWidget* parent, SceneNode* node, const QString& name) :
 			QTreeWidgetItem(parent, QStringList() << name),
 			Node(node)
 		{
 		}
 
-		explicit inline NodeItem(NodeItem* parent, SceneNode* node, QString& name) :
+		explicit inline NodeItem(NodeItem* parent, SceneNode* node, const QString& name) :
 			QTreeWidgetItem(parent, QStringList() << name),
 			Node(node)
 		{
@@ -128,6 +128,9 @@ namespace GUI
 		Document*           m_Document;
 		Definitions*        m_Definitions;
 
+		QAction*            m_FilterClearAction;
+		NodeItem*           m_FilterNodeItemBackup;
+
 		public: // methodssetup
 
 		explicit DocumentWindow(Document* document, Definitions* definitions, QWidget* parent = null);
@@ -158,6 +161,8 @@ namespace GUI
 
 		void UpdateProgress(SceneNode* node, float& progress);
 		void SwitchEditMode(bool textChanged);
+		void FindNodes(const QStringList& filter, NodeItem* nodeItem, QVector<NodeItem*>& nodeItems);
+		NodeItem* FindNode(const SceneNode* node, NodeItem* nodeItem);
 
 		private slots: // handlers
 
@@ -167,6 +172,7 @@ namespace GUI
 		void EnableTextControls();
 		void ApplyTextChanges();
 		void RevertTextChanges();
+		void FilterTree(QString text = QString());
 		void ShowEditMenu(QPoint point);
 	};
 }}}

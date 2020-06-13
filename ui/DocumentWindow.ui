@@ -106,7 +106,11 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QLineEdit" name="TreeSearch"/>
+           <widget class="QLineEdit" name="TreeSearch">
+            <property name="clearButtonEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

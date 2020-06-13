@@ -86,7 +86,9 @@ DocumentWindow::DocumentWindow(Document* document, Definitions* definitions, QWi
 	QWidget(parent),
 	m_Ui(new Ui::DocumentWindow()),
 	m_Document(document),
-	m_Definitions(definitions)
+	m_Definitions(definitions),
+	m_FilterClearAction(null),
+	m_FilterNodeItemBackup(null)
 {
 	m_Ui->setupUi(this);
 
@@ -103,6 +105,19 @@ DocumentWindow::DocumentWindow(Document* document, Definitions* definitions, QWi
 	connect(m_Ui->TextEdit, SIGNAL(textChanged()), this, SLOT(EnableTextControls()));
 	connect(m_Ui->Apply, SIGNAL(clicked()), this, SLOT(ApplyTextChanges()));
 	connect(m_Ui->Revert, SIGNAL(clicked()), this, SLOT(RevertTextChanges()));
+	connect(m_Ui->TreeSearch, SIGNAL(textEdited(QString)), this, SLOT(FilterTree(QString)));
+
+	const auto& treeSearchChilds = m_Ui->TreeSearch->children();
+	foreach (child, treeSearchChilds)
+	{
+		auto action = as(*child, QAction*);
+		if (action != null)
+		{
+			m_FilterClearAction = action;
+			connect(action, SIGNAL(triggered()), this, SLOT(FilterTree()));
+			break;
+		}
+	}
 }
 
 DocumentWindow::~DocumentWindow()
@@ -118,6 +133,8 @@ DocumentWindow::~DocumentWindow()
 	disconnect(m_Ui->TextEdit, SIGNAL(textChanged()), this, SLOT(EnableTextControls()));
 	disconnect(m_Ui->Apply, SIGNAL(clicked()), this, SLOT(ApplyTextChanges()));
 	disconnect(m_Ui->Revert, SIGNAL(clicked()), this, SLOT(RevertTextChanges()));
+	disconnect(m_Ui->TreeSearch, SIGNAL(textEdited(QString)), this, SLOT(FilterTree(QString)));
+	disconnect(m_FilterClearAction, SIGNAL(triggered()), this, SLOT(FilterTree()));
 
 	delete m_Ui;
 }
@@ -401,6 +418,41 @@ void DocumentWindow::SwitchEditMode(bool textChanged)
 	EditMenuUpdateRequested(textUnchanged ? as(m_Ui->Tree->currentItem(), NodeItem*) : null, textChanged);
 }
 
+void DocumentWindow::FindNodes(const QStringList& filter, NodeItem* nodeItem, QVector<NodeItem*>& nodeItems)
+{
+	const auto& name = nodeItem->text(0);
+	foreach (token, filter)
+	{
+		if (name.contains(*token) == true)
+		{
+			nodeItems.push_back(nodeItem);
+		}
+	}
+
+	for (int idx = 0, count = nodeItem->childCount(); idx < count; idx++)
+	{
+		auto child = as(nodeItem->child(idx), NodeItem*);
+		FindNodes(filter, child, nodeItems);
+	}
+}
+
+NodeItem* DocumentWindow::FindNode(const SceneNode* node, NodeItem* nodeItem)
+{
+	if (nodeItem->Node == node)
+		return nodeItem;
+
+	for (int idx = 0, count = nodeItem->childCount(); idx < count; idx++)
+	{
+		auto child     = as(nodeItem->child(idx), NodeItem*);
+		auto childNode = FindNode(node, child);
+
+		if (childNode != null)
+			return childNode;
+	}
+
+	return null;
+}
+
 void DocumentWindow::UpdateMenuAndTable(QTreeWidgetItem* current, QTreeWidgetItem* previous)
 {
 	unused(previous);
@@ -476,6 +528,56 @@ void DocumentWindow::RevertTextChanges()
 	m_Ui->TextEdit->setText(item->text());
 
 	SwitchEditMode(false);
+}
+
+void DocumentWindow::FilterTree(QString text)
+{
+	auto tree = m_Ui->Tree;
+
+	if (m_FilterNodeItemBackup == null)
+	{
+		m_FilterNodeItemBackup = as(tree->topLevelItem(0), NodeItem*);
+		tree->takeTopLevelItem(0);
+	}
+	else
+	{
+		auto selectedNode = as(tree->currentItem(), NodeItem*);
+
+		while (tree->topLevelItemCount() > 0)
+		{
+			delete tree->takeTopLevelItem(0);
+		}
+
+		if (text.isEmpty() == true)
+		{
+			tree->addTopLevelItem(m_FilterNodeItemBackup);
+
+			if (selectedNode != null)
+			{
+				auto filteredSelectedNode = FindNode(selectedNode->Node, m_FilterNodeItemBackup);
+				tree->setCurrentItem(filteredSelectedNode);
+				tree->expandItem(filteredSelectedNode);
+			}
+
+			m_FilterNodeItemBackup = null;
+			return;
+		}
+	}
+
+	QVector<NodeItem*> nodeItems;
+	auto filter = text.split(' ', QString::SkipEmptyParts);
+
+	FindNodes(filter, m_FilterNodeItemBackup, nodeItems);
+
+	foreach (item, nodeItems)
+	{
+		auto nodeItem     = *item;
+		auto filteredNode = new NodeItem(tree, nodeItem->Node, nodeItem->text(0));
+		auto progress     = 1.0f;
+
+		tree->addTopLevelItem(filteredNode);
+		CreateTree(filteredNode, filteredNode->Node, progress);
+	}
 }
 
 void DocumentWindow::ShowEditMenu(QPoint point)
