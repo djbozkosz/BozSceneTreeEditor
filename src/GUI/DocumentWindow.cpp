@@ -212,10 +212,10 @@ bool DocumentWindow::AddNode(SceneNode* node, NodeItem* parentItem, int idx)
 
 		childs.insert(idx, nodeItem);
 		parentItem->addChildren(childs.toList());
-
-		auto progress = 1.0f;
-		CreateTree(nodeItem, node, progress);
 	}
+
+	auto progress = 1.0f;
+	CreateTree(nodeItem, node, progress);
 
 	tree->setCurrentItem(nodeItem);
 	UpdateMenuAndTable(nodeItem, null);
@@ -423,7 +423,7 @@ void DocumentWindow::FindNodes(const QStringList& filter, NodeItem* nodeItem, QV
 	const auto& name = nodeItem->text(0);
 	foreach (token, filter)
 	{
-		if (name.contains(*token) == true)
+		if (name.toLower().contains(*token) == true)
 		{
 			nodeItems.push_back(nodeItem);
 		}
@@ -565,7 +565,7 @@ void DocumentWindow::FilterTree(QString text)
 	}
 
 	QVector<NodeItem*> nodeItems;
-	auto filter = text.split(' ', QString::SkipEmptyParts);
+	auto filter = text.toLower().split(' ', QString::SkipEmptyParts);
 
 	FindNodes(filter, m_FilterNodeItemBackup, nodeItems);
 

@@ -298,8 +298,10 @@ uint SceneNodeUtility::GetFieldSize(const void* field, const Definitions::NodeFi
 		}
 
 		case Definitions::ENodeFieldType::StringArray:
-		case Definitions::ENodeFieldType::StringArray2:
 			return size + *reinterpret_cast<const uint*>(field);
+
+		case Definitions::ENodeFieldType::StringArray2:
+			return size + sizeof(uint) + *reinterpret_cast<const uint*>(field);
 
 		case Definitions::ENodeFieldType::StringFixed:
 			return size + fieldInfo->Number;
@@ -322,7 +324,7 @@ uint SceneNodeUtility::GetFieldSize(const void* field, const Definitions::NodeFi
 	}
 }
 
-uint SceneNodeUtility::GetFieldsSize(const QVector<void *>& fields, const QVector<Definitions::NodeFieldInfo>& fieldInfos)
+uint SceneNodeUtility::GetFieldsSize(const QVector<void*>& fields, const QVector<Definitions::NodeFieldInfo>& fieldInfos)
 {
 	auto size = 0;
 
