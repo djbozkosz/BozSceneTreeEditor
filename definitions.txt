@@ -63,13 +63,13 @@ Node 0x4050 BoundingBox [Float3 : Minimum, Float3 : Maximum] <0, 1>
 
 Node 0x4060 Sound has_childs [] <>
 Node 0x4061 Type [Uint32 : Type] <0>
-Node 0x4062 Unknown [Float : Unknown] <>
-Node 0x4063 Unknown [Float : Unknown] <>
-Node 0x4064 Unknown [Float2 : Unknown] <>
-Node 0x4068 Radius [Float : InnerRadius, Float : OuterRadius, Float : Unknown, Float : Unknown] <0, 1>
-Node 0x4066 Empty [] <>
-Node 0x4067 Empty [] <>
-Node 0xb800 Unknown [Float : Unknown] <>
+Node 0x4062 Volume [Float : Volume] <0>
+Node 0x4063 Unknown [Float : Unknown] <0>
+Node 0x4064 Unknown [Float2 : Unknown] <0>
+Node 0x4068 Radius [Float : InnerRadius, Float : OuterRadius, Float : InnerFalloff, Float : OuterFalloff] <0, 1>
+Node 0x4066 Loop [] <>
+Node 0x4067 Unknown [] <>
+Node 0xb800 Pitch [Float : Pitch] <0>
 Node 0xb200 Sector [String : Name] <0>
 
 Struct MeshVertex [Float3 : Vertex]
@@ -123,7 +123,7 @@ Node 0xae03 FrameAnimation [Hex16 : Unknown, Float : Unknown, Float : Unknown, S
 
 Struct NonRainFrame [StringArray2 : Frame]
 
-Node 0xaef0 RainSetup [Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex32 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown, Hex32 : Unknown, Float : Unknown] <>
+Node 0xaef0 RainSetup [Uint32 : DoNotChange_0, Uint32 : Enabled, Uint32 : DoNotChange_1, Uint32 : Unknown, Uint32 : DoNotChange_2, Uint32 : Unknown, Uint32 : DoNotChange_3, Uint8 : Center_ColorB, Uint8 : Center_ColorG, Uint8 : Center_ColorR, Uint8 : Center_ColorA, Uint32 : DoNotChange_4, Uint8 : Edge_ColorB, Uint8 : Edge_ColorG, Uint8 : Edge_ColorR, Uint8 : Edge_ColorA, Uint32 : DoNotChange_5, Float : Speed, Uint32 : DoNotChange_6, Float : Length, Uint32 : DoNotChange_7, Float : Width, Uint32 : DoNotChange_8, Float : SpawnZoneRadius, Uint32 : DoNotChange_9, Float : SpawnZoneHeight, Uint32 : DoNotChange_10, Uint32 : Count, Uint32 : DoNotChange_11, Float : DirX, Uint32 : DoNotChange_12, Float : DirY, Uint32 : DoNotChange_13, Float : DirZ] <>
 Node 0xaef1 NonRainFrames [Uint32 : FrameCount, NonRainFrame'0 : Frames] <>
 
 Node 0xae50 InitScripts has_childs [] <>
@@ -139,5 +139,5 @@ Node 0x07d0 Frame [StringArray : Name, Float3 : Position, Float4 : Rotation, Flo
 
 Enum 0x4011 [0] [2 : Light, 3 : Point, 4 : Sound, 6 : BoundingBox, 9 : Model, 12 : Occluder, 14 : Geometry]
 Enum 0x4041 [0] [1 : Point, 2 : Spot, 3 : Directional, 4 : Ambient, 5 : Fog]
-Enum 0x4061 [0] [1 : Point]
+Enum 0x4061 [0] [1 : Point, 3 : Ambient]
 Enum 0xae22 [0] [1 : Hidden, 2 : Player, 4 : Car, 5 : Script, 6 : Door, 8 : Railway, 9 : VillaObject, 12 : Traffic, 18 : Pedestrians, 20 : Bridge, 21 : Dog, 22 : Airplane, 24 : Turnout, 25 : Pumper, 27 : Human, 28 : RaceCamera, 30 : Wagon, 34 : Clock, 35 : Physical, 36 : Truck]
