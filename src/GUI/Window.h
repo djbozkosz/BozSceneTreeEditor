@@ -75,6 +75,8 @@ namespace GUI
 		static const QString IMPORT_FILE_DIALOG_PATH;
 		static const QString EXPORT_FILE_DIALOG_PATH;
 
+		static const QString ABOUT_TEXT;
+
 		private: // members
 
 		int                 m_NewFileCounter;

@@ -32,6 +32,18 @@ const QString Window::RECENT_FILE_PATH        = "RecentFilePath";
 const QString Window::IMPORT_FILE_DIALOG_PATH = "ImportFileDialogPath";
 const QString Window::EXPORT_FILE_DIALOG_PATH = "ExportFileDialogPath";
 
+const QString Window::ABOUT_TEXT =
+		QString("After short development<br>created by: djbozkosz<br><br>"
+		"Version: %1<br>"
+		"Copyright (c): 2005 - 2020<br><br>"
+		"Found a bug or have some ideas how to improve this app?<br>Don't hesitate to contact me at <a href=\"mailto:t_ruzicka@email.cz\">t_ruzicka@email.cz</a>.<br><br>"
+		"Web: <a href=\"http://www.djbozkosz.wz.cz\">www.djbozkosz.wz.cz</a><br>"
+		"Facebook: <a href=\"https://www.facebook.com/tomas.ruzicka.73\">facebook.com/tomas.ruzicka.73</a><br>"
+		"Twitter: <a href=\"https://twitter.com/djbozkosz\">twitter.com/djbozkosz</a><br>"
+		"GitHub: <a href=\"https://www.github.com/djbozkosz\">github.com/djbozkosz</a><br>"
+		"LinkedIn: <a href=\"https://www.linkedin.com/in/tom%C3%A1%C5%A1-r%C5%AF%C5%BEi%C4%8Dka-716aa5124\">linkedin.com/in/tomáš-růžička-716aa5124</a><br><br>"
+		"Running Technology:<br>Qt %2").arg(VERSION).arg(QT_VERSION_STR);
+
 
 Window::Window(QSettings* settings, Scene::Definitions* definitions) :
 	QMainWindow(),
@@ -434,7 +446,7 @@ void Window::ImportNode()
 
 void Window::ShowAbout()
 {
-	QMessageBox::about(this, windowTitle(), "todo");
+	QMessageBox::about(this, windowTitle(), ABOUT_TEXT);
 }
 
 void Window::UpdateEditMenu(int tabIdx)
