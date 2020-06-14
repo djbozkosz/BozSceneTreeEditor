@@ -39,10 +39,10 @@ Definitions::Definitions() :
 	m_RNodeLine("^Node\\s+([a-fx0-9]+)_?([a-fx0-9]*)\\s+([a-zA-Z0-9_]+)\\s+([a-zA-Z0-9_]+)?\\s*\\[(.*)\\]\\s*\\<(.*)\\>$"),
 	m_RStructLine("^Struct\\s+([a-zA-Z0-9_]+)\\s+\\[(.*)\\]$"),
 	m_RNodeFieldList(",\\s*"),
-	m_RNodeField("^([a-zA-Z0-9_]+)\\'?([0-9]*)\\s*\\:\\s*([a-zA-Z0-9_]+)$"),
+	m_RNodeField("^([a-zA-Z0-9_]+)\\'?([a-zA-Z0-9_]*)\\s*\\:\\s*([a-zA-Z0-9_]+)$"),
 	m_RNodeFieldLine("^NodeFields\\s+([a-fx0-9]+)\\s+([a-fx0-9]+)\\s+\\[([0-9]+)\\]\\s+([0-9]+)\\s+\\[(.*)\\]$"),
 	m_RNodeNameField("^([a-fx0-9]*)\\s*\\:?\\s*([0-9]+)$"),
-	m_RNodeFieldEnumLine("^Enum\\s+([a-fx0-9]+)\\s+\\[([0-9]+)\\]\\s+\\[(.*)\\]$")
+	m_RNodeFieldEnumLine("^Enum\\s+([a-zA-Z0-9_]+)\\s+\\[(.*)\\]$")
 {
 	foreach (field, FIELD_TYPES)
 	{
@@ -99,17 +99,13 @@ const Definitions::NodeNames* Definitions::GetNodeNames(ushort type) const
 	return &name.value();
 }
 
-const Definitions::NodeFieldEnum* Definitions::GetNodeFieldEnum(ushort type, uint fieldIdx) const
+const Definitions::NodeFieldEnum* Definitions::GetNodeFieldEnum(const QString& name) const
 {
-	auto fields = m_NodeFieldEnums.find(type);
-	if (fields == m_NodeFieldEnums.end())
+	auto enumMap = m_NodeFieldEnums.find(name);
+	if (enumMap == m_NodeFieldEnums.end())
 		return null;
 
-	auto enumMap = fields->find(fieldIdx);
-	if (enumMap == fields->end())
-		return null;
-
-	return &enumMap.value();
+	return &(*enumMap);
 }
 
 void Definitions::Load(const QString &file)
@@ -232,7 +228,8 @@ void Definitions::LoadFields(QVector<NodeFieldInfo>& fieldInfos, const QString& 
 		QString type;
 		QString name;
 		uint    number;
-		LoadField(*field, type, name, number);
+		QString string;
+		LoadField(*field, type, name, number, string);
 
 		NodeFieldInfo fieldInfo;
 
@@ -249,12 +246,13 @@ void Definitions::LoadFields(QVector<NodeFieldInfo>& fieldInfos, const QString& 
 		fieldInfo.FieldType = fieldType.value();
 		fieldInfo.Name      = name;
 		fieldInfo.Number    = number;
+		fieldInfo.String    = string;
 
 		fieldInfos.push_back(fieldInfo);
 	}
 }
 
-void Definitions::LoadField(const QString& field, QString& type, QString& name, uint& number)
+void Definitions::LoadField(const QString& field, QString& type, QString& name, uint& number, QString& string)
 {
 	auto match = m_RNodeField.exactMatch(field);
 	Debug::Assert(match == true) << "Invalid field format:" << field;
@@ -264,6 +262,7 @@ void Definitions::LoadField(const QString& field, QString& type, QString& name, 
 	type          = captures[1];
 	name          = captures[3];
 	number        = captures[2].toUInt();
+	string        = captures[2];
 }
 
 void Definitions::LoadNodeName(ushort type, const QString& fields)
@@ -290,13 +289,12 @@ void Definitions::LoadNodeFieldEnum(const QString& line)
 {
 	auto match = m_RNodeFieldEnumLine.exactMatch(line);
 	Debug::Assert(match == true) << "Invalid node field enum:" << line;
-	Debug::Assert(m_RNodeFieldEnumLine.captureCount() == 3) << "Invalid parameters count for node field enum:" << line;
+	Debug::Assert(m_RNodeFieldEnumLine.captureCount() == 2) << "Invalid parameters count for node field enum:" << line;
 
 	auto captures = m_RNodeFieldEnumLine.capturedTexts();
 
-	auto type      = captures[1].toUShort(null, 0);
-	auto fieldIdx  = captures[2].toUShort(null, 0);
-	auto fieldList = captures[3].split(m_RNodeFieldList, QString::SkipEmptyParts);
+	auto enumName  = captures[1];
+	auto fieldList = captures[2].split(m_RNodeFieldList, QString::SkipEmptyParts);
 
 	NodeFieldEnum enumMap;
 
@@ -305,12 +303,12 @@ void Definitions::LoadNodeFieldEnum(const QString& line)
 		QString idx;
 		QString name;
 		uint    number;
-		LoadField(*field, idx, name, number);
+		QString string;
+		LoadField(*field, idx, name, number, string);
 
 		auto key     = idx.toUShort(null, 0);
 		enumMap[key] = name;
 	}
 
-	auto& enums     = m_NodeFieldEnums[type];
-	enums[fieldIdx] = enumMap;
+	m_NodeFieldEnums[enumName] = enumMap;
 }

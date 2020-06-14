@@ -58,11 +58,16 @@ QStringList SceneNodeUtility::GetFieldDataAsString(const SceneNodeUtility::Field
 
 QString SceneNodeUtility::GetFieldDataEnum(const Definitions* definitions, const FieldContext& fieldCtx, int idx)
 {
-	auto enumMap = definitions->GetNodeFieldEnum(fieldCtx.Node->Type, fieldCtx.FieldIdx);
+	auto fieldInfo = fieldCtx.GetFieldInfo();
+	auto enumName  = fieldInfo->String;
+
+	if (enumName.isEmpty() == true)
+		return QString();
+
+	auto enumMap = definitions->GetNodeFieldEnum(enumName);
 	if (enumMap == null)
 		return QString();
 
-	auto fieldInfo = fieldCtx.GetFieldInfo();
 	auto fieldType = fieldInfo->FieldType->Type;
 	auto data      = 0;
 

@@ -14,7 +14,7 @@ Node 0x3211 ClippingRange [Float : Near, Float : Far] <0, 1>
 
 Node 0x4000 Frames has_childs [] <>
 Node 0x4010 Frame has_childs [] <0x0010 : 0, 0x4011 : 0>
-Node 0x4011 Type [Uint32 : Type] <0>
+Node 0x4011 Type [Uint32'EFrameType : Type] <0>
 Node 0x0010 Name [String : Name] <0>
 Node 0x0020 Position [Float3 : Position] <0>
 Node 0x0022 Rotation [Float4 : Rotation] <0>
@@ -51,7 +51,7 @@ Node 0xb401_0x0015 Unknown [Float3 : Unknown] <>
 Node 0x4033 Hidden [] <>
 
 Node 0x4040 Light has_childs [] <>
-Node 0x4041 Type [Uint32 : Type] <0>
+Node 0x4041 Type [Uint32'ELightType : Type] <0>
 Node 0x0026 Color [Color : Color] <0>
 Node 0x4042 Power [Float : Power] <0>
 Node 0x4043 Cone [Float : InnerAngle, Float : OuterAngle] <0, 1>
@@ -62,7 +62,7 @@ Node 0x4046 Sector [String : Name] <0>
 Node 0x4050 BoundingBox [Float3 : Minimum, Float3 : Maximum] <0, 1>
 
 Node 0x4060 Sound has_childs [] <>
-Node 0x4061 Type [Uint32 : Type] <0>
+Node 0x4061 Type [Uint32'ESoundType : Type] <0>
 Node 0x4062 Volume [Float : Volume] <0>
 Node 0x4063 Unknown [Float : Unknown] <0>
 Node 0x4064 Unknown [Float2 : Unknown] <0>
@@ -97,26 +97,26 @@ Struct PedestrianDensity [Uint32 : DensityRatio]
 Node 0xae20 Actors has_childs [] <>
 Node 0xae21 Actor has_childs [] <0xae23 : 0, 0xae22 : 0>
 Node 0xae23 Name [String : Name] <0>
-Node 0xae22 Type [Uint32 : Type] <0>
+Node 0xae22 Type [Uint32'EActorType : Type] <0>
 Node 0xae24 Data [Unknown : Data] <>
 NodeFields 0xae24 0xae22 [0] 1 []
 NodeFields 0xae24 0xae22 [0] 2 [Hex8 : Unknown, Hex32 : CharacterType1, Hex32 : CharacterType2, Float : Strength, Float : Energy, Float : LeftHandEnergy, Float : RightHandEnergy, Float : LeftLegEnergy, Float : RightLegEnergy, Float : Reactions, Float : Speed, Float : Aggresivity, Float : Intelligence, Float : Shooting, Float : Sight, Float : Hearing, Float : Driving, Float : Mass, Float : Morale]
 NodeFields 0xae24 0xae22 [0] 5 [Hex8 : Unknown, Hex32 : Unknown, Hex8 : Unknown, Hex32 : Unknown, StringArray : Script]
-NodeFields 0xae24 0xae22 [0] 6 [Hex32 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Float : Unknown, Hex8 : Unknown, Hex8 : Unknown, Float : Unknown, Float : Unknown, StringFixed'16 : OpenSound, StringFixed'16 : CloseSound, StringFixed'16 : LockedSound, Hex8 : Unknown]
-NodeFields 0xae24 0xae22 [0] 8 [Hex8 : Unknown, Hex32 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown]
+NodeFields 0xae24 0xae22 [0] 6 [Hex32 : Unknown, Hex8 : Unknown, Uint8 : OpenInBothDirections, Uint8 : ForcedOpenDirection, Float : OpenAngle, Uint8 : Opened, Uint8 : Locked, Float : OpenSpeed, Float : CloseSpeed, StringFixed'16 : OpenSound, StringFixed'16 : CloseSound, StringFixed'16 : LockedSound, Hex8 : Unknown]
+NodeFields 0xae24 0xae22 [0] 8 [Hex8 : Unknown, Uint32 : WagonCount, Float : WagonDistance, Float : Unknown, Float : MaxSpeed, Float : Unknown, Float : Unknown]
 NodeFields 0xae24 0xae22 [0] 9 [Hex32 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown]
 NodeFields 0xae24 0xae22 [0] 12 [Hex32 : Unknown, Float : DespawnRadius, Float : InnerSpawnRadius, Float : OuterSpawnRadius, Uint32 : MaxCarsCount, Uint32 : CarsCount, Traffic'5 : Cars]
 NodeFields 0xae24 0xae22 [0] 18 [Hex32 : Unknown, Hex8 : Unknown, Float : SpawnRadius, Float : DespawnRadius, Float : InnerSpawnRadius, Float : OuterSpawnRadius, Float : InnerSpawnRadius, Uint32 : MaxPedsCount, Uint32 : PedsCount, PedestrianName'8 : PedestrianNames, PedestrianDensity'8 : PedestrianDensity]
 NodeFields 0xae24 0xae22 [0] 20 []
-NodeFields 0xae24 0xae22 [0] 21 [Hex8 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Float : Unknown, Hex8 : Unknown]
+NodeFields 0xae24 0xae22 [0] 21 [Hex8 : Unknown, Float : WalkSpeed, Float : RunSpeed, Float : RunAcceleration, Float : Energy, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Damage, Float : AttackRadius, Uint8 : AttackOnStart]
 NodeFields 0xae24 0xae22 [0] 22 [Hex8 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Float : Unknown, Float : Unknown]
-NodeFields 0xae24 0xae22 [0] 24 [Hex16 : Unknown, Float : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, StringFixed'32 : TurnoutFrame0, StringFixed'32 : TurnoutFrame1]
+NodeFields 0xae24 0xae22 [0] 24 [Hex16 : Unknown, Float : TurnAngle, Float : TurnSpeed, Hex32 : Unknown, Uint32 : NavPointID0, Uint32 : NavPointID1, Uint32 : NavPointID2, StringFixed'32 : TurnoutFrame0, StringFixed'32 : TurnoutFrame1]
 NodeFields 0xae24 0xae22 [0] 25 [Hex8 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown, Hex32 : Unknown]
 NodeFields 0xae24 0xae22 [0] 27 [Hex8 : Unknown, Hex32 : CharacterType1, Hex32 : CharacterType2, Float : Strength, Float : Energy, Float : LeftHandEnergy, Float : RightHandEnergy, Float : LeftLegEnergy, Float : RightLegEnergy, Float : Reactions, Float : Speed, Float : Aggresivity, Float : Intelligence, Float : Shooting, Float : Sight, Float : Hearing, Float : Driving, Float : Mass, Float : Morale, Hex8 : Unknown, Hex8 : Unknown, Hex32 : Unknown, StringArray : Script]
 NodeFields 0xae24 0xae22 [0] 28 [Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Hex8 : Unknown, Float : Unknown, Float : Unknown, Float : Unknown, Hex32 : Unknown, Hex32 : Unknown]
 NodeFields 0xae24 0xae22 [0] 30 []
 NodeFields 0xae24 0xae22 [0] 34 []
-NodeFields 0xae24 0xae22 [0] 35 [Hex8 : Unknown, Hex8 : Unknown, Float : Unknown, Float : Unknown, Float : Mass, Float : Friction, Float : Unknown, Uint32 : Sound, Hex8 : Unknown, Hex32 : Unknown]
+NodeFields 0xae24 0xae22 [0] 35 [Uint8 : Unknown, Uint8 : Collide, Float : Unknown, Float : Unknown, Float : Mass, Float : Friction, Float : Unknown, Uint32'EPhysicsType : Sound, Uint8 : Unknown, Uint32'EMaterial : HitMaterial]
 
 Node 0xae02 FrameAnimations has_childs [] <>
 Node 0xae03 FrameAnimation [Hex16 : Unknown, Float : Unknown, Float : Unknown, StringArray : Frame] <3>
@@ -137,7 +137,9 @@ Node 0x07d0 Frame [StringArray : Name, Float3 : Position, Float4 : Rotation, Flo
 
 
 
-Enum 0x4011 [0] [2 : Light, 3 : Point, 4 : Sound, 6 : BoundingBox, 9 : Model, 12 : Occluder, 14 : Geometry]
-Enum 0x4041 [0] [1 : Point, 2 : Spot, 3 : Directional, 4 : Ambient, 5 : Fog]
-Enum 0x4061 [0] [1 : Point, 3 : Ambient]
-Enum 0xae22 [0] [1 : Hidden, 2 : Player, 4 : Car, 5 : Script, 6 : Door, 8 : Railway, 9 : VillaObject, 12 : Traffic, 18 : Pedestrians, 20 : Bridge, 21 : Dog, 22 : Airplane, 24 : Turnout, 25 : Pumper, 27 : Human, 28 : RaceCamera, 30 : Wagon, 34 : Clock, 35 : Physical, 36 : Truck]
+Enum EFrameType [2 : Light, 3 : Point, 4 : Sound, 6 : BoundingBox, 9 : Model, 12 : Occluder, 14 : Geometry]
+Enum ELightType [1 : Point, 2 : Spot, 3 : Directional, 4 : Ambient, 5 : Fog]
+Enum ESoundType [1 : Point, 3 : Ambient]
+Enum EActorType [1 : Hidden, 2 : Player, 4 : Car, 5 : Script, 6 : Door, 8 : Railway, 9 : VillaObject, 12 : Traffic, 18 : Pedestrians, 20 : Bridge, 21 : Dog, 22 : Airplane, 24 : Turnout, 25 : Pumper, 27 : Human, 28 : RaceCamera, 30 : Wagon, 34 : Clock, 35 : Physical, 36 : Truck]
+Enum EPhysicsType [0 : Stone, 1 : Crate, 2 : Barrel, 3 : TrashBin, 4 : TrafficSign, 5 : PaperBox, 6 : Concrete, 7 : MetalPlate, 8 : SmallWeapon0, 9 : SmallWeapon1, 10 : WoodenPlank, 11 : SmallMetal, 12 : BigWeapon, 13 : CarLight]
+Enum EMaterial [0 : Invalid, 1 : Asphalt, 2 : Pavevment, 3 : Sidewalk, 4 : Concrete, 5 : Grass, 6 : Sand, 7 : Clay, 8 : Gravel, 9 : Rock, 10 : RailwayLine, 11 : Leaves, 12 : DoNotUse, 13 : Wood0, 14 : Wood30, 15 : Wood70, 16 : Parquet, 17 : Marble, 18 : Carpet, 19 : MetalConstruction, 20 : MetalPlate0, 21 : MetalPlate30, 22 : MetalPlate70, 23 : DoNotUse, 24 : Glass, 25 : GlassUnbreakable, 26 : DoNotUse, 27 : WiredFence, 28 : WoodenFence, 29 : Hedge, 30 : DoNotUse, 31 : DeadlyWater, 32 : DoNotUse, 33 : Universal, 34 : DoNotUse, 35 : Body, 36 : Plaster, 37 : Junk, 38 : Bricks, 39 : DoNotUse, 40 : DeadlyCollision, 41 : DestructibleCollision, 42 : Straw, 43 : Butter, 44 : SlippingWater, 45 : StickingWater, 46 : DirtyRoad]

@@ -76,6 +76,7 @@ namespace Scene
 			StructDefinition*    NestedField;
 			QString              Name;
 			uint                 Number;
+			QString              String;
 
 			inline NodeFieldInfo() : FieldType(0), NestedField(null), Number(0) {}
 		};
@@ -144,8 +145,8 @@ namespace Scene
 		typedef QVector<NodeName> NodeNames;
 		QMap<ushort, NodeNames>             m_NodeNames;
 
-		typedef QMap<int, QString>                       NodeFieldEnum;
-		typedef QMap<ushort, QMap<uint, NodeFieldEnum> > NodeFieldEnums;
+		typedef QMap<int, QString>           NodeFieldEnum;
+		typedef QMap<QString, NodeFieldEnum> NodeFieldEnums;
 		NodeFieldEnums                      m_NodeFieldEnums;
 
 		public: // methods
@@ -161,7 +162,7 @@ namespace Scene
 		const NodeFieldDefinition* GetNodeField(ushort type) const;
 		const NodeDefinition*      GetNodeFieldData(ushort type, uint dataType) const;
 		const NodeNames*           GetNodeNames(ushort type) const;
-		const NodeFieldEnum*       GetNodeFieldEnum(ushort type, uint fieldIdx) const;
+		const NodeFieldEnum*       GetNodeFieldEnum(const QString& name) const;
 
 		private: // methods
 
@@ -171,7 +172,7 @@ namespace Scene
 		void LoadStruct(const QString& line);
 		void LoadNodeFields(const QString& line);
 		void LoadFields(QVector<NodeFieldInfo>& fieldInfos, const QString& fields);
-		void LoadField(const QString& field, QString& type, QString& name, uint& size);
+		void LoadField(const QString& field, QString& type, QString& name, uint& number, QString& string);
 		void LoadNodeName(ushort type, const QString& fields);
 		void LoadNodeFieldEnum(const QString& line);
 
