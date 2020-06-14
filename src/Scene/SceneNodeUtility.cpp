@@ -170,12 +170,13 @@ void SceneNodeUtility::SetFieldDataFromString(SceneNode* root, const SceneNodeUt
 			auto dataTermSize   = (fieldType == Definitions::ENodeFieldType::StringArray2) ? 1 : 0;
 			auto lastDataSize   = GetFieldSize(field, fieldInfo, false);
 			auto dataSize       = data.length() + dataTermSize;
-			auto newData        = ResizeFieldData(fieldCtx, dataSize + sizeof(uint));
+			auto newDataSize    = dataSize + sizeof(uint);
+			auto newData        = ResizeFieldData(fieldCtx, newDataSize);
 			auto newDataInt     = reinterpret_cast<uint*>(newData);
 			memcpy(&newDataInt[0], &dataSize, sizeof(uint));
 			memcpy(&newDataInt[1], data.toLatin1().constData(), dataSize);
 
-			ApplyNodeSizeOffset(path, dataSize - lastDataSize);
+			ApplyNodeSizeOffset(path, newDataSize - lastDataSize);
 			break;
 		}
 
@@ -303,8 +304,6 @@ uint SceneNodeUtility::GetFieldSize(const void* field, const Definitions::NodeFi
 		}
 
 		case Definitions::ENodeFieldType::StringArray:
-			return size + *reinterpret_cast<const uint*>(field);
-
 		case Definitions::ENodeFieldType::StringArray2:
 			return size + sizeof(uint) + *reinterpret_cast<const uint*>(field);
 
