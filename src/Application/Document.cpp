@@ -1,4 +1,5 @@
 #include <QFile>
+#include <QDir>
 
 #include "Application/Document.h"
 #include "Scene/SceneNode.h"
@@ -52,7 +53,7 @@ void Document::Save(const QString& file)
 #ifdef RELEASE_BUILD
 	QFile writer(m_File);
 #else
-	QFile writer("C:\\Users\\Tomáš\\Desktop\\scene2.bin");
+	QFile writer(QString("%1\\Desktop\\scene2.bin").arg(QDir::homePath()));
 #endif
 
 	auto result = writer.open(QIODevice::WriteOnly);
