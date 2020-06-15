@@ -1,6 +1,6 @@
 ## BozSceneTreeEditor
 
-[![Version: 1.0.0](https://img.shields.io/badge/version-1.0.0-lightgrey.svg)](https://github.com/djbozkosz/BozSceneTreeEditor)
+[![Version: 1.0.1](https://img.shields.io/badge/version-1.0.1-lightgrey.svg)](https://github.com/djbozkosz/BozSceneTreeEditor)
 [![Game: Mafia](https://img.shields.io/badge/game-mafia-red.svg)](https://mafiagame.com)
 [![Qt: 5](https://img.shields.io/badge/qt-5-green.svg)](https://www.qt.io)
 [![License: GPL v3](https://img.shields.io/badge/license-GPL%20v3-blue.svg)](https://github.com/djbozkosz/BozSceneTreeEditor/blob/master/LICENSE)
