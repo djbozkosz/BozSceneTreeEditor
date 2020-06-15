@@ -34,6 +34,7 @@ const QVector<Definitions::NodeFieldType> Definitions::FIELD_TYPES =
 
 
 Definitions::Definitions() :
+	m_RLineSplit("(\\r)?\\n"),
 	m_RDialogFileLine("^File\\s+(.*)\\s+(.*)\\s+\\[(.*)\\]$"),
 	m_RDialogExportFileLine("^ExportFile\\s+(.*)\\s+(.*)\\s+\\[(.*)\\]$"),
 	m_RNodeLine("^Node\\s+([a-fx0-9]+)_?([a-fx0-9]*)\\s+([a-zA-Z0-9_]+)\\s+([a-zA-Z0-9_]+)?\\s*\\[(.*)\\]\\s*\\<(.*)\\>$"),
@@ -114,7 +115,7 @@ void Definitions::Load(const QString &file)
 	auto result = reader.open(QIODevice::ReadOnly);
 	Debug::Assert(result == true) << "Cannot open definition file" << file;
 
-	auto lines = QString::fromLatin1(reader.readAll()).split("\r\n", QString::SkipEmptyParts);
+	auto lines = QString::fromLatin1(reader.readAll()).split(m_RLineSplit, QString::SkipEmptyParts);
 	foreach (line, lines)
 	{
 		if (line->startsWith("File ") == true)

@@ -123,6 +123,7 @@ namespace Scene
 
 		private: // members
 
+		QRegExp                             m_RLineSplit;
 		QRegExp                             m_RDialogFileLine;
 		QRegExp                             m_RDialogExportFileLine;
 		QRegExp                             m_RNodeLine;
