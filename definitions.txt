@@ -1,5 +1,6 @@
 File scene2.bin scene2*.bin [LS3D Scene File]
 File cache.bin cache*.bin [LS3D City File]
+File effects.bin effects*.bin [LS3D Scene Effects File]
 File file.dnc *.dnc [DCED Export File]
 
 ExportFile .dnc *.dnc [DCED Export File]
@@ -137,6 +138,11 @@ Node 0x07d0 Frame [StringArray : Name, Float3 : Position, Float4 : Rotation, Flo
 
 
 
+Node 0x0064 Effects has_childs [] <>
+Node 0x0064_0x03e8 Emitter [Float4 : MatrixRow0, Float4 : MatrixRow1, Float4 : MatrixRow2, Float4 : MatrixRow3, Uint32'EEffect : Effect] <4>
+
+
+
 Enum EFrameType [2 : Light, 3 : Point, 4 : Sound, 6 : BoundingBox, 9 : Model, 12 : Occluder, 14 : Geometry]
 Enum ELightType [1 : Point, 2 : Spot, 3 : Directional, 4 : Ambient, 5 : Fog]
 Enum ESoundType [1 : Point, 3 : Ambient]
@@ -144,3 +150,4 @@ Enum EActorType [1 : Hidden, 2 : Player, 4 : Car, 5 : Script, 6 : Door, 8 : Rail
 Enum EPhysicsType [0 : Stone, 1 : Crate, 2 : Barrel, 3 : TrashBin, 4 : TrafficSign, 5 : PaperBox, 6 : Concrete, 7 : MetalPlate, 8 : SmallWeapon0, 9 : SmallWeapon1, 10 : WoodenPlank, 11 : SmallMetal, 12 : BigWeapon, 13 : CarLight]
 Enum EMaterial [0 : Invalid, 1 : Asphalt, 2 : Pavevment, 3 : Sidewalk, 4 : Concrete, 5 : Grass, 6 : Sand, 7 : Clay, 8 : Gravel, 9 : Rock, 10 : RailwayLine, 11 : Leaves, 12 : DoNotUse, 13 : Wood0, 14 : Wood30, 15 : Wood70, 16 : Parquet, 17 : Marble, 18 : Carpet, 19 : MetalConstruction, 20 : MetalPlate0, 21 : MetalPlate30, 22 : MetalPlate70, 23 : DoNotUse, 24 : Glass, 25 : GlassUnbreakable, 26 : DoNotUse, 27 : WiredFence, 28 : WoodenFence, 29 : Hedge, 30 : DoNotUse, 31 : DeadlyWater, 32 : DoNotUse, 33 : Universal, 34 : DoNotUse, 35 : Body, 36 : Plaster, 37 : Junk, 38 : Bricks, 39 : DoNotUse, 40 : DeadlyCollision, 41 : DestructibleCollision, 42 : Straw, 43 : Butter, 44 : SlippingWater, 45 : StickingWater, 46 : DirtyRoad]
 Enum ECharacterVoice [0 : Paulie, 1 : Sam, 2 : Salieri, 3 : Tommy, 4 : Frank, 5 : Luigi, 6 : Ralph, 7 : Vincenzo, 8 : Man, 9 : Salvatore, 10 : Cop0, 11 : Cop1, 12 : PortGuard0, 13 : PortGuard1, 14 : PortGuard2, 15 : PortGuard3, 16 : PortGuard4, 17 : Enemy0, 18 : Enemy1, 19 : Enemy2, 20 : Enemy3, 21 : Enemy4, 22 : Hoolig, 23 : Sergio, 24 : Enemy5, 25 : Joe, 26 : PedMan0, 27 : PedMan1, 28 : PedMan2, 29 : PedWoman0, 30 : PedWoman1, 31 : PedWoman2, 32 : NoVoice, 33 : Lucas]
+Enum EEffect [0 : blood, 1 : hit_stonewall, 2 : hit_ground, 3 : hit_metal, 4 : hit_wood, 5 : night_chimney_smoke, 6 : Fire, 7 : Explosion, 8 : molotov_explosion, 9 : fire_small, 10 : explosion_big, 11 : molotov_fire, 12 : Thompson_muzzle_flash_day, 13 : Thompson_muzzle_flash_night, 14 : pistol_muzzle_flash_day, 15 : pistol_muzzle_flash_night, 16 : shotgun_muzzle_flash_day, 17 : shotgun_muzzle_flash_night, 18 : fireworks, 19 : pena, 20 : explosion_car, 21 : fire_fading, 22 : fire_small_fading, 23 : pena_ve_vane, 24 : smoke_cigarette, 25 : smoke_cigarette_breath, 26 : chcani, 27 : bliti, 28 : smoke_parnik, 29 : hit_grass, 30 : voda_prehrada, 31 : voda_prehrada_dole, 32 : listi_ze_stromu, 33 : prach_motorest, 34 : kour_restaurace, 35 : dollars, 36 : fontanka1, 37 : zblunk, 38 : smoke_saliery, 39 : lighter, 40 : krev_vrtule, 41 : voda_vezeni_1, 42 : voda_vezeni_2, 43 : hit_water, 44 : smoke_loco1, 45 : steam_loco, 46 : clun, 47 : steam2_loco, 48 : explosion_hotel, 49 : gasoline, 50 : smoke_coffee, 51 : Explosion_hotel1, 52 : Explosion_Morello, 53 : Dust_Morello, 54 : kola_na_vode, 55 : slow_smoke, 56 : spark_cig, 57 : Fire_no_smoke, 58 : smoke_cigarette_breath1, 59 : horici_benzin, 60 : FMVlighter, 61 : bloodSamFMV, 62 : FMV_Loko_2sec, 63 : FMV_Loko_1sec, 64 : FMV_Loko_03, 65 : FMV_Loko_low, 66 : FMV_chladic, 67 : FMV_Expl_cisterna, 68 : FMV_lighter, 69 : FMV_gasoline2, 70 : doutnik, 71 : kour_na_lokomotivu_NESAHAT, 72 : vol_dust, 73 : hovna, 74 : FMV_cigarette, 75 : dust_fall, 76 : kaluz_chuze, 77 : fire_cig, 78 : kour_lod_doprava, 79 : fireworks1, 80 : fireworks2, 81 : fireworks3, 82 : fireworks4, 83 : vlny, 84 : vlny_big, 85 : vlny_small, 86 : FMV_sirka, 87 : hydrant, 88 : kytka_listy, 89 : hadice, 90 : dymovnice, 91 : FMV_pistol_muzzle_flash]
