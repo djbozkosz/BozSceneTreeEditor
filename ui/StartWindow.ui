@@ -1,0 +1,863 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>StartWindow</class>
+ <widget class="QWidget" name="StartWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1024</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="StartWindowVerticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QFrame" name="Background">
+     <property name="styleSheet">
+      <string notr="true">#Background {
+	border: 1px solid palette(mid);
+	background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:10, y2:20, stop:0 palette(base), stop:1 palette(highlight));
+	border-radius: 5px;
+}
+
+#Background[isDarkMode=&quot;true&quot;] {
+	background-color: qradialgradient(spread:pad, cx:0.5, cy:1.2, radius:1.2, fx:0.5, fy:1.2, stop:0 rgb(0, 60, 120), stop:1 rgb(30, 30, 30));
+}
+
+QScrollArea,
+QScrollArea &gt; QWidget &gt; QWidget {
+	background: transparent;
+}
+
+#ActionsArea[isDarkMode=&quot;true&quot;] {
+	border: none;
+}
+
+#InfoArea[isDarkMode=&quot;true&quot;] {
+	border: none;
+}
+</string>
+     </property>
+     <layout class="QVBoxLayout" name="BackgroundVerticalLayout">
+      <item>
+       <widget class="QFrame" name="TitlePanel">
+        <layout class="QHBoxLayout" name="TitlePanelHorizontalLayout">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <property name="rightMargin">
+          <number>18</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="TitleIcon">
+           <property name="pixmap">
+            <pixmap resource="../qrc/Icons.qrc">:/images/icons/icon32.png</pixmap>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="TitleLabel">
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;Boz Scene Tree Editor&lt;/span&gt;   v1.1.0&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="TitleSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>868</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="TitleInfo">
+           <property name="text">
+            <string>djbozkosz, 2005 - 2026.&lt;br&gt;
+&lt;a href=&quot;http://www.djbozkosz.wz.cz&quot;&gt;www.djbozkosz.wz.cz&lt;/a&gt;</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="openExternalLinks">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="TitleLine">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="StartPage">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>1</verstretch>
+         </sizepolicy>
+        </property>
+        <layout class="QHBoxLayout" name="StartPageHorizontalLayout">
+         <item>
+          <widget class="QSplitter" name="StartPageSplitter">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="handleWidth">
+            <number>3</number>
+           </property>
+           <property name="childrenCollapsible">
+            <bool>false</bool>
+           </property>
+           <widget class="QScrollArea" name="ActionsArea">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>3</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="widgetResizable">
+             <bool>true</bool>
+            </property>
+            <widget class="QWidget" name="Actions">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>445</width>
+               <height>497</height>
+              </rect>
+             </property>
+             <layout class="QVBoxLayout" name="ActionsVerticalLayout">
+              <property name="rightMargin">
+               <number>18</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="ActionsTitle">
+                <property name="styleSheet">
+                 <string notr="true">font-size: 10.5pt;
+color: palette(highlight);</string>
+                </property>
+                <property name="text">
+                 <string> Actions:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="ActionsList">
+                <layout class="QVBoxLayout" name="ActionsListVerticalLayout">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QPushButton" name="Action_New">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="cursor">
+                    <cursorShape>PointingHandCursor</cursorShape>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+	text-align: left;
+	font-size: 9pt;
+	background-color: transparent;
+	border: 1px dashed transparent;
+	border-radius: 5px;
+	padding: 3px;
+}
+
+QPushButton:hover {
+	color: palette(highlight);
+	background-color: palette(base);
+	border: 1px dashed palette(highlight);
+}
+
+QPushButton:pressed {
+	color: palette(link);
+	background-color: palette(alternate-base);
+	border: 1px solid palette(highlight);
+}
+</string>
+                   </property>
+                   <property name="text">
+                    <string>New File</string>
+                   </property>
+                   <property name="flat">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="Action_Open">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="cursor">
+                    <cursorShape>PointingHandCursor</cursorShape>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+	text-align: left;
+	font-size: 9pt;
+	background-color: transparent;
+	border: 1px dashed transparent;
+	border-radius: 5px;
+	padding: 3px;
+}
+
+QPushButton:hover {
+	color: palette(highlight);
+	background-color: palette(base);
+	border: 1px dashed palette(highlight);
+}
+
+QPushButton:pressed {
+	color: palette(link);
+	background-color: palette(alternate-base);
+	border: 1px solid palette(highlight);
+}
+</string>
+                   </property>
+                   <property name="text">
+                    <string>Open File</string>
+                   </property>
+                   <property name="flat">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="Action_OpenRecent">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>26</height>
+                    </size>
+                   </property>
+                   <property name="cursor">
+                    <cursorShape>PointingHandCursor</cursorShape>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+	text-align: left;
+	font-size: 9pt;
+	background-color: transparent;
+	border: 1px dashed transparent;
+	border-radius: 5px;
+	padding: 3px;
+}
+
+QPushButton:hover {
+	color: palette(highlight);
+	background-color: palette(base);
+	border: 1px dashed palette(highlight);
+}
+
+QPushButton:pressed {
+	color: palette(link);
+	background-color: palette(alternate-base);
+	border: 1px solid palette(highlight);
+}
+</string>
+                   </property>
+                   <property name="text">
+                    <string>Open Recent File</string>
+                   </property>
+                   <property name="flat">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="RecentFilesTitle">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">font-size: 10.5pt;
+color: palette(highlight);</string>
+                </property>
+                <property name="text">
+                 <string> Recent Files:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="RecentFilesList">
+                <layout class="QVBoxLayout" name="RecentFilesListVerticalLayout">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <spacer name="ActionsSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>5</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+           <widget class="QScrollArea" name="InfoArea">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <property name="widgetResizable">
+             <bool>true</bool>
+            </property>
+            <widget class="QWidget" name="Info">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>-2255</y>
+               <width>521</width>
+               <height>3410</height>
+              </rect>
+             </property>
+             <layout class="QVBoxLayout" name="InfoVerticalLayout">
+              <property name="leftMargin">
+               <number>18</number>
+              </property>
+              <property name="rightMargin">
+               <number>18</number>
+              </property>
+              <item>
+               <widget class="QFrame" name="GetStartedBox">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">.QFrame {
+	background-color: palette(alternate-base);
+	border: 1px solid palette(mid);
+	border-radius: 5px;
+}
+
+.QFrame:hover {
+	border: 1px solid palette(border);
+}</string>
+                </property>
+                <layout class="QGridLayout" name="GetStartedBoxGridLayout">
+                 <property name="leftMargin">
+                  <number>18</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>14</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>18</number>
+                 </property>
+                 <item row="0" column="1" rowspan="2">
+                  <widget class="QLabel" name="GetStartedImage">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="pixmap">
+                    <pixmap resource="../qrc/Images.qrc">:/images/image00.png</pixmap>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="GetStartedTitle">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>24</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">font-size: 10.5pt;
+color: palette(highlight);</string>
+                   </property>
+                   <property name="text">
+                    <string>Get Started:</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="GetStarted">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="cursor">
+                    <cursorShape>IBeamCursor</cursorShape>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">font-size: 9pt;</string>
+                   </property>
+                   <property name="text">
+                    <string>&lt;b&gt;Boz Scene Tree Editor&lt;/b&gt; is a modding tool for the first Mafia game. It brings mostly full control over the various tree and node based game files - &lt;i&gt;scene2.bin&lt;/i&gt;, &lt;i&gt;cache.bin&lt;/i&gt;, &lt;i&gt;effects.bin&lt;/i&gt; and additionally &lt;i&gt;dnc&lt;/i&gt; files.
+&lt;ul&gt;
+&lt;li&gt;&lt;b&gt;Scene2.bin&lt;/b&gt; - Main level file, describing player, objects placement, lights, sounds, scripts and more.
+&lt;li&gt;&lt;b&gt;Cache.bin&lt;/b&gt; - City file containing simple objects, which are managed in groups (city blocks). These objects are static and cannot be accessed from the main scene file or via scripts.
+&lt;li&gt;&lt;b&gt;Effects.bin&lt;/b&gt; - Scene file with the placement of the all static particle effects.
+&lt;li&gt;&lt;b&gt;*.dnc&lt;/b&gt; - Snipped of the files above. Originally defined by the DCED scene editor as the format for storing exported/imported objects.
+&lt;/ul&gt;
+</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
+                   <property name="openExternalLinks">
+                    <bool>true</bool>
+                   </property>
+                   <property name="textInteractionFlags">
+                    <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="InfoDocs">
+                <layout class="QVBoxLayout" name="InfoDocsVerticalLayout">
+                 <property name="leftMargin">
+                  <number>18</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>18</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="UsageTitle">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">font-size: 10.5pt;
+color: palette(highlight);</string>
+                   </property>
+                   <property name="text">
+                    <string>Usage:</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="Usage_2">
+                   <property name="cursor">
+                    <cursorShape>IBeamCursor</cursorShape>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">font-size: 9pt;</string>
+                   </property>
+                   <property name="text">
+                    <string>Open or create a new file from the &lt;i&gt;File&lt;/i&gt; menu. When the new file is created, it is possible to import the new scene structure from the &lt;i&gt;dnc&lt;/i&gt; directory.&lt;br&gt;
+&lt;br&gt;
+While editing, drag and drop the nodes or copy paste them to the proper place. Even between the opened tabs. Empty nodes may be created from the &lt;i&gt;Edit&lt;/i&gt; menu, via right click context menu or import predefined and custom dnc nodes.&lt;br&gt;
+&lt;br&gt;
+However, valid tree structure must be maintained, to keep compatibility with the game. For example: don't forget to rename node after duplication.</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
+                   <property name="openExternalLinks">
+                    <bool>true</bool>
+                   </property>
+                   <property name="textInteractionFlags">
+                    <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="WhatsNewTitle">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">font-size: 10.5pt;
+color: palette(highlight);</string>
+                   </property>
+                   <property name="text">
+                    <string>What's New:</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="WhatsNew">
+                   <property name="cursor">
+                    <cursorShape>IBeamCursor</cursorShape>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">font-size: 9pt;</string>
+                   </property>
+                   <property name="text">
+                    <string>&lt;b&gt;1.1.0 - 2026.02.01:&lt;/b&gt;&lt;br&gt;
+Quality of life improvements:
+&lt;ul&gt;&lt;li&gt;added drag and drop support to open the file, works for exe in explorer and in editor window
+&lt;li&gt;added start and taskbar jumplist support for recently opened files
+&lt;li&gt;added start page with frequent actions, recently opened files, introduction, changelog and documentation
+&lt;li&gt;added dark theme, may be selected manually or chosen based on system settings&lt;/ul&gt;
+&lt;br&gt;
+&lt;b&gt;1.0.2 - 2021.06.05:&lt;/b&gt;&lt;br&gt;
+Small improvements:
+&lt;ul&gt;&lt;li&gt;added character voice enum, added script spatial flag
+&lt;li&gt;added support for scene effects file
+&lt;li&gt;added Effects dnc&lt;/ul&gt;
+&lt;br&gt;
+&lt;b&gt;1.0.1 - 2020.06.15:&lt;/b&gt;&lt;br&gt;
+Bugfix update:
+&lt;ul&gt;&lt;li&gt;fixed loading definitions file with unix line endings&lt;/ul&gt;
+&lt;br&gt;
+&lt;b&gt;1.0.0 - 2020.06.14:&lt;/b&gt;&lt;br&gt;
+Initial release with features:
+&lt;ul&gt;&lt;li&gt;node operations
+&lt;li&gt;scene2.bin support
+&lt;li&gt;cache.bin support&lt;/ul&gt;</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
+                   <property name="openExternalLinks">
+                    <bool>true</bool>
+                   </property>
+                   <property name="textInteractionFlags">
+                    <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="DocsTitle">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>30</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">font-size: 10.5pt;
+color: palette(highlight);</string>
+                   </property>
+                   <property name="text">
+                    <string>Documentation:</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="Docs">
+                   <property name="cursor">
+                    <cursorShape>IBeamCursor</cursorShape>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">font-size: 9pt;</string>
+                   </property>
+                   <property name="text">
+                    <string>All supported files have a specific, but simple, internal structure - the nodes, which are composed into one or several trees. Every node may have its own data and array of the child nodes.&lt;br&gt;
+&lt;br&gt;
+Layout of the node is following:&lt;br&gt;
+&lt;br&gt;
+&lt;code&gt;struct &lt;b&gt;Node&lt;/b&gt;&lt;br&gt;
+&lt;b&gt;{&lt;/b&gt;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;ushort &lt;b&gt;Type&lt;/b&gt;;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;uint &lt;b&gt;Size&lt;/b&gt;;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;void* &lt;b&gt;Data&lt;/b&gt;;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Node* &lt;b&gt;Childs[]&lt;/b&gt;;&lt;br&gt;
+&lt;b&gt;}&lt;b&gt;;&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;b&gt;Type&lt;/b&gt; is a two byte integer, which defines a data layout and child nodes.
+&lt;li&gt;&lt;b&gt;Size&lt;/b&gt; is a four byte integer of the node length in bytes. All fields are included in the size - node type (2), node size (4), data length and sum of the child node sizes. For example: if the file has a one root node, its size equals to file size.
+&lt;li&gt;&lt;b&gt;Data&lt;/b&gt; layout is defined by the node type above. For example, a scene object position node contains three x, y, z floating point numbers.
+&lt;li&gt;&lt;b&gt;Child&lt;/b&gt; node availability is also defined by the node type. However, the number of childs is not explicitly stored, but it must be detected during the file read - if the file pointer reaches the end of the node itself, no further child nodes are available.
+&lt;/ul&gt;
+All known node data descriptors are not hardcoded in the tool binary, but they are stored in the &lt;i&gt;definitions.txt&lt;/i&gt; file. Node data layout and description is updated according to that file. If the node type is unknown, the stored data may be loaded as an opaque byte array and saved in the same way, which is the biggest advantage of this node based structure.&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;b&gt;Scene2.bin&lt;/b&gt; description:
+&lt;ul&gt;
+&lt;li&gt;Scene file contains an initial metadata, frames, actors, init scripts and other top level setup.
+&lt;li&gt;Frames are the spatial or visual objects, by default, without the dynamic behaviour. The frames may be objects, lights, sounds, occluders, lightmaps and so on.
+&lt;li&gt;Actors are tied to the frames and add some behaviour to them, based on the actor type. The actors may be humans, cars, scripts, doors, physical objects and others.
+&lt;li&gt;Init scripts are not connected to the frames and they are executed after every level (re)load.&lt;/ul&gt;
+&lt;br&gt;
+&lt;b&gt;Cache.bin&lt;/b&gt; description:
+&lt;ul&gt;
+&lt;li&gt;The city file, which is much simpler than the &lt;i&gt;scene2.bin&lt;/i&gt; file.
+&lt;li&gt;It contains only the list of the city blocks and the list of the frames in every block.
+&lt;li&gt;These frames are static and inaccessible from the &lt;i&gt;scene2.bin&lt;/i&gt; scripts.&lt;/ul&gt;
+&lt;br&gt;
+&lt;b&gt;Effects.bin&lt;/b&gt; description:
+&lt;ul&gt;
+&lt;li&gt;Scene file with the placement of the all static particle effects.
+&lt;li&gt;Every emitter contains the transform and ID of the particle effect, which is defined in the &lt;i&gt;tables/effects.tbl&lt;/i&gt; file.&lt;/ul&gt;
+&lt;br&gt;
+&lt;b&gt;Definitions.txt&lt;/b&gt; description:&lt;br&gt;
+&lt;br&gt;
+&lt;b&gt;File type filter [name]&lt;/b&gt;&lt;br&gt;
+&lt;b&gt;ExportFile type filter [name]&lt;/b&gt;
+&lt;ul&gt;
+&lt;li&gt;Registers a type of file into the open, save and export dialogs.
+&lt;li&gt;&lt;b&gt;type&lt;/b&gt; - base filename with extension
+&lt;li&gt;&lt;b&gt;filter&lt;/b&gt; - dialog files filter
+&lt;li&gt;&lt;b&gt;name&lt;/b&gt; - file description
+&lt;/ul&gt;
+Example: &lt;i&gt;File scene2.bin scene2*.bin [LS3D Scene File]&lt;/i&gt;&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;b&gt;Node parentType_nodeType name has_childs [dataType’dataSetup : dataName, …] &amp;lt;childNodeType : childNodeDataIndex, …&amp;gt;&lt;/b&gt;
+&lt;ul&gt;
+&lt;li&gt;Registers a new node description. This description is used only when the node type matches the nodeType and optionally the type of the parent node matches the parentType.
+&lt;li&gt;&lt;b&gt;parentType&lt;/b&gt; - optional node type to link the parent and child nodes
+&lt;li&gt;&lt;b&gt;nodeType&lt;/b&gt; - type of the node
+&lt;li&gt;&lt;b&gt;name&lt;/b&gt; - node description
+&lt;li&gt;&lt;b&gt;has_childs&lt;/b&gt; - optional flag to specify, that the node may have a childrens
+&lt;li&gt;&lt;b&gt;dataType&lt;/b&gt; - name of the data type, predefined or custom structure
+&lt;li&gt;&lt;b&gt;dataSetup&lt;/b&gt; - optional description of the data, may be:
+&lt;ul&gt;&lt;li&gt;enumeration name
+&lt;li&gt;the index to the other data, if the array of structures is expected
+&lt;li&gt;length of the fixed-length string type StringFixed&lt;/ul&gt;
+&lt;li&gt;&lt;b&gt;dataName&lt;/b&gt; - data description
+&lt;li&gt;&lt;b&gt;childNodeType&lt;/b&gt; - optional child node type to be shown in the tree
+&lt;li&gt;&lt;b&gt;childNodeDataIndex&lt;/b&gt; - optional data at index of the child node to be shown in the tree
+&lt;/ul&gt;
+Example: &lt;i&gt;Node 0x4010 Frame has_childs [] &amp;lt;0x0010 : 0, 0x4011 : 0&amp;gt;&lt;/i&gt;&lt;br&gt;
+Frame node with the type 0x4010 which may have the childs, but no own data and the content of the child nodes 0x0010 (frame name) and 0x4011 (frame type) will be shown in the tree.&lt;br&gt;&lt;br&gt;
+Example: &lt;i&gt;Node 0x0020 Position [Float3 : Position] &amp;lt;0&amp;gt;&lt;/i&gt;&lt;br&gt;
+Position node with the type 0x0020 exposing three float point numbers.&lt;br&gt;&lt;br&gt;
+Example: &lt;i&gt;Node 0x4041 Type [Uint32'ELightType : Type] &amp;lt;0&amp;gt;&lt;/i&gt;&lt;br&gt;
+Node for the type of the light, uses ELightType enum to translate the numbers into the light type.&lt;br&gt;&lt;br&gt;
+Example: &lt;i&gt;Node 0x4083 Occluder [Uint32 : VerticesCount, MeshVertex'0 : Vertices, Uint32 : TrianglesCount, MeshTriangleIndices'2 : TriangleIndices] &amp;lt;&amp;gt;&lt;/i&gt;&lt;br&gt;
+Occluder node, which uses the MeshVertex struct array for the vertices. The number of the vertices is defined by the zero index at VerticesCount. Triangle indices are defined in the same way.&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;b&gt;NodeFields nodeType siblingType [siblingIndex] fieldType [dataType’dataSetup : dataName, …]&lt;/b&gt;
+&lt;ul&gt;
+&lt;li&gt;Registers a new actor node description. This description is used only when the node type matches the nodeType and the value at index of siblingIndex in the sibling node of type siblingType matches the fieldType.
+&lt;li&gt;&lt;b&gt;nodeType&lt;/b&gt; - type of the node
+&lt;li&gt;&lt;b&gt;siblingType&lt;/b&gt; - type of the sibling node
+&lt;li&gt;&lt;b&gt;siblingIndex&lt;/b&gt; - index of the sibling data to look for the field type
+&lt;li&gt;&lt;b&gt;fieldType&lt;/b&gt; - field type to find in the sibling node
+&lt;li&gt;&lt;b&gt;dataType&lt;/b&gt;, &lt;b&gt;dataSetup&lt;/b&gt;, &lt;b&gt;dataName&lt;/b&gt; - same data description is used as the node data description above
+&lt;/ul&gt;
+Example: &lt;i&gt;NodeFields 0xae24 0xae22 [0] 5 [Hex8 : Unknown, Uint32 : EnableSpatialDetector, Hex8 : Unknown, Hex32 : Unknown, StringArray : Script]&lt;/i&gt;&lt;br&gt;
+Actor node definition of type 5 - script with the several fields.&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;b&gt;Struct structName [dataType’dataSetup : dataName, …]&lt;/b&gt;
+&lt;ul&gt;
+&lt;li&gt;Registers a new structure, which may be used in the array of structs.
+&lt;li&gt;&lt;b&gt;structName&lt;/b&gt; - name of the struct to be referenced in the node data
+&lt;li&gt;&lt;b&gt;dataType&lt;/b&gt;, &lt;b&gt;dataSetup&lt;/b&gt;, &lt;b&gt;dataName&lt;/b&gt; - same data description is used as the node data description above
+&lt;/ul&gt;
+Example: &lt;i&gt;Struct PedestrianName [StringFixed'17 : Pedestrian]&lt;/i&gt;&lt;br&gt;
+Struct definition with the name PedestrianName containing one field Pedestrian of the type StringFixed with length of 17.&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;b&gt;Enum enumName [number : name, …]&lt;/b&gt;
+&lt;ul&gt;
+&lt;li&gt;Registers a new enumeration to be used in the nodes.
+&lt;li&gt;&lt;b&gt;enumName&lt;/b&gt; - name of the enumeration to be referenced in the node data
+&lt;li&gt;&lt;b&gt;number&lt;/b&gt; - particular value to be described
+&lt;li&gt;&lt;b&gt;name&lt;/b&gt; - name of that value
+&lt;/ul&gt;
+Example:&lt;i&gt; Enum ESoundType [1 : Point, 3 : Ambient]&lt;/i&gt;&lt;br&gt;
+Enum definition for the sound types: point with the value 1 and ambient with the value 3.</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                   </property>
+                   <property name="wordWrap">
+                    <bool>true</bool>
+                   </property>
+                   <property name="openExternalLinks">
+                    <bool>true</bool>
+                   </property>
+                   <property name="textInteractionFlags">
+                    <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <spacer name="InfoSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>5</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../qrc/Icons.qrc"/>
+  <include location="../qrc/Images.qrc"/>
+ </resources>
+ <connections/>
+</ui>

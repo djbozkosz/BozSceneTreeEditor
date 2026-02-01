@@ -1,21 +1,29 @@
 #include <QBuffer>
-#include <QList>
-#include <QVariant>
-#include <QSettings>
-#include <QFile>
-#include <QEvent>
 #include <QCloseEvent>
-#include <QLabel>
-#include <QProgressBar>
-#include <QMainWindow>
-#include <QMenu>
+#include <QDragEnterEvent>
+#include <QEvent>
+#include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QLabel>
+#include <QList>
+#include <QMainWindow>
+#include <QMenu>
 #include <QMessageBox>
+#include <QMimeData>
+#include <QProgressBar>
+#include <QPushButton>
+#include <QSettings>
+#include <QVariant>
+
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
 
 #include "ui_Window.h"
 
 #include "GUI/DocumentWindow.h"
+#include "GUI/StartWindow.h"
 #include "GUI/Window.h"
 #include "Application/Document.h"
 #include "Scene/SceneNode.h"
@@ -25,9 +33,12 @@
 using namespace Djbozkosz::Application::GUI;
 
 
+const int     Window::MAX_RECENT_FILES        = 15;
+
+const QString Window::ACTIVE_THEME            = "ActiveTheme";
 const QString Window::OPEN_FILE_DIALOG_PATH   = "OpenFileDialogPath";
 const QString Window::SAVE_FILE_DIALOG_PATH   = "SaveFileDialogPath";
-const QString Window::RECENT_FILE_PATH        = "RecentFilePath";
+const QString Window::RECENT_FILE_PATHS       = "RecentFilePaths";
 
 const QString Window::IMPORT_FILE_DIALOG_PATH = "ImportFileDialogPath";
 const QString Window::EXPORT_FILE_DIALOG_PATH = "ExportFileDialogPath";
@@ -35,7 +46,7 @@ const QString Window::EXPORT_FILE_DIALOG_PATH = "ExportFileDialogPath";
 const QString Window::ABOUT_TEXT =
 		QString("After short development<br>created by: djbozkosz<br><br>"
 		"Version: %1<br>"
-		"Copyright (c): 2005 - 2020<br><br>"
+		"Copyright (c): 2005 - 2026<br><br>"
 		"Found a bug or have some ideas how to improve this app?<br>Don't hesitate to contact me at <a href=\"mailto:t_ruzicka@email.cz\">t_ruzicka@email.cz</a>.<br><br>"
 		"Web: <a href=\"http://www.djbozkosz.wz.cz\">www.djbozkosz.wz.cz</a><br>"
 		"Facebook: <a href=\"https://www.facebook.com/tomas.ruzicka.73\">facebook.com/tomas.ruzicka.73</a><br>"
@@ -47,6 +58,7 @@ const QString Window::ABOUT_TEXT =
 
 Window::Window(QSettings* settings, Scene::Definitions* definitions) :
 	QMainWindow(),
+	m_StartWindow(null),
 	m_NewFileCounter(1),
 	m_Settings(settings),
 	m_Definitions(definitions),
@@ -54,10 +66,12 @@ Window::Window(QSettings* settings, Scene::Definitions* definitions) :
 	m_Status(null),
 	m_Progress(null)
 {
+	m_DefaultPalette = qApp->palette();
+
 	ResetClipboard();
 
 	m_Ui->setupUi(this);
-	setWindowTitle(QString("%1 %2").arg(windowTitle()).arg(VERSION));
+	setWindowTitle(QString("%1 v%2").arg(windowTitle()).arg(VERSION));
 
 	auto statusBar = m_Ui->StatusBar;
 
@@ -76,64 +90,94 @@ Window::Window(QSettings* settings, Scene::Definitions* definitions) :
 	connect(tabs, SIGNAL(currentChanged(int)),    this, SLOT(UpdateEditMenu(int)));
 	connect(tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseFile(int)));
 
-	connect(m_Ui->Menu_New,        SIGNAL(triggered()), this, SLOT(NewFile()));
-	connect(m_Ui->Menu_Open,       SIGNAL(triggered()), this, SLOT(OpenFile()));
-	connect(m_Ui->Menu_OpenRecent, SIGNAL(triggered()), this, SLOT(OpenRecentFile()));
-	connect(m_Ui->Menu_Reload,     SIGNAL(triggered()), this, SLOT(ReloadFile()));
-	connect(m_Ui->Menu_Save,       SIGNAL(triggered()), this, SLOT(SaveFile()));
-	connect(m_Ui->Menu_SaveAs,     SIGNAL(triggered()), this, SLOT(SaveAsFile()));
-	connect(m_Ui->Menu_Close,      SIGNAL(triggered()), this, SLOT(CloseFile()));
-	connect(m_Ui->Menu_Exit,       SIGNAL(triggered()), this, SLOT(ExitApp()));
+	connect(m_Ui->Menu_New,          SIGNAL(triggered()), this, SLOT(NewFile()));
+	connect(m_Ui->Menu_Open,         SIGNAL(triggered()), this, SLOT(OpenFile()));
+	connect(m_Ui->Menu_OpenRecent,   SIGNAL(triggered()), this, SLOT(OpenRecentFile()));
+	connect(m_Ui->Menu_Reload,       SIGNAL(triggered()), this, SLOT(ReloadFile()));
+	connect(m_Ui->Menu_Save,         SIGNAL(triggered()), this, SLOT(SaveFile()));
+	connect(m_Ui->Menu_SaveAs,       SIGNAL(triggered()), this, SLOT(SaveAsFile()));
+	connect(m_Ui->Menu_Close,        SIGNAL(triggered()), this, SLOT(CloseFile()));
+	connect(m_Ui->Menu_Exit,         SIGNAL(triggered()), this, SLOT(ExitApp()));
 
-	connect(m_Ui->Menu_Cut,        SIGNAL(triggered()), this, SLOT(CutNode()));
-	connect(m_Ui->Menu_Copy,       SIGNAL(triggered()), this, SLOT(CopyNode()));
-	connect(m_Ui->Menu_Paste,      SIGNAL(triggered()), this, SLOT(PasteNode()));
-	connect(m_Ui->Menu_Duplicate,  SIGNAL(triggered()), this, SLOT(DuplicateNode()));
-	connect(m_Ui->Menu_Delete,     SIGNAL(triggered()), this, SLOT(DeleteNode()));
-	connect(m_Ui->Menu_Export,     SIGNAL(triggered()), this, SLOT(ExportNode()));
-	connect(m_Ui->Menu_Import,     SIGNAL(triggered()), this, SLOT(ImportNode()));
+	connect(m_Ui->Menu_DefaultTheme, SIGNAL(triggered()), this, SLOT(DefaultTheme()));
+	connect(m_Ui->Menu_DarkTheme,    SIGNAL(triggered()), this, SLOT(DarkTheme()));
+	connect(m_Ui->Menu_SystemTheme,  SIGNAL(triggered()), this, SLOT(SystemTheme()));
 
-	connect(m_Ui->Menu_About,      SIGNAL(triggered()), this, SLOT(ShowAbout()));
+	connect(m_Ui->Menu_Cut,          SIGNAL(triggered()), this, SLOT(CutNode()));
+	connect(m_Ui->Menu_Copy,         SIGNAL(triggered()), this, SLOT(CopyNode()));
+	connect(m_Ui->Menu_Paste,        SIGNAL(triggered()), this, SLOT(PasteNode()));
+	connect(m_Ui->Menu_Duplicate,    SIGNAL(triggered()), this, SLOT(DuplicateNode()));
+	connect(m_Ui->Menu_Delete,       SIGNAL(triggered()), this, SLOT(DeleteNode()));
+	connect(m_Ui->Menu_Export,       SIGNAL(triggered()), this, SLOT(ExportNode()));
+	connect(m_Ui->Menu_Import,       SIGNAL(triggered()), this, SLOT(ImportNode()));
 
-	auto  menuCreate      = m_Ui->Menu_Create;
-	auto  actionsCreate   = QList<QAction*>();
-	auto& nodeDefinitions = m_Definitions->GetNodes();
+	connect(m_Ui->Menu_About,        SIGNAL(triggered()), this, SLOT(ShowAbout()));
 
-	foreach (definition, nodeDefinitions)
+	UpdateRecentFilesMenu();
+
+	UpdateDefinitionActions();
+
+	m_StartWindow = new StartWindow(m_Settings, this, m_Ui->Container);
+	m_StartWindow->installEventFilter(this);
+
+	m_Ui->ContainerVerticalLayout->insertWidget(0, m_StartWindow);
+	m_Ui->Tabs->hide();
+
+#ifdef Q_OS_WIN
+	auto uxThemeLibrary = LoadLibraryA("uxtheme.dll");
+	if (uxThemeLibrary != null)
 	{
-		if ((definition->Fields.isEmpty() == false && definition->Fields[0].FieldType->Type == Definitions::ENodeFieldType::Unknown) ||
-			(definition->Name == "Unknown"))
-			continue;
-
-		auto action = new CreateAction(&(*definition), menuCreate);
-		connect(action, SIGNAL(triggered()), this, SLOT(CreateNode()));
-
-		actionsCreate.push_back(action);
+		m_ShouldAppsUseDarkMode = reinterpret_cast<TShouldAppsUseDarkMode>(GetProcAddress(uxThemeLibrary, MAKEINTRESOURCEA(132)));
 	}
+	else
+	{
+		m_ShouldAppsUseDarkMode = null;
+	}
+	m_UxThemeLibrary = uxThemeLibrary;
+#else
+	m_UxThemeLibrary        = null;
+	m_ShouldAppsUseDarkMode = null;
+#endif
 
-	menuCreate->addActions(actionsCreate);
+	auto activeTheme = m_Settings->value(ACTIVE_THEME, -1);
+	if (activeTheme == 0)
+	{
+		DefaultTheme();
+	}
+	else if (activeTheme == 1)
+	{
+		DarkTheme();
+	}
+	else
+	{
+		SystemTheme();
+	}
 }
 
 Window::~Window()
 {
-	disconnect(m_Ui->Menu_New,        SIGNAL(triggered()), this, SLOT(NewFile()));
-	disconnect(m_Ui->Menu_Open,       SIGNAL(triggered()), this, SLOT(OpenFile()));
-	disconnect(m_Ui->Menu_OpenRecent, SIGNAL(triggered()), this, SLOT(OpenRecentFile()));
-	disconnect(m_Ui->Menu_Reload,     SIGNAL(triggered()), this, SLOT(ReloadFile()));
-	disconnect(m_Ui->Menu_Save,       SIGNAL(triggered()), this, SLOT(SaveFile()));
-	disconnect(m_Ui->Menu_SaveAs,     SIGNAL(triggered()), this, SLOT(SaveAsFile()));
-	disconnect(m_Ui->Menu_Close,      SIGNAL(triggered()), this, SLOT(CloseFile()));
-	disconnect(m_Ui->Menu_Exit,       SIGNAL(triggered()), this, SLOT(ExitApp()));
+	disconnect(m_Ui->Menu_New,          SIGNAL(triggered()), this, SLOT(NewFile()));
+	disconnect(m_Ui->Menu_Open,         SIGNAL(triggered()), this, SLOT(OpenFile()));
+	disconnect(m_Ui->Menu_OpenRecent,   SIGNAL(triggered()), this, SLOT(OpenRecentFile()));
+	disconnect(m_Ui->Menu_Reload,       SIGNAL(triggered()), this, SLOT(ReloadFile()));
+	disconnect(m_Ui->Menu_Save,         SIGNAL(triggered()), this, SLOT(SaveFile()));
+	disconnect(m_Ui->Menu_SaveAs,       SIGNAL(triggered()), this, SLOT(SaveAsFile()));
+	disconnect(m_Ui->Menu_Close,        SIGNAL(triggered()), this, SLOT(CloseFile()));
+	disconnect(m_Ui->Menu_Exit,         SIGNAL(triggered()), this, SLOT(ExitApp()));
 
-	disconnect(m_Ui->Menu_Cut,        SIGNAL(triggered()), this, SLOT(CutNode()));
-	disconnect(m_Ui->Menu_Copy,       SIGNAL(triggered()), this, SLOT(CopyNode()));
-	disconnect(m_Ui->Menu_Paste,      SIGNAL(triggered()), this, SLOT(PasteNode()));
-	disconnect(m_Ui->Menu_Duplicate,  SIGNAL(triggered()), this, SLOT(DuplicateNode()));
-	disconnect(m_Ui->Menu_Delete,     SIGNAL(triggered()), this, SLOT(DeleteNode()));
-	disconnect(m_Ui->Menu_Export,     SIGNAL(triggered()), this, SLOT(ExportNode()));
-	disconnect(m_Ui->Menu_Import,     SIGNAL(triggered()), this, SLOT(ImportNode()));
+	disconnect(m_Ui->Menu_DefaultTheme, SIGNAL(triggered()), this, SLOT(DefaultTheme()));
+	disconnect(m_Ui->Menu_DarkTheme,    SIGNAL(triggered()), this, SLOT(DarkTheme()));
+	disconnect(m_Ui->Menu_SystemTheme,  SIGNAL(triggered()), this, SLOT(SystemTheme()));
 
-	disconnect(m_Ui->Menu_About,      SIGNAL(triggered()), this, SLOT(ShowAbout()));
+	disconnect(m_Ui->Menu_Cut,          SIGNAL(triggered()), this, SLOT(CutNode()));
+	disconnect(m_Ui->Menu_Copy,         SIGNAL(triggered()), this, SLOT(CopyNode()));
+	disconnect(m_Ui->Menu_Paste,        SIGNAL(triggered()), this, SLOT(PasteNode()));
+	disconnect(m_Ui->Menu_Duplicate,    SIGNAL(triggered()), this, SLOT(DuplicateNode()));
+	disconnect(m_Ui->Menu_Delete,       SIGNAL(triggered()), this, SLOT(DeleteNode()));
+	disconnect(m_Ui->Menu_Export,       SIGNAL(triggered()), this, SLOT(ExportNode()));
+	disconnect(m_Ui->Menu_Import,       SIGNAL(triggered()), this, SLOT(ImportNode()));
+
+	disconnect(m_Ui->Menu_About,        SIGNAL(triggered()), this, SLOT(ShowAbout()));
 
 	auto actionsCreate = m_Ui->Menu_Create->actions();
 	foreach (action, actionsCreate)
@@ -146,7 +190,25 @@ Window::~Window()
 	disconnect(tabs, SIGNAL(currentChanged(int)),    this, SLOT(UpdateEditMenu(int)));
 	disconnect(tabs, SIGNAL(tabCloseRequested(int)), this, SLOT(CloseFile(int)));
 
+	foreach (action, m_RecentFileActions)
+	{
+		disconnect(*action, SIGNAL(triggered()), this, SLOT(OpenRecentFile()));
+	}
+
+	m_RecentFileActions.clear();
+
+	m_StartWindow->removeEventFilter(this);
+	m_StartWindow->Cleanup();
+
 	delete m_Ui;
+
+#ifdef Q_OS_WIN
+	HMODULE uxThemeLibrary = reinterpret_cast<HMODULE>(m_UxThemeLibrary);
+	if (uxThemeLibrary != null)
+	{
+		FreeLibrary(uxThemeLibrary);
+	}
+#endif
 }
 
 void Window::AddDocument(Document* document)
@@ -166,6 +228,9 @@ void Window::AddDocument(Document* document)
 
 	tabs->addTab(tab, GetFileName(document));
 	tabs->setCurrentIndex(tabs->count() - 1);
+
+	m_StartWindow->hide();
+	tabs->show();
 
 	m_Ui->Menu_Reload->setEnabled(true);
 	m_Ui->Menu_Save->setEnabled(true);
@@ -214,12 +279,15 @@ void Window::RemoveDocumemt(Djbozkosz::Application::Document* document)
 		{
 			(*action)->setEnabled(false);
 		}
+
+		tabs->hide();
+		m_StartWindow->show();
 	}
 }
 
 bool Window::eventFilter(QObject* object, QEvent* event)
 {
-	if (object == m_Ui->Tabs && event->type() == QEvent::MouseButtonDblClick)
+	if ((object == m_Ui->Tabs || object == m_StartWindow) && event->type() == QEvent::MouseButtonDblClick)
 	{
 		OpenFile();
 	}
@@ -240,6 +308,22 @@ void Window::closeEvent(QCloseEvent* event)
 	}
 }
 
+void Window::dragEnterEvent(QDragEnterEvent *event)
+{
+	event->setDropAction(Qt::CopyAction);
+	event->accept();
+}
+
+void Window::dropEvent(QDropEvent *event)
+{
+	auto urls = event->mimeData()->urls();
+
+	foreach (url, urls)
+	{
+		OpenFile(url->toLocalFile());
+	}
+}
+
 void Window::NewFile()
 {
 	emit FileCreated(m_NewFileCounter++);
@@ -251,18 +335,47 @@ void Window::OpenFile()
 	if (file.isEmpty() == true)
 		return;
 
+	OpenFile(file);
+}
+
+void Window::OpenFile(const QString& file)
+{
 	emit FileOpened(file);
 
-	m_Settings->setValue(RECENT_FILE_PATH, file);
+	AddRecentFile(file);
 }
 
 void Window::OpenRecentFile()
 {
-	auto file = m_Settings->value(RECENT_FILE_PATH).toString();
-	if (file.isEmpty() == true)
+	auto file = QString();
+
+	auto action = qobject_cast<QAction*>(sender());
+	if (action != null)
+	{
+		file = action->text();
+	}
+
+	if (QFileInfo(file).isFile() == false)
+	{
+		auto pushButton = qobject_cast<QPushButton*>(sender());
+		if (pushButton != null)
+		{
+			file = pushButton->text();
+		}
+	}
+
+	if (QFileInfo(file).isFile() == false)
+	{
+		if (m_RecentFileActions.isEmpty() == false)
+		{
+			file = m_RecentFileActions[0]->text();
+		}
+	}
+
+	if (QFileInfo(file).isFile() == false)
 		return;
 
-	emit FileOpened(file);
+	OpenFile(file);
 }
 
 void Window::ReloadFile()
@@ -444,9 +557,99 @@ void Window::ImportNode()
 	AddNode(reader);
 }
 
+void Window::DefaultTheme()
+{
+	m_Ui->Menu_DefaultTheme->setChecked(true);
+	m_Ui->Menu_DarkTheme   ->setChecked(false);
+	m_Ui->Menu_SystemTheme ->setChecked(false);
+
+	m_Settings->setValue(ACTIVE_THEME, 0);
+
+	UpdateTheme(false);
+}
+
+void Window::DarkTheme()
+{
+	m_Ui->Menu_DefaultTheme->setChecked(false);
+	m_Ui->Menu_DarkTheme   ->setChecked(true);
+	m_Ui->Menu_SystemTheme ->setChecked(false);
+
+	m_Settings->setValue(ACTIVE_THEME, 1);
+
+	UpdateTheme(true);
+}
+
+void Window::SystemTheme()
+{
+	m_Ui->Menu_DefaultTheme->setChecked(false);
+	m_Ui->Menu_DarkTheme   ->setChecked(false);
+	m_Ui->Menu_SystemTheme ->setChecked(true);
+
+	m_Settings->setValue(ACTIVE_THEME, -1);
+
+	UpdateTheme(IsSystemDarkThemeActive());
+}
+
 void Window::ShowAbout()
 {
 	QMessageBox::about(this, windowTitle(), ABOUT_TEXT);
+}
+
+void Window::UpdateTheme(bool isDarkMode)
+{
+	if (isDarkMode == true)
+	{
+		/*
+		* stylesheet setup:
+
+		* background hue:        210
+		* background saturation:   0
+		* background brightness:  46
+		* background depth:       10
+
+		* highlight  hue:        210
+		* highlight  saturation: 255
+		* highlight  brightness: 160
+		* highlight  depth:       24
+
+		* font       hue:          0
+		* font       saturation:   0
+		* font       brightness: 255
+		* font       size:         8
+		*/
+
+		auto palette = m_DefaultPalette;
+		palette.setColor(QPalette::Window,          QColor("#2e2e2e"));
+		palette.setColor(QPalette::WindowText,      QColor("#ffffff"));
+		palette.setColor(QPalette::Button,          QColor("#2e2e2e"));
+		palette.setColor(QPalette::Light,           QColor("#003383"));
+		palette.setColor(QPalette::Midlight,        QColor("#1c6cbc"));
+		palette.setColor(QPalette::Dark,            QColor("#424242"));
+		palette.setColor(QPalette::Mid,             QColor("#333333"));
+		palette.setColor(QPalette::Text,            QColor("#ffffff"));
+		palette.setColor(QPalette::BrightText,      QColor("#000000"));
+		palette.setColor(QPalette::ButtonText,      QColor("#ffffff"));
+		palette.setColor(QPalette::Base,            QColor("#2e2e2e"));
+		palette.setColor(QPalette::Shadow,          QColor("#424242"));
+		palette.setColor(QPalette::Highlight,       QColor("#3399ff"));
+		palette.setColor(QPalette::HighlightedText, QColor("#ffffff"));
+		palette.setColor(QPalette::Link,            QColor("#3399ff"));
+		palette.setColor(QPalette::LinkVisited,     QColor("#3399ff"));
+		palette.setColor(QPalette::AlternateBase,   QColor("#333333"));
+		qApp->setPalette(palette);
+
+		QFile stylesheetResource(":/stylesheet/stylesheet.css");
+		stylesheetResource.open(QIODevice::ReadOnly);
+		auto stylesheet = QString::fromUtf8(stylesheetResource.readAll());
+		qApp->setStyleSheet(stylesheet);
+	}
+	else
+	{
+		qApp->setPalette(m_DefaultPalette);
+		qApp->setStyleSheet(QString());
+	}
+
+	m_StartWindow->UpdateTheme(isDarkMode);
 }
 
 void Window::UpdateEditMenu(int tabIdx)
@@ -501,6 +704,23 @@ void Window::UpdateDirtyState(bool isDirty)
 	auto idx      = GetCurrentTabIdx();
 
 	m_Ui->Tabs->setTabText(idx, file);
+}
+
+bool Window::IsSystemDarkThemeActive() const
+{
+	auto isDark = false;
+
+	if (m_ShouldAppsUseDarkMode != null)
+	{
+		isDark = m_ShouldAppsUseDarkMode();
+	}
+
+	if (isDark == true)
+		return true;
+
+	isDark = (m_DefaultPalette.window().color().value() < 128);
+
+	return isDark;
 }
 
 DocumentWindow* Window::GetTab(int idx) const
@@ -569,6 +789,82 @@ bool Window::AddNode(SceneNode* node)
 	return GetCurrentTab()->AddNode(node, parentItem, idx);
 }
 
+void Window::UpdateDefinitionActions()
+{
+	auto  menuCreate      = m_Ui->Menu_Create;
+	auto  actionsCreate   = QList<QAction*>();
+	auto& nodeDefinitions = m_Definitions->GetNodes();
+
+	foreach (definition, nodeDefinitions)
+	{
+		if ((definition->Fields.isEmpty() == false && definition->Fields[0].FieldType->Type == Definitions::ENodeFieldType::Unknown) ||
+			(definition->Name == "Unknown"))
+			continue;
+
+		auto action = new CreateAction(&(*definition), menuCreate);
+		connect(action, SIGNAL(triggered()), this, SLOT(CreateNode()));
+
+		actionsCreate.push_back(action);
+	}
+
+	menuCreate->addActions(actionsCreate);
+}
+
+void Window::AddRecentFile(const QString& filename)
+{
+	auto file = filename;
+	file.replace("/", "\\");
+
+	auto recentFiles = m_Settings->value(RECENT_FILE_PATHS).toStringList();
+
+	while (true)
+	{
+		auto recentFileIdx = recentFiles.indexOf(file);
+		if (recentFileIdx == -1)
+			break;
+
+		recentFiles.removeAt(recentFileIdx);
+	}
+
+	recentFiles.push_front(file);
+
+	while (recentFiles.size() > MAX_RECENT_FILES)
+	{
+		recentFiles.pop_back();
+	}
+
+	m_Settings->setValue(RECENT_FILE_PATHS, recentFiles);
+
+	UpdateRecentFilesMenu();
+	m_StartWindow->UpdateRecentFilesMenu();
+}
+
+void Window::UpdateRecentFilesMenu()
+{
+	auto recentFiles = m_Settings->value(RECENT_FILE_PATHS).toStringList();
+
+	foreach (action, m_RecentFileActions)
+	{
+		disconnect(*action, SIGNAL(triggered()), this, SLOT(OpenRecentFile()));
+
+		m_Ui->Menu_File->removeAction(*action);
+		(*action)->deleteLater();
+	}
+
+	m_RecentFileActions.clear();
+
+	foreach (file, recentFiles)
+	{
+		auto action = new QAction(*file, m_Ui->Menu_File);
+		connect(action, SIGNAL(triggered()), this, SLOT(OpenRecentFile()));
+
+		m_Ui->Menu_File->insertAction(m_Ui->Menu_Exit, action);
+		m_RecentFileActions.push_back(action);
+	}
+
+	m_Ui->Menu_File->insertSeparator(m_Ui->Menu_Exit);
+}
+
 void Window::SaveDocument(Document* document, bool replace)
 {
 	auto file = document->GetFile();
@@ -585,7 +881,7 @@ void Window::SaveDocument(Document* document, bool replace)
 	emit FileSaved(document, file);
 	m_Status->setText("Saved.");
 
-	m_Settings->setValue(RECENT_FILE_PATH, file);
+	AddRecentFile(file);
 }
 
 QString Window::GetFileName(Document* document, bool useDirtyState)

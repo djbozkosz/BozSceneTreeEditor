@@ -3,7 +3,7 @@ QT                 += core gui widgets
 TEMPLATE            = app
 
 TARGET              = BozSceneTreeEditor
-VERSION             = 1.0.1
+VERSION             = 1.1.0
 RC_ICONS            = images/icons/icon.ico
 
 CONFIG(release, debug|release) {

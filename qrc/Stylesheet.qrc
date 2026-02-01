@@ -1,0 +1,13 @@
+<RCC>
+	<qresource prefix="/stylesheet">
+		<file alias="stylesheet.css">../src/GUI/Stylesheet.css</file>
+		<file alias="arrow_down.png">../images/stylesheet/arrow_down.png</file>
+		<file alias="arrow_left.png">../images/stylesheet/arrow_left.png</file>
+		<file alias="arrow_right.png">../images/stylesheet/arrow_right.png</file>
+		<file alias="arrow_up.png">../images/stylesheet/arrow_up.png</file>
+		<file alias="close.png">../images/stylesheet/close.png</file>
+		<file alias="checked.png">../images/stylesheet/checked.png</file>
+		<file alias="indeterminate.png">../images/stylesheet/indeterminate.png</file>
+		<file alias="radio.png">../images/stylesheet/radio.png</file>
+	</qresource>
+</RCC>

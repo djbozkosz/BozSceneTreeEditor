@@ -1,9 +1,11 @@
 #ifndef APPLICATION_GUI_WINDOW_H
 #define APPLICATION_GUI_WINDOW_H
 
-#include <QMainWindow>
-#include <QString>
 #include <QAction>
+#include <QList>
+#include <QMainWindow>
+#include <QPalette>
+#include <QString>
 
 #include "Scene/Definitions.h"
 
@@ -34,6 +36,7 @@ namespace GUI
 {
 	class NodeItem;
 	class DocumentWindow;
+	class StartWindow;
 
 
 	using namespace Djbozkosz::Application::Scene;
@@ -66,11 +69,18 @@ namespace GUI
 
 		Q_OBJECT
 
+		private: // types
+
+		typedef bool (__stdcall *TShouldAppsUseDarkMode)();
+
 		private: // constants
 
+		static const int     MAX_RECENT_FILES;
+
+		static const QString ACTIVE_THEME;
 		static const QString OPEN_FILE_DIALOG_PATH;
 		static const QString SAVE_FILE_DIALOG_PATH;
-		static const QString RECENT_FILE_PATH;
+		static const QString RECENT_FILE_PATHS;
 
 		static const QString IMPORT_FILE_DIALOG_PATH;
 		static const QString EXPORT_FILE_DIALOG_PATH;
@@ -79,18 +89,27 @@ namespace GUI
 
 		private: // members
 
-		int                 m_NewFileCounter;
+		StartWindow*           m_StartWindow;
 
-		QSettings*          m_Settings;
-		Scene::Definitions* m_Definitions;
+		int                    m_NewFileCounter;
 
-		Ui::Window*         m_Ui;
-		QLabel*             m_Status;
-		QProgressBar*       m_Progress;
+		QSettings*             m_Settings;
+		Scene::Definitions*    m_Definitions;
 
-		DocumentWindow*     m_ClipboardTab;
-		SceneNode*          m_ClipboardNode;
-		bool                m_ClipboardIsCut;
+		Ui::Window*            m_Ui;
+		QLabel*                m_Status;
+		QProgressBar*          m_Progress;
+
+		void*                  m_UxThemeLibrary;
+		TShouldAppsUseDarkMode m_ShouldAppsUseDarkMode;
+
+		QPalette               m_DefaultPalette;
+
+		QList<QAction*>        m_RecentFileActions;
+
+		DocumentWindow*        m_ClipboardTab;
+		SceneNode*             m_ClipboardNode;
+		bool                   m_ClipboardIsCut;
 
 		public: // methods
 
@@ -115,12 +134,15 @@ namespace GUI
 		private: // QMainWindow implementation
 
 		override void closeEvent(QCloseEvent* event);
+		override void dragEnterEvent(QDragEnterEvent *event);
+		override void dropEvent(QDropEvent *event);
 
-		private slots: // handlers
+		public slots: // handlers
 
 		// File
 		void NewFile();
 		void OpenFile();
+		void OpenFile(const QString& file);
 		void OpenRecentFile();
 		void ReloadFile();
 		void SaveFile();
@@ -140,9 +162,17 @@ namespace GUI
 		void ExportNode();
 		void ImportNode();
 
+		// Window
+		void DefaultTheme();
+		void DarkTheme();
+		void SystemTheme();
+
 		// Help
 		void ShowAbout();
 
+		private slots: // handlers
+
+		void UpdateTheme(bool isDarkMode);
 		void UpdateEditMenu(int tabIdx);
 		void UpdateEditMenu(NodeItem* nodeItem, bool isFullyDisabled = false);
 		void ShowEditMenu(QPoint point);
@@ -150,6 +180,8 @@ namespace GUI
 		void UpdateDirtyState(bool isDirty);
 
 		private: // methods
+
+		bool IsSystemDarkThemeActive() const;
 
 		DocumentWindow* GetTab(int idx)      const;
 		DocumentWindow* GetCurrentTab()      const;
@@ -159,6 +191,11 @@ namespace GUI
 		void GetAddNodeContext(NodeItem*& parentItem, SceneNode*& parentNode, int& idx);
 		void AddNode(QIODevice& reader);
 		bool AddNode(SceneNode* node);
+
+		void UpdateDefinitionActions();
+
+		void AddRecentFile(const QString& filename);
+		void UpdateRecentFilesMenu();
 
 		void SaveDocument(Document* document, bool replace);
 

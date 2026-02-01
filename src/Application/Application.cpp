@@ -1,3 +1,5 @@
+#include <QDir>
+#include <QFileInfo>
 #include <QSettings>
 
 #include "Application/Application.h"
@@ -20,6 +22,28 @@ Application::Application(int argc, char* argv[]) : QApplication(argc, argv)
 {
 	QCoreApplication::setOrganizationName("djbozkosz");
 	QCoreApplication::setApplicationName("BozSceneTreeEditor");
+
+	auto arguments    = QCoreApplication::arguments();
+	auto argDocuments = QStringList();
+
+	for (int idx = 1, count = arguments.size(); idx < count; idx++)
+	{
+		auto argument = arguments[idx];
+		auto isFile   = QFileInfo(argument).isFile();
+
+		if (isFile == true)
+		{
+			argDocuments.push_back(argument);
+		}
+	}
+
+	if (argDocuments.isEmpty() == false)
+	{
+		// restore the working dir back to app path
+		// when the app is started via file "opwn with" or file drag & drop
+		QDir::setCurrent(QCoreApplication::applicationDirPath());
+	}
+
 	m_Settings    = new QSettings();
 	m_Definitions = new Scene::Definitions();
 
@@ -31,6 +55,11 @@ Application::Application(int argc, char* argv[]) : QApplication(argc, argv)
 	connect(m_Window, SIGNAL(FileReloaded(Document*)),       this, SLOT(ReloadDocument(Document*)));
 	connect(m_Window, SIGNAL(FileSaved(Document*, QString)), this, SLOT(SaveDocument(Document*, QString)));
 	connect(m_Window, SIGNAL(FileClosed(Document*)),         this, SLOT(CloseDocument(Document*)));
+
+	foreach (document, argDocuments)
+	{
+		m_Window->OpenFile(*document);
+	}
 }
 
 Application::~Application()

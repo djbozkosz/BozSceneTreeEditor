@@ -10,6 +10,15 @@
     <height>700</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>640</width>
+    <height>400</height>
+   </size>
+  </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
   <property name="windowTitle">
    <string>Boz Scene Tree Editor</string>
   </property>
@@ -32,12 +41,6 @@
     </property>
     <item>
      <widget class="QTabWidget" name="Tabs">
-      <property name="minimumSize">
-       <size>
-        <width>400</width>
-        <height>200</height>
-       </size>
-      </property>
       <property name="currentIndex">
        <number>-1</number>
       </property>
@@ -54,7 +57,7 @@
      <x>0</x>
      <y>0</y>
      <width>1260</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="Menu_File">
@@ -89,7 +92,7 @@
       <bool>false</bool>
      </property>
      <property name="title">
-      <string>&amp;Create</string>
+      <string>C&amp;reate</string>
      </property>
     </widget>
     <addaction name="Menu_Cut"/>
@@ -103,8 +106,17 @@
     <addaction name="Menu_Import"/>
     <addaction name="Menu_Export"/>
    </widget>
+   <widget class="QMenu" name="Menu_Window">
+    <property name="title">
+     <string>&amp;Window</string>
+    </property>
+    <addaction name="Menu_DefaultTheme"/>
+    <addaction name="Menu_DarkTheme"/>
+    <addaction name="Menu_SystemTheme"/>
+   </widget>
    <addaction name="Menu_File"/>
    <addaction name="Menu_Edit"/>
+   <addaction name="Menu_Window"/>
    <addaction name="Menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="StatusBar"/>
@@ -255,7 +267,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>D&amp;uplicate</string>
+    <string>&amp;Duplicate</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+D</string>
@@ -272,6 +284,30 @@
   <action name="actionAaa">
    <property name="text">
     <string>aaa</string>
+   </property>
+  </action>
+  <action name="Menu_DefaultTheme">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Default Theme</string>
+   </property>
+  </action>
+  <action name="Menu_DarkTheme">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>D&amp;ark Theme</string>
+   </property>
+  </action>
+  <action name="Menu_SystemTheme">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;System Theme</string>
    </property>
   </action>
  </widget>
