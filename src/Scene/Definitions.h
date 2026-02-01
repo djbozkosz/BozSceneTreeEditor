@@ -1,10 +1,10 @@
 #ifndef APPLICATION_SCENE_DEFINITIONS_H
 #define APPLICATION_SCENE_DEFINITIONS_H
 
-#include <QString>
 #include <QRegExp>
-#include <QVector>
 #include <QMap>
+#include <QString>
+#include <QVector>
 
 #include "Utility/Base.h"
 

@@ -1,8 +1,8 @@
 #ifndef APPLICATION_SCENE_SCENENODESERIALIZER_H
 #define APPLICATION_SCENE_SCENENODESERIALIZER_H
 
-#include <QVector>
 #include <QIODevice>
+#include <QVector>
 
 #include "Scene/Definitions.h"
 

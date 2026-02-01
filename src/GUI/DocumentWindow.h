@@ -1,11 +1,11 @@
 #ifndef APPLICATION_GUI_DOCUMENTWINDOW_H
 #define APPLICATION_GUI_DOCUMENTWINDOW_H
 
-#include <QWidget>
+#include <QPoint>
+#include <QTableWidgetItem>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-#include <QTableWidgetItem>
-#include <QPoint>
+#include <QWidget>
 
 #include "Scene/Definitions.h"
 #include "Scene/SceneNodeUtility.h"
@@ -116,7 +116,7 @@ namespace GUI
 
 
 	sealed class DocumentWindow : public QWidget
-	{											 
+	{
 		private:
 
 		Q_OBJECT
@@ -131,7 +131,7 @@ namespace GUI
 		QAction*            m_FilterClearAction;
 		NodeItem*           m_FilterNodeItemBackup;
 
-		public: // methodssetup
+		public: // methods
 
 		explicit DocumentWindow(Document* document, Definitions* definitions, QWidget* parent = null);
 		virtual ~DocumentWindow();

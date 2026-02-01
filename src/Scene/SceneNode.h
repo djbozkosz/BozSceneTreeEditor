@@ -2,9 +2,9 @@
 #define APPLICATION_SCENE_SCENENODE_H
 
 #include <QFile>
-#include <QVector>
 #include <QVariant>
 #include <QVariantList>
+#include <QVector>
 
 #include "Scene/Definitions.h"
 

@@ -1,12 +1,12 @@
 #include "Utility/PreBase.h"
 
-#include <QStringList>
-#include <QTableWidgetItem>
-#include <QMenu>
-#include <QPoint>
-#include <QEvent>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <QEvent>
+#include <QMenu>
+#include <QPoint>
+#include <QStringList>
+#include <QTableWidgetItem>
 
 #include "ui_DocumentWindow.h"
 
